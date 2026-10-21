@@ -125,7 +125,52 @@ class AuthPasswordCredential(Base):
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     failed_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    email_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at = created_at_column()
+    updated_at = updated_at_column()
+
+
+class AuthEmailVerificationToken(Base):
+    __tablename__ = "auth_email_verification_tokens"
+    __table_args__ = (
+        CheckConstraint(
+            "delivery_status in ('pending', 'sent', 'failed')",
+            name="auth_email_verification_tokens_delivery_status_allowed",
+        ),
+        UniqueConstraint("token_hash", name="uq_auth_email_verification_tokens_token_hash"),
+        Index(
+            "ix_auth_email_verification_tokens_credential_created",
+            "credential_id",
+            "created_at",
+        ),
+        Index("ix_auth_email_verification_tokens_expires_at", "expires_at"),
+    )
+
+    id = uuid_primary_key()
+    credential_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True),
+        ForeignKey("auth_password_credentials.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    workspace_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True),
+        ForeignKey("workspaces.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    delivery_status: Mapped[str] = mapped_column(String(32), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    invalidated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at = created_at_column()
     updated_at = updated_at_column()
 

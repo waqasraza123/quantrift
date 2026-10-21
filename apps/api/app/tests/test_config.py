@@ -183,6 +183,31 @@ def test_production_rejects_wildcard_cors_origin() -> None:
         )
 
 
+def test_production_session_signup_requires_email_provider() -> None:
+    with pytest.raises(ValueError, match="AUTH_EMAIL_PROVIDER"):
+        Settings(
+            _env_file=None,
+            app_env=AppEnvironment.PRODUCTION,
+            auth_mode="session",
+        )
+
+
+def test_smtp_email_provider_requires_delivery_settings() -> None:
+    with pytest.raises(ValueError, match="AUTH_SMTP_HOST"):
+        Settings(_env_file=None, auth_email_provider="smtp")
+
+
+def test_smtp_email_provider_accepts_complete_settings() -> None:
+    settings = Settings(
+        _env_file=None,
+        auth_email_provider="smtp",
+        auth_email_from_address="security@example.test",
+        auth_smtp_host="smtp.example.test",
+    )
+
+    assert settings.auth_email_provider == "smtp"
+
+
 def test_quality_thresholds_must_be_ordered() -> None:
     with pytest.raises(ValueError, match="INTELLIGENCE_QUALITY_STRONG_THRESHOLD"):
         Settings(

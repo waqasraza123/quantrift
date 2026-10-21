@@ -1,6 +1,5 @@
 import { getServerApiProxyEnv } from "@/config/serverEnv";
 import { isTrustedMutationRequest, untrustedOriginResponse } from "../origin";
-import { isBackendAuthSession, setAuthSessionCookie } from "../session";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,10 +21,10 @@ export async function POST(request: Request): Promise<Response> {
       cache: "no-store",
     });
     const payload = await parseJson(response);
-    if (response.ok && isBackendAuthSession(payload)) {
-      await setAuthSessionCookie(payload.access_token, payload.expires_at);
-    }
-    return Response.json(payload, { status: response.status });
+    return Response.json(payload, {
+      status: response.status,
+      headers: { "cache-control": "no-store" },
+    });
   } catch {
     return Response.json(
       { error: { code: "auth_backend_unavailable", message: "Unable to reach auth API" } },

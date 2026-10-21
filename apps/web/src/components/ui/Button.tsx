@@ -10,6 +10,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  loadingText?: string;
 };
 
 type ButtonLinkProps = {
@@ -34,14 +35,22 @@ const sizeClassName: Record<ButtonSize, string> = {
   lg: "min-h-11 px-4 py-2.5 text-sm",
 };
 
-export function Button({ variant = "secondary", size = "md", loading = false, disabled, children, className, ...props }: ButtonProps) {
+export function Button({ variant = "secondary", size = "md", loading = false, loadingText = "Loading", disabled, children, className, ...props }: ButtonProps) {
   return (
     <button
       className={buttonClassName(variant, size, className)}
       {...props}
       disabled={disabled || loading}
     >
-      {loading ? "Loading" : children}
+      {loading ? (
+        <>
+          <span
+            aria-hidden="true"
+            className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none"
+          />
+          <span>{loadingText}</span>
+        </>
+      ) : children}
     </button>
   );
 }

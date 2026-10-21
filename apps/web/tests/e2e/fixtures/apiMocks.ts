@@ -10,6 +10,12 @@ export type MockApiScenario =
   | "daily-workflow-populated"
   | "quick-action-unsupported"
   | "navigation-empty"
+  | "auth-register-success"
+  | "auth-register-failure"
+  | "auth-login-success"
+  | "auth-login-unverified"
+  | "auth-login-failure"
+  | "auth-resend-failure"
   | "safe-copy";
 
 export const mockApiBaseUrl = process.env.E2E_MOCK_API_BASE_URL || "http://127.0.0.1:4010";

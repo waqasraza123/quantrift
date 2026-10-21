@@ -1,15 +1,24 @@
+from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from typing import cast
 from uuid import uuid4
 
 import pytest
-from fastapi import Depends
+from fastapi import Depends, Request
 from httpx import ASGITransport, AsyncClient
 from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import AppEnvironment, Settings
+from app.core.errors import AppError
+from app.core.rate_limit import InMemoryRateLimiter
 from app.main import create_app
 from app.modules.auth.api_keys import api_key_prefix, generate_api_key, hash_api_key
+from app.modules.auth.email import (
+    DisabledVerificationEmailProvider,
+    VerificationEmail,
+    VerificationEmailDeliveryError,
+)
 from app.modules.auth.identity import IdentityContext
 from app.modules.auth.passwords import (
     generate_session_token,
@@ -19,8 +28,12 @@ from app.modules.auth.passwords import (
     password_needs_rehash,
     verify_password,
 )
-from app.modules.auth.routes import update_auth_profile
+from app.modules.auth.routes import enforce_auth_rate_limit, update_auth_profile
 from app.modules.auth.schemas import AuthProfileUpdateRequest, IdentitySource
+from app.modules.auth.verification import (
+    generate_email_verification_token,
+    hash_email_verification_token,
+)
 from app.modules.permissions.dependencies import require_permission
 from app.modules.permissions.registry import Permission
 from app.modules.users.models import User, UserRole
@@ -63,6 +76,62 @@ def test_session_token_hash_does_not_store_raw_token() -> None:
     assert raw_token.startswith("tai_session_")
     assert token_hash != raw_token
     assert hash_session_token(raw_token) == token_hash
+
+
+def test_email_verification_token_hash_does_not_store_raw_token() -> None:
+    raw_token = generate_email_verification_token()
+    token_hash = hash_email_verification_token(raw_token)
+
+    assert raw_token.startswith("qrv_")
+    assert token_hash != raw_token
+    assert hash_email_verification_token(raw_token) == token_hash
+
+
+@pytest.mark.asyncio
+async def test_disabled_email_provider_fails_closed() -> None:
+    with pytest.raises(VerificationEmailDeliveryError):
+        await DisabledVerificationEmailProvider().send_verification_email(
+            VerificationEmail(
+                recipient_email="analyst@example.test",
+                recipient_name="Analyst",
+                verification_url="https://app.example.test/verify-email?token=redacted",
+                expires_at=datetime.now(UTC) + timedelta(hours=1),
+            )
+        )
+
+
+@pytest.mark.asyncio
+async def test_auth_rate_limit_rejects_duplicate_attempts() -> None:
+    request = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/auth/email/resend",
+            "headers": [],
+            "client": ("127.0.0.1", 50000),
+            "server": ("test", 80),
+            "scheme": "http",
+            "query_string": b"",
+            "app": SimpleNamespace(state=SimpleNamespace(rate_limiter=InMemoryRateLimiter())),
+        }
+    )
+    await enforce_auth_rate_limit(
+        request,
+        scope="resend-verification",
+        identifier="analyst@example.test",
+        requests_per_minute=1,
+    )
+
+    with pytest.raises(AppError) as error:
+        await enforce_auth_rate_limit(
+            request,
+            scope="resend-verification",
+            identifier="analyst@example.test",
+            requests_per_minute=1,
+        )
+
+    assert error.value.status_code == 429
+    assert error.value.code == "auth_rate_limit_exceeded"
 
 
 @pytest.mark.asyncio

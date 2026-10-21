@@ -20,7 +20,7 @@ export async function POST(request: Request): Promise<Response> {
           authorization: `Bearer ${token}`,
           "content-type": "application/json",
         },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({}),
         cache: "no-store",
       });
     } catch {

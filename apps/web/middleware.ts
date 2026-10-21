@@ -5,6 +5,7 @@ const publicPaths = new Set([
   "/",
   "/login",
   "/register",
+  "/verify-email",
   "/icon.svg",
   "/manifest.webmanifest",
   "/robots.txt",

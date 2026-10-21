@@ -9,7 +9,10 @@ ROUTES_ROOT = Path(__file__).resolve().parents[2] / "modules"
 MUTATING_ROUTE_EXEMPTIONS: dict[tuple[str, str], str] = {
     ("POST", "/auth/login"): "credential exchange endpoint",
     ("POST", "/auth/logout"): "self-service session revocation",
+    ("POST", "/auth/email/resend"): "public email verification recovery endpoint",
+    ("POST", "/auth/email/verify"): "public email verification endpoint",
     ("POST", "/auth/password/change"): "self-service password credential rotation",
+    ("PATCH", "/auth/profile"): "self-service authenticated profile update",
     ("POST", "/auth/register"): "first-party account bootstrap endpoint",
     ("POST", "/auth/sessions/revoke-other"): "self-service session revocation",
     ("POST", "/auth/sessions/{session_id}/revoke"): "self-service session revocation",

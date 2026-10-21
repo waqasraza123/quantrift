@@ -4,9 +4,9 @@ import { getServerApiProxyEnv } from "@/config/serverEnv";
 const authCookieMaxAgeSeconds = 60 * 60 * 24;
 
 export type BackendAuthSession = {
-  access_token: string;
-  token_type: string;
-  expires_at: string;
+  accessToken: string;
+  tokenType: string;
+  expiresAt: string;
   identity: unknown;
 };
 
@@ -20,6 +20,8 @@ export async function setAuthSessionCookie(token: string, expiresAt: string): Pr
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge,
+    expires: new Date(expiresAt),
+    priority: "high",
   });
 }
 
@@ -41,6 +43,8 @@ export async function clearAuthSessionCookie(): Promise<void> {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 0,
+    expires: new Date(0),
+    priority: "high",
   });
 }
 
@@ -55,5 +59,10 @@ export function isBackendAuthSession(value: unknown): value is BackendAuthSessio
     return false;
   }
   const record = value as Record<string, unknown>;
-  return typeof record.access_token === "string" && typeof record.expires_at === "string";
+  return (
+    typeof record.accessToken === "string" &&
+    typeof record.expiresAt === "string" &&
+    typeof record.identity === "object" &&
+    record.identity !== null
+  );
 }

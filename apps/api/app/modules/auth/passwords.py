@@ -22,6 +22,7 @@ from app.modules.auth.models import (
     AuthSessionStatus,
 )
 from app.modules.auth.schemas import IdentitySource
+from app.modules.auth.verification import EmailVerificationService, IssuedEmailVerification
 from app.modules.users.models import User, UserRole
 from app.modules.workspaces.models import Workspace
 
@@ -44,6 +45,11 @@ class CreatedSession:
     identity: IdentityContext
 
 
+@dataclass(frozen=True)
+class RegisteredAccount:
+    verification: IssuedEmailVerification
+
+
 class PasswordAuthService:
     def __init__(self, session: AsyncSession, settings: Settings) -> None:
         self.session = session
@@ -56,7 +62,7 @@ class PasswordAuthService:
         name: str,
         email: str,
         password: str,
-    ) -> CreatedSession:
+    ) -> RegisteredAccount:
         if not self.settings.auth_password_enabled:
             raise AppError(404, "password_auth_disabled", "Password authentication is disabled")
         if not self.settings.auth_password_signup_enabled:
@@ -88,12 +94,20 @@ class PasswordAuthService:
         self.session.add(credential)
         try:
             await self.session.flush()
-            created_session = await self.create_session(user=user, workspace=workspace)
+            verification = await EmailVerificationService(
+                self.session,
+                self.settings,
+            ).issue(
+                credential=credential,
+                recipient_name=user.name,
+                enforce_cooldown=False,
+                commit=False,
+            )
             await self.session.commit()
         except IntegrityError as error:
             await self.session.rollback()
             raise AppError(409, "account_conflict", "Account already exists") from error
-        return created_session
+        return RegisteredAccount(verification=verification)
 
     async def login(self, *, email: str, password: str) -> CreatedSession:
         if not self.settings.auth_password_enabled:
@@ -110,6 +124,15 @@ class PasswordAuthService:
         if not verify_password(password, credential.password_hash):
             await self.record_failed_attempt(credential, now)
             raise invalid_credentials_error()
+        if credential.email_verified_at is None:
+            credential.failed_attempts = 0
+            credential.locked_until = None
+            await self.session.commit()
+            raise AppError(
+                403,
+                "email_unverified",
+                "Verify your email address before signing in",
+            )
         user = await self.session.get(User, credential.user_id)
         workspace = await self.session.get(Workspace, credential.workspace_id)
         if user is None or workspace is None or user.workspace_id != workspace.id:
@@ -143,6 +166,14 @@ class PasswordAuthService:
         user = await self.session.get(User, auth_session.user_id)
         workspace = await self.session.get(Workspace, auth_session.workspace_id)
         if user is None or workspace is None or user.workspace_id != workspace.id:
+            return None
+        credential = await self.get_credential_by_user(
+            user_id=auth_session.user_id,
+            workspace_id=auth_session.workspace_id,
+        )
+        if credential is None or credential.email_verified_at is None:
+            auth_session.status = AuthSessionStatus.REVOKED.value
+            await self.session.commit()
             return None
         auth_session.last_seen_at = now
         await self.session.commit()

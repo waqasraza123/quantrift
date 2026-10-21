@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "exemptRoutes": ["", "login", "register"],
+  "exemptRoutes": ["", "login", "register", "verify-email"],
   "routes": [
     {
       "route": "command-center",

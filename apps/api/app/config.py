@@ -194,6 +194,23 @@ class Settings(BaseSettings):
     auth_session_ttl_minutes: int = Field(default=1440, ge=15, le=43200)
     auth_password_failed_attempt_limit: int = Field(default=8, ge=1, le=100)
     auth_password_lockout_minutes: int = Field(default=15, ge=1, le=1440)
+    auth_email_verification_ttl_minutes: int = Field(default=60, ge=5, le=1440)
+    auth_email_resend_cooldown_seconds: int = Field(default=60, ge=0, le=3600)
+    auth_register_rate_limit_per_minute: int = Field(default=5, ge=1, le=100)
+    auth_login_rate_limit_per_minute: int = Field(default=10, ge=1, le=100)
+    auth_verification_rate_limit_per_minute: int = Field(default=10, ge=1, le=100)
+    auth_resend_rate_limit_per_minute: int = Field(default=3, ge=1, le=100)
+    auth_email_provider: str = "disabled"
+    auth_public_web_base_url: str = "http://localhost:3000"
+    auth_email_from_address: str | None = None
+    auth_email_from_name: str = "QuantRift"
+    auth_smtp_host: str | None = None
+    auth_smtp_port: int = Field(default=587, ge=1, le=65535)
+    auth_smtp_username: str | None = None
+    auth_smtp_password: SecretStr | None = None
+    auth_smtp_use_tls: bool = True
+    auth_smtp_use_ssl: bool = False
+    auth_smtp_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
     auth_dev_user_email: str | None = None
     auth_dev_workspace_id: str | None = None
     jwt_issuer: str | None = None
@@ -488,6 +505,25 @@ class Settings(BaseSettings):
             raise ValueError(msg)
         return normalized_value
 
+    @field_validator("auth_email_provider")
+    @classmethod
+    def validate_auth_email_provider(cls, value: str) -> str:
+        normalized_value = value.strip().lower()
+        if normalized_value not in {"disabled", "smtp"}:
+            msg = "AUTH_EMAIL_PROVIDER must be disabled or smtp"
+            raise ValueError(msg)
+        return normalized_value
+
+    @field_validator("auth_public_web_base_url")
+    @classmethod
+    def validate_auth_public_web_base_url(cls, value: str) -> str:
+        normalized_value = value.strip().rstrip("/")
+        url = urlsplit(normalized_value)
+        if url.scheme not in {"http", "https"} or not url.netloc:
+            msg = "AUTH_PUBLIC_WEB_BASE_URL must be an absolute HTTP(S) URL"
+            raise ValueError(msg)
+        return normalized_value
+
     @field_validator("jwt_algorithm")
     @classmethod
     def validate_jwt_algorithm(cls, value: str) -> str:
@@ -510,7 +546,15 @@ class Settings(BaseSettings):
             raise ValueError(msg)
         return normalized_value
 
-    @field_validator("auth_dev_user_email", "auth_dev_workspace_id", "jwt_issuer", "jwt_audience")
+    @field_validator(
+        "auth_dev_user_email",
+        "auth_dev_workspace_id",
+        "jwt_issuer",
+        "jwt_audience",
+        "auth_email_from_address",
+        "auth_smtp_host",
+        "auth_smtp_username",
+    )
     @classmethod
     def normalize_optional_auth_setting(cls, value: str | None) -> str | None:
         if value is None:
@@ -1014,6 +1058,28 @@ class Settings(BaseSettings):
             if not self.jwt_audience:
                 msg = "JWT_AUDIENCE is required when JWT auth is enabled"
                 raise ValueError(msg)
+        if self.auth_smtp_use_tls and self.auth_smtp_use_ssl:
+            msg = "AUTH_SMTP_USE_TLS and AUTH_SMTP_USE_SSL cannot both be true"
+            raise ValueError(msg)
+        if self.auth_email_provider == "smtp":
+            if not self.auth_smtp_host or not self.auth_email_from_address:
+                msg = (
+                    "AUTH_SMTP_HOST and AUTH_EMAIL_FROM_ADDRESS are required when "
+                    "AUTH_EMAIL_PROVIDER=smtp"
+                )
+                raise ValueError(msg)
+            if bool(self.auth_smtp_username) != (not secret_is_empty(self.auth_smtp_password)):
+                msg = "AUTH_SMTP_USERNAME and AUTH_SMTP_PASSWORD must be configured together"
+                raise ValueError(msg)
+        if (
+            self.app_env in {AppEnvironment.STAGING, AppEnvironment.PRODUCTION}
+            and effective_auth_mode in {"session", "mixed"}
+            and self.auth_password_enabled
+            and self.auth_password_signup_enabled
+            and self.auth_email_provider == "disabled"
+        ):
+            msg = "AUTH_EMAIL_PROVIDER must be configured when password sign-up is enabled"
+            raise ValueError(msg)
         if self.app_env == AppEnvironment.PRODUCTION and "*" in self.cors_allowed_origins:
             msg = "CORS_ALLOWED_ORIGINS must not include * in production"
             raise ValueError(msg)

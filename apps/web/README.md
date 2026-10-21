@@ -256,6 +256,14 @@ set the API to `AUTH_MODE=session` with a Neon-backed `DATABASE_URL`. The `/logi
 pages call same-origin Next.js auth handlers, which store the returned backend session token in an
 HttpOnly cookie named by `WEB_AUTH_SESSION_COOKIE`.
 
+Registration does not create that cookie. New users stay on the verification-pending interface,
+receive a provider-delivered link to `/verify-email`, and can sign in only after the backend marks
+the address verified. The login handler strips the raw backend token from its browser response and
+stores it only in the HttpOnly, `SameSite=Lax` cookie (`Secure` in production). Verification and
+resend requests also use same-origin handlers and surface delivery failures instead of presenting a
+false sent state. Configure the SMTP provider and public verification URL on the API; no SMTP
+credentials belong in the web environment.
+
 Browser-initiated `POST`, `PATCH`, and `DELETE` calls go through the same-origin Next.js route
 `/api/backend/{path}`. In session mode, browser `GET` calls use the same proxy so the server can
 attach the HttpOnly session token. That server-side proxy forwards the request to `WEB_API_PROXY_BASE_URL`

@@ -27,16 +27,24 @@ export type CurrentIdentity = {
 };
 
 export type AuthSession = {
-  access_token: string;
-  token_type: string;
-  expires_at: string;
+  expiresAt: string;
   identity: CurrentIdentity;
+};
+
+export type AuthVerificationResult = {
+  status: "verification_pending" | "verified" | "already_verified" | "sent" | "accepted";
+  email?: string;
+  expiresAt?: string;
+  message: string;
 };
 
 export type AuthFormResult = {
   ok: boolean;
+  code?: string;
+  status?: number;
   message?: string;
   session?: AuthSession;
+  verification?: AuthVerificationResult;
 };
 
 export async function getCurrentIdentity(): Promise<ApiResult<CurrentIdentity>> {
@@ -53,12 +61,20 @@ export async function registerWithPassword(payload: {
   email: string;
   password: string;
 }): Promise<AuthFormResult> {
-  return submitAuthForm("/api/auth/register", {
+  return submitVerificationForm("/api/auth/register", {
     workspace_name: payload.workspaceName,
     name: payload.name,
     email: payload.email,
     password: payload.password,
   });
+}
+
+export async function resendVerificationEmail(email: string): Promise<AuthFormResult> {
+  return submitVerificationForm("/api/auth/resend-verification", { email });
+}
+
+export async function verifyEmailToken(token: string): Promise<AuthFormResult> {
+  return submitVerificationForm("/api/auth/verify-email", { token });
 }
 
 export async function logout(): Promise<void> {
@@ -82,7 +98,12 @@ async function submitAuthForm(path: string, body: Record<string, string>): Promi
     });
     const payload = (await response.json()) as unknown;
     if (!response.ok) {
-      return { ok: false, message: extractMessage(payload, response.statusText) };
+      return {
+        ok: false,
+        code: extractCode(payload),
+        status: response.status,
+        message: extractMessage(payload, response.statusText),
+      };
     }
     if (!isAuthSession(payload)) {
       return { ok: false, message: "Authentication response was invalid" };
@@ -93,15 +114,60 @@ async function submitAuthForm(path: string, body: Record<string, string>): Promi
   }
 }
 
+async function submitVerificationForm(
+  path: string,
+  body: Record<string, string>,
+): Promise<AuthFormResult> {
+  try {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    const payload = (await response.json()) as unknown;
+    if (!response.ok) {
+      return {
+        ok: false,
+        code: extractCode(payload),
+        status: response.status,
+        message: extractMessage(payload, response.statusText),
+      };
+    }
+    if (!isAuthVerificationResult(payload)) {
+      return { ok: false, message: "Verification response was invalid" };
+    }
+    return { ok: true, verification: payload };
+  } catch {
+    return { ok: false, message: "Unable to reach authentication service" };
+  }
+}
+
 function isAuthSession(value: unknown): value is AuthSession {
   if (!isRecord(value)) {
     return false;
   }
   return (
-    typeof value.access_token === "string" &&
-    typeof value.expires_at === "string" &&
+    typeof value.expiresAt === "string" &&
     isRecord(value.identity)
   );
+}
+
+function isAuthVerificationResult(value: unknown): value is AuthVerificationResult {
+  if (!isRecord(value)) {
+    return false;
+  }
+  return typeof value.status === "string" && typeof value.message === "string";
+}
+
+function extractCode(payload: unknown): string | undefined {
+  if (!isRecord(payload) || !isRecord(payload.error)) {
+    return undefined;
+  }
+  return typeof payload.error.code === "string" ? payload.error.code : undefined;
 }
 
 function extractMessage(payload: unknown, fallback: string): string {

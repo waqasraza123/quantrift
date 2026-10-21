@@ -605,6 +605,17 @@ AUTH_PASSWORD_SIGNUP_ENABLED=true
 AUTH_SESSION_TTL_MINUTES=1440
 AUTH_PASSWORD_FAILED_ATTEMPT_LIMIT=8
 AUTH_PASSWORD_LOCKOUT_MINUTES=15
+AUTH_EMAIL_VERIFICATION_TTL_MINUTES=60
+AUTH_EMAIL_RESEND_COOLDOWN_SECONDS=60
+AUTH_EMAIL_PROVIDER=disabled
+AUTH_PUBLIC_WEB_BASE_URL=http://localhost:3000
+AUTH_EMAIL_FROM_ADDRESS=
+AUTH_SMTP_HOST=
+AUTH_SMTP_PORT=587
+AUTH_SMTP_USERNAME=
+AUTH_SMTP_PASSWORD=
+AUTH_SMTP_USE_TLS=true
+AUTH_SMTP_USE_SSL=false
 AUTH_DEV_USER_EMAIL=
 AUTH_DEV_WORKSPACE_ID=
 JWT_ISSUER=
@@ -812,6 +823,10 @@ BACKFILL_PLAN_MAX_LIMIT=10000
 `AUTH_MODE=session`, `AUTH_MODE=jwt`, `AUTH_MODE=api_key`, or `AUTH_MODE=mixed`; protected routes resolve an identity
 before applying workspace membership and permission checks. For first-party UI login, set `DATABASE_URL`
 to a migrated Neon Postgres database, use `AUTH_MODE=session`, and keep `AUTH_PASSWORD_ENABLED=true`.
+Password signup requires email verification and never creates a session before confirmation. Set
+`AUTH_EMAIL_PROVIDER=smtp`, the SMTP connection variables, `AUTH_EMAIL_FROM_ADDRESS`, and
+`AUTH_PUBLIC_WEB_BASE_URL` before enabling signup in staging or production. Verification tokens are
+random, hashed at rest, expiring, single-use, and replaceable through the rate-limited resend route.
 Password sessions support `/auth/sessions` inventory plus user-owned revoke-one and revoke-other
 operations without exposing raw token hashes. Session-authenticated users can rotate their password
 with `/auth/password/change`, which verifies the current password, hashes the replacement server-side,

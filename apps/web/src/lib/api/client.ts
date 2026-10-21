@@ -161,6 +161,9 @@ export function authHeaders(env = getPublicEnv()): ApiHeaders {
     }
     return headers;
   }
+  if (env.authMode === "session") {
+    return headers;
+  }
   const bearerToken = browserBearerToken(env.authBearerTokenStorageKey);
   if (bearerToken) {
     headers.authorization = `Bearer ${bearerToken}`;

@@ -1,10 +1,12 @@
-from typing import Annotated
+import hashlib
+from typing import Annotated, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import AppError
+from app.core.rate_limit import RateLimitBackendUnavailable
 from app.dependencies import database_session
 from app.modules.auth.activity import (
     AuthActivityDraft,
@@ -15,6 +17,7 @@ from app.modules.auth.activity import (
 )
 from app.modules.auth.api_keys import ApiKeyService
 from app.modules.auth.dependencies import optional_identity, require_admin
+from app.modules.auth.email import VerificationEmailDeliveryError, VerificationEmailProvider
 from app.modules.auth.identity import IdentityContext, identity_to_read
 from app.modules.auth.models import AuthActivityEvent, AuthApiKey, AuthSession
 from app.modules.auth.passwords import PasswordAuthService, hash_session_token
@@ -27,12 +30,16 @@ from app.modules.auth.schemas import (
     AuthApiKeyRead,
     AuthApiKeyStatusRead,
     AuthContextRead,
+    AuthEmailVerificationRead,
+    AuthEmailVerificationRequest,
+    AuthEmailVerificationResendRequest,
     AuthLoginRequest,
     AuthLogoutRequest,
     AuthPasswordChangeRead,
     AuthPasswordChangeRequest,
     AuthProfileUpdateRequest,
     AuthRegisterRequest,
+    AuthRegistrationRead,
     AuthSessionBulkRevokeRead,
     AuthSessionCreated,
     AuthSessionRead,
@@ -41,6 +48,12 @@ from app.modules.auth.schemas import (
     IdentitySource,
 )
 from app.modules.auth.settings import auth_is_enforced, effective_auth_mode
+from app.modules.auth.verification import (
+    EmailVerificationResult,
+    EmailVerificationService,
+    IssuedEmailVerification,
+    deliver_email_verification,
+)
 from app.modules.users.models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -54,14 +67,20 @@ async def require_session_user_identity(
     return identity
 
 
-@router.post("/register", response_model=AuthSessionCreated, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=AuthRegistrationRead, status_code=status.HTTP_201_CREATED)
 async def register(
     payload: AuthRegisterRequest,
     request: Request,
     session: Annotated[AsyncSession, Depends(database_session)],
-) -> AuthSessionCreated:
+) -> AuthRegistrationRead:
+    await enforce_auth_rate_limit(
+        request,
+        scope="register",
+        identifier=payload.email,
+        requests_per_minute=request.app.state.settings.auth_register_rate_limit_per_minute,
+    )
     try:
-        created_session = await PasswordAuthService(
+        registered_account = await PasswordAuthService(
             session=session,
             settings=request.app.state.settings,
         ).register(
@@ -80,18 +99,38 @@ async def register(
             error_code=error.code,
         )
         raise
+    try:
+        await send_verification_email(
+            request=request,
+            session=session,
+            issued=registered_account.verification,
+        )
+    except VerificationEmailDeliveryError:
+        await record_auth_activity(
+            request=request,
+            session=session,
+            event_type=AuthActivityEventType.REGISTER,
+            status=AuthActivityStatus.FAILURE,
+            email=payload.email,
+            error_code="verification_delivery_failed",
+            metadata={"accountCreated": True},
+        )
+        raise AppError(
+            503,
+            "verification_delivery_failed",
+            "Account created, but the verification email could not be delivered. Try resending it.",
+        ) from None
     await record_auth_activity(
         request=request,
         session=session,
         event_type=AuthActivityEventType.REGISTER,
         status=AuthActivityStatus.SUCCESS,
-        identity=created_session.identity,
         email=payload.email,
     )
-    return AuthSessionCreated(
-        access_token=created_session.token,
-        expires_at=created_session.expires_at,
-        identity=identity_to_read(created_session.identity),
+    return AuthRegistrationRead(
+        email=registered_account.verification.email,
+        expires_at=registered_account.verification.expires_at,
+        message="Check your inbox to verify your email before signing in.",
     )
 
 
@@ -101,6 +140,12 @@ async def login(
     request: Request,
     session: Annotated[AsyncSession, Depends(database_session)],
 ) -> AuthSessionCreated:
+    await enforce_auth_rate_limit(
+        request,
+        scope="login",
+        identifier=payload.email,
+        requests_per_minute=request.app.state.settings.auth_login_rate_limit_per_minute,
+    )
     try:
         created_session = await PasswordAuthService(
             session=session,
@@ -128,6 +173,59 @@ async def login(
         access_token=created_session.token,
         expires_at=created_session.expires_at,
         identity=identity_to_read(created_session.identity),
+    )
+
+
+@router.post("/email/verify", response_model=AuthEmailVerificationRead)
+async def verify_email(
+    payload: AuthEmailVerificationRequest,
+    request: Request,
+    session: Annotated[AsyncSession, Depends(database_session)],
+) -> AuthEmailVerificationRead:
+    await enforce_auth_rate_limit(
+        request,
+        scope="verify-email",
+        identifier=payload.token,
+        requests_per_minute=request.app.state.settings.auth_verification_rate_limit_per_minute,
+    )
+    result = await EmailVerificationService(
+        session,
+        request.app.state.settings,
+    ).verify(payload.token)
+    return verification_result_to_read(result)
+
+
+@router.post("/email/resend", response_model=AuthEmailVerificationRead)
+async def resend_verification_email(
+    payload: AuthEmailVerificationResendRequest,
+    request: Request,
+    session: Annotated[AsyncSession, Depends(database_session)],
+) -> AuthEmailVerificationRead:
+    await enforce_auth_rate_limit(
+        request,
+        scope="resend-verification",
+        identifier=payload.email,
+        requests_per_minute=request.app.state.settings.auth_resend_rate_limit_per_minute,
+    )
+    service = EmailVerificationService(session, request.app.state.settings)
+    result = await service.resend(payload.email)
+    if result is None:
+        return AuthEmailVerificationRead(
+            status="accepted",
+            message="If an unverified account exists, the resend request has been accepted.",
+        )
+    try:
+        await send_verification_email(request=request, session=session, issued=result)
+    except VerificationEmailDeliveryError:
+        raise AppError(
+            503,
+            "verification_delivery_failed",
+            "The verification email could not be delivered. Please try again later.",
+        ) from None
+    return AuthEmailVerificationRead(
+        status="sent",
+        email=result.email,
+        message="A new verification email has been sent.",
     )
 
 
@@ -468,9 +566,7 @@ async def record_auth_activity(
             event_type=event_type,
             status=status,
             user_id=(
-                identity.user.id
-                if identity is not None and identity.user is not None
-                else None
+                identity.user.id if identity is not None and identity.user is not None else None
             ),
             workspace_id=identity.workspace_id if identity is not None else None,
             email=email,
@@ -497,3 +593,66 @@ def bearer_token(request: Request) -> str | None:
     if authorization is None or not authorization.lower().startswith("bearer "):
         return None
     return authorization.split(" ", 1)[1].strip() or None
+
+
+async def send_verification_email(
+    *,
+    request: Request,
+    session: AsyncSession,
+    issued: IssuedEmailVerification,
+) -> None:
+    provider = cast(
+        VerificationEmailProvider,
+        request.app.state.verification_email_provider,
+    )
+    await deliver_email_verification(
+        issued=issued,
+        service=EmailVerificationService(session, request.app.state.settings),
+        provider=provider,
+    )
+
+
+def verification_result_to_read(result: EmailVerificationResult) -> AuthEmailVerificationRead:
+    if result.status == "already_verified":
+        message = "This email address is already verified. You can sign in."
+    else:
+        message = "Email verified successfully. You can now sign in."
+    return AuthEmailVerificationRead(
+        status=result.status,
+        email=result.email,
+        message=message,
+    )
+
+
+async def enforce_auth_rate_limit(
+    request: Request,
+    *,
+    scope: str,
+    identifier: str,
+    requests_per_minute: int,
+) -> None:
+    client_host = request.client.host if request.client is not None else "unknown"
+    normalized_identifier = identifier.strip().lower()
+    identifier_hash = hashlib.sha256(normalized_identifier.encode("utf-8")).hexdigest()
+    client_hash = hashlib.sha256(client_host.encode("utf-8")).hexdigest()
+    try:
+        client_allowed = await request.app.state.rate_limiter.allow(
+            f"auth-rate-limit:{scope}:client:{client_hash}",
+            requests_per_minute,
+        )
+        identifier_allowed = await request.app.state.rate_limiter.allow(
+            f"auth-rate-limit:{scope}:identifier:{identifier_hash}",
+            requests_per_minute,
+        )
+    except RateLimitBackendUnavailable:
+        raise AppError(
+            503,
+            "rate_limit_backend_unavailable",
+            "Authentication rate limit service is unavailable",
+        ) from None
+    if not client_allowed or not identifier_allowed:
+        raise AppError(
+            429,
+            "auth_rate_limit_exceeded",
+            "Too many authentication attempts. Please try again shortly.",
+        )

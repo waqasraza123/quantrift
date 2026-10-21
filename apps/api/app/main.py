@@ -16,6 +16,7 @@ from app.modules.ai_intelligence.routes import router as ai_intelligence_router
 from app.modules.analysis.routes import router as analysis_router
 from app.modules.artifact_graph.routes import router as artifact_graph_router
 from app.modules.audit_timeline.routes import router as audit_timeline_router
+from app.modules.auth.email import create_verification_email_provider
 from app.modules.auth.routes import router as auth_router
 from app.modules.backfill_plans.routes import router as backfill_plans_router
 from app.modules.backtest_experiments.routes import router as backtest_experiments_router
@@ -131,6 +132,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = resolved_settings
     app.state.logger = logging.getLogger(resolved_settings.service_name)
     app.state.rate_limiter = create_rate_limiter(resolved_settings)
+    app.state.verification_email_provider = create_verification_email_provider(resolved_settings)
     if resolved_settings.cors_allowed_origins:
         app.add_middleware(
             CORSMiddleware,

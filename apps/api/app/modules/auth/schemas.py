@@ -36,6 +36,14 @@ class AuthSessionStatusRead(StrEnum):
     EXPIRED = "expired"
 
 
+class AuthEmailVerificationStatusRead(StrEnum):
+    VERIFICATION_PENDING = "verification_pending"
+    VERIFIED = "verified"
+    ALREADY_VERIFIED = "already_verified"
+    SENT = "sent"
+    ACCEPTED = "accepted"
+
+
 class AuthActivityEventTypeRead(StrEnum):
     REGISTER = "register"
     LOGIN = "login"
@@ -130,6 +138,27 @@ class AuthRegisterRequest(ApiSchema):
 class AuthLoginRequest(ApiSchema):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=1, max_length=256)
+
+
+class AuthEmailVerificationRequest(ApiSchema):
+    token: str = Field(min_length=20, max_length=512)
+
+
+class AuthEmailVerificationResendRequest(ApiSchema):
+    email: str = Field(min_length=3, max_length=320)
+
+
+class AuthRegistrationRead(ApiSchema):
+    status: AuthEmailVerificationStatusRead = AuthEmailVerificationStatusRead.VERIFICATION_PENDING
+    email: str
+    expires_at: datetime
+    message: str
+
+
+class AuthEmailVerificationRead(ApiSchema):
+    status: AuthEmailVerificationStatusRead
+    email: str | None = None
+    message: str
 
 
 class AuthPasswordChangeRequest(ApiSchema):

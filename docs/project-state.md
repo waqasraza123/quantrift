@@ -17,6 +17,13 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 ## Current Architecture
 
 - Production auth and workspace RBAC exist under `apps/api/app/modules/auth/` and `apps/api/app/modules/permissions/`. `AUTH_MODE=dev` with `AUTH_ENABLED=false` remains the local/test pass-through default; production modes support first-party password sessions backed by Postgres, user-owned password rotation plus session inventory/revocation/activity APIs, hashed auth activity events, legacy admin API-key compatibility, hashed persisted API keys, RS256 JWT identity lookup through `auth_identities`, workspace membership enforcement, permission dependencies, and `/auth/me` plus `/auth/context` without adding broker execution, auto-trading, copy trading, or financial-advice behavior.
+- New password credentials use Argon2id while legacy PBKDF2-SHA256 credentials are upgraded after
+  successful login. New accounts require expiring, single-use email verification backed by hashed
+  tokens and SMTP provider delivery before login can create a session; existing credentials are
+  preserved as verified by the migration. The Next.js server keeps raw session tokens exclusively
+  in HttpOnly, SameSite cookies, strips them from browser responses, forwards them for server reads
+  and same-origin proxy calls, and authenticated users can update only their own display name
+  through `PATCH /auth/profile`.
 - The production hardening foundation branches are reconciled through Alembic merge revision `202605061100_production_hardening_merge`. Runtime supervisor state, provider credential references, dashboard read models, auth/RBAC, product readiness, job queue, candle ingestion performance, and observability SLO snapshots now converge to one migration head while preserving local/dev auth behavior and read-only cockpit fallbacks.
 
 - Workspace intelligence catalog metadata indexing and search endpoints exist for cross-artifact discovery without external search infrastructure or raw payload storage.

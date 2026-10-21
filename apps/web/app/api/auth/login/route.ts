@@ -27,9 +27,22 @@ async function authenticate(request: Request, path: string): Promise<Response> {
     });
     const payload = await parseJson(response);
     if (response.ok && isBackendAuthSession(payload)) {
-      await setAuthSessionCookie(payload.access_token, payload.expires_at);
+      await setAuthSessionCookie(payload.accessToken, payload.expiresAt);
+      return Response.json(
+        {
+          expiresAt: payload.expiresAt,
+          identity: payload.identity,
+        },
+        {
+          status: response.status,
+          headers: { "cache-control": "no-store" },
+        },
+      );
     }
-    return Response.json(payload, { status: response.status });
+    return Response.json(payload, {
+      status: response.status,
+      headers: { "cache-control": "no-store" },
+    });
   } catch {
     return Response.json(
       { error: { code: "auth_backend_unavailable", message: "Unable to reach auth API" } },

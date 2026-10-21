@@ -68,6 +68,75 @@ async function handleRequest(request, response) {
     sendJson(response, 200, { status: "ok", service: "mock-api" });
     return;
   }
+  if (request.method === "POST" && url.pathname === "/auth/register") {
+    if (scenario === "auth-register-failure") {
+      sendJson(response, 503, { error: { code: "verification_delivery_failed", message: "Account created, but the verification email could not be delivered. Try resending it." } });
+      return;
+    }
+    sendJson(response, 201, {
+      status: "verification_pending",
+      email: "analyst@example.test",
+      expiresAt: "2026-10-21T13:00:00.000Z",
+      message: "Check your inbox to verify your email before signing in.",
+    });
+    return;
+  }
+  if (request.method === "POST" && url.pathname === "/auth/login") {
+    if (scenario === "auth-login-unverified") {
+      sendJson(response, 403, { error: { code: "email_unverified", message: "Verify your email address before signing in" } });
+      return;
+    }
+    if (scenario === "auth-login-failure") {
+      sendJson(response, 401, { error: { code: "invalid_credentials", message: "Credentials are invalid" } });
+      return;
+    }
+    sendJson(response, 200, {
+      accessToken: "tai_session_mock-secret-never-return-to-browser",
+      tokenType: "bearer",
+      expiresAt: "2099-10-21T13:00:00.000Z",
+      identity: {
+        authenticated: true,
+        source: "session",
+        provider: null,
+        providerSubject: null,
+        user: { id: demoUserId, workspaceId: demoWorkspaceId, email: "analyst@example.test", name: "Demo Analyst", role: "admin" },
+        workspace: { id: demoWorkspaceId, name: "Demo Analysis Workspace" },
+        permissions: [],
+        scopes: [],
+        admin: true,
+      },
+    });
+    return;
+  }
+  if (request.method === "POST" && url.pathname === "/auth/email/resend") {
+    if (scenario === "auth-resend-failure") {
+      sendJson(response, 503, { error: { code: "verification_delivery_failed", message: "The verification email could not be delivered." } });
+      return;
+    }
+    sendJson(response, 200, { status: "sent", email: "analyst@example.test", message: "A new verification email has been sent." });
+    return;
+  }
+  if (request.method === "POST" && url.pathname === "/auth/email/verify") {
+    const body = await readJsonBody(request);
+    if (body.token === "expired-token-value-for-e2e") {
+      sendJson(response, 410, { error: { code: "verification_token_expired", message: "Verification link has expired" } });
+      return;
+    }
+    if (body.token === "already-verified-token-e2e") {
+      sendJson(response, 200, { status: "already_verified", email: "analyst@example.test", message: "This email address is already verified. You can sign in." });
+      return;
+    }
+    if (body.token !== "valid-verification-token-e2e") {
+      sendJson(response, 400, { error: { code: "invalid_verification_token", message: "Verification link is invalid" } });
+      return;
+    }
+    sendJson(response, 200, { status: "verified", email: "analyst@example.test", message: "Email verified successfully. You can now sign in." });
+    return;
+  }
+  if (request.method === "POST" && url.pathname === "/auth/logout") {
+    sendEmpty(response, 204);
+    return;
+  }
   if (scenario === "backend-unavailable" && url.pathname === "/onboarding/status") {
     sendJson(response, 503, { error: { code: "backend_unavailable", message: "Mock backend unavailable." } });
     return;

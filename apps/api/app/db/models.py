@@ -20,6 +20,7 @@ from app.modules.artifact_graph.models import (
 from app.modules.auth.models import (
     AuthActivityEvent,
     AuthApiKey,
+    AuthEmailVerificationToken,
     AuthIdentity,
     AuthPasswordCredential,
     AuthSession,
@@ -228,6 +229,7 @@ __all__ = [
     "ArtifactInvalidationItem",
     "AuthActivityEvent",
     "AuthApiKey",
+    "AuthEmailVerificationToken",
     "AuthIdentity",
     "AuthPasswordCredential",
     "AuthSession",
