@@ -1,25 +1,15 @@
-import { RouteLoadingShell } from "@/components/layout/RouteLoadingShell";
-import { ShimmerSkeleton } from "@/lib/ui/motion";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 export default function AppLoading() {
   return (
-    <RouteLoadingShell>
-      <section className="space-y-6">
-        <div className="space-y-3">
-          <ShimmerSkeleton className="h-8 w-72 rounded-md" />
-          <ShimmerSkeleton className="h-4 w-2/3 rounded-md" />
+    <main className="flex min-h-screen items-center justify-center bg-[#061416] px-6 text-white">
+      <div className="flex items-center gap-3" role="status" aria-label="Loading QuantRift">
+        <BrandMark className="h-10 w-10 text-white" />
+        <div>
+          <p className="text-base font-black tracking-[-0.02em]">QuantRift</p>
+          <p className="mt-0.5 text-xs font-medium text-white/45">Loading secure workspace…</p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <ShimmerSkeleton key={index} className="h-24 rounded-xl" />
-          ))}
-        </div>
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <ShimmerSkeleton key={index} className="h-16 rounded-lg" />
-          ))}
-        </div>
-      </section>
-    </RouteLoadingShell>
+      </div>
+    </main>
   );
 }

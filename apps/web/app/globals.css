@@ -309,15 +309,9 @@ textarea {
 }
 
 .landing-grid {
-  background-image:
-    linear-gradient(rgba(103, 232, 213, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(103, 232, 213, 0.045) 1px, transparent 1px);
-  background-size: 80px 80px;
+  background-image: none;
 }
 
 .landing-glow {
-  background:
-    radial-gradient(circle at 14% 10%, rgba(255, 118, 88, 0.14), transparent 30rem),
-    radial-gradient(circle at 86% 22%, rgba(103, 232, 213, 0.13), transparent 34rem),
-    radial-gradient(circle at 50% 76%, rgba(248, 229, 207, 0.05), transparent 30rem);
+  background: none;
 }

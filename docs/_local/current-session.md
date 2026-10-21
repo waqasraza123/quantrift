@@ -1887,3 +1887,13 @@ changes. Preserve unrelated worktree changes unless explicitly asked.
   macOS metadata and Playwright output remain excluded. No additional verification was run during
   publication, per user instruction.
 
+## Public Route Transition Fix
+
+- Replaced the root loading boundary's authenticated `AppShell` dashboard skeleton with a neutral
+  QuantRift loading screen so public and auth navigation cannot expose the dashboard shell.
+- Removed the public/auth grid and radial glow treatments; landing, sign-in, sign-up, and email
+  verification now use the solid `#061416` background.
+- Verification: TypeScript and the production web build passed with four existing unused-import
+  warnings. Focused browser checks confirmed no dashboard shell during homepage-to-sign-in or
+  sign-in/sign-up transitions and computed `background-image: none` on the auth page.
+
