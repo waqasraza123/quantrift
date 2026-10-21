@@ -261,8 +261,8 @@ receive a provider-delivered link to `/verify-email`, and can sign in only after
 the address verified. The login handler strips the raw backend token from its browser response and
 stores it only in the HttpOnly, `SameSite=Lax` cookie (`Secure` in production). Verification and
 resend requests also use same-origin handlers and surface delivery failures instead of presenting a
-false sent state. Configure the SMTP provider and public verification URL on the API; no SMTP
-credentials belong in the web environment.
+false sent state. Configure Resend and the public verification URL on the API; the Resend API key
+never belongs in the web environment. SMTP remains available as an API-side compatibility provider.
 
 Browser-initiated `POST`, `PATCH`, and `DELETE` calls go through the same-origin Next.js route
 `/api/backend/{path}`. In session mode, browser `GET` calls use the same proxy so the server can

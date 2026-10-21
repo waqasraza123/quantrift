@@ -1,8 +1,10 @@
+import json
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from typing import cast
 from uuid import uuid4
 
+import httpx
 import pytest
 from fastapi import Depends, Request
 from httpx import ASGITransport, AsyncClient
@@ -16,6 +18,7 @@ from app.main import create_app
 from app.modules.auth.api_keys import api_key_prefix, generate_api_key, hash_api_key
 from app.modules.auth.email import (
     DisabledVerificationEmailProvider,
+    ResendVerificationEmailProvider,
     VerificationEmail,
     VerificationEmailDeliveryError,
 )
@@ -92,12 +95,80 @@ async def test_disabled_email_provider_fails_closed() -> None:
     with pytest.raises(VerificationEmailDeliveryError):
         await DisabledVerificationEmailProvider().send_verification_email(
             VerificationEmail(
+                delivery_id="delivery-id",
                 recipient_email="analyst@example.test",
                 recipient_name="Analyst",
                 verification_url="https://app.example.test/verify-email?token=redacted",
                 expires_at=datetime.now(UTC) + timedelta(hours=1),
             )
         )
+
+
+@pytest.mark.asyncio
+async def test_resend_email_provider_sends_confirmed_idempotent_delivery() -> None:
+    captured_request: httpx.Request | None = None
+
+    async def handle_request(request: httpx.Request) -> httpx.Response:
+        nonlocal captured_request
+        captured_request = request
+        return httpx.Response(200, json={"id": "resend-message-id"})
+
+    settings = Settings(
+        _env_file=None,
+        auth_email_provider="resend",
+        auth_email_from_address="security@example.test",
+        auth_email_from_name="QuantRift Security",
+        resend_api_key=SecretStr("re_test_key"),
+    )
+    email = VerificationEmail(
+        delivery_id="c55755f8-ae82-4d58-b1e8-1c47ec030dda",
+        recipient_email="analyst@example.test",
+        recipient_name="Analyst",
+        verification_url="https://app.example.test/verify-email?token=redacted",
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+    )
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handle_request)) as client:
+        await ResendVerificationEmailProvider(settings, client=client).send_verification_email(
+            email
+        )
+
+    assert captured_request is not None
+    assert captured_request.url == "https://api.resend.com/emails"
+    assert captured_request.headers["authorization"] == "Bearer re_test_key"
+    assert (
+        captured_request.headers["idempotency-key"]
+        == "email-verification/c55755f8-ae82-4d58-b1e8-1c47ec030dda"
+    )
+    payload = json.loads(captured_request.content)
+    assert payload["from"] == "QuantRift Security <security@example.test>"
+    assert payload["to"] == ["analyst@example.test"]
+    assert payload["tags"] == [{"name": "category", "value": "email_verification"}]
+    assert email.verification_url in payload["text"]
+
+
+@pytest.mark.asyncio
+async def test_resend_email_provider_reports_rejected_delivery() -> None:
+    async def handle_request(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(422, json={"message": "validation_error"})
+
+    settings = Settings(
+        _env_file=None,
+        auth_email_provider="resend",
+        auth_email_from_address="security@example.test",
+        resend_api_key=SecretStr("re_test_key"),
+    )
+    email = VerificationEmail(
+        delivery_id="delivery-id",
+        recipient_email="analyst@example.test",
+        recipient_name="Analyst",
+        verification_url="https://app.example.test/verify-email?token=redacted",
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+    )
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handle_request)) as client:
+        with pytest.raises(VerificationEmailDeliveryError, match="rejected"):
+            await ResendVerificationEmailProvider(settings, client=client).send_verification_email(
+                email
+            )
 
 
 @pytest.mark.asyncio

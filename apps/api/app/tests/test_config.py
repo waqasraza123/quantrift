@@ -208,6 +208,24 @@ def test_smtp_email_provider_accepts_complete_settings() -> None:
     assert settings.auth_email_provider == "smtp"
 
 
+def test_resend_email_provider_requires_api_key_and_sender() -> None:
+    with pytest.raises(ValueError, match="RESEND_API_KEY"):
+        Settings(_env_file=None, auth_email_provider="resend")
+
+
+def test_resend_email_provider_accepts_complete_settings() -> None:
+    settings = Settings(
+        _env_file=None,
+        auth_email_provider="resend",
+        auth_email_from_address="security@example.test",
+        resend_api_key=SecretStr("re_test_key"),
+    )
+
+    assert settings.auth_email_provider == "resend"
+    assert settings.resend_api_key is not None
+    assert settings.resend_api_key.get_secret_value() == "re_test_key"
+
+
 def test_quality_thresholds_must_be_ordered() -> None:
     with pytest.raises(ValueError, match="INTELLIGENCE_QUALITY_STRONG_THRESHOLD"):
         Settings(

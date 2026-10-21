@@ -184,6 +184,7 @@ async def deliver_email_verification(
     try:
         await provider.send_verification_email(
             VerificationEmail(
+                delivery_id=str(issued.token_id),
                 recipient_email=issued.email,
                 recipient_name=issued.recipient_name,
                 verification_url=verification_url,

@@ -32,7 +32,9 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     env_file:
-      - apps/api/.env.example
+      - path: apps/api/.env.example
+      - path: apps/api/.env
+        required: false
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql://trading:trading@postgres:5432/trading_intelligence
@@ -83,7 +85,9 @@ services:
     profiles:
       - workers
     env_file:
-      - apps/api/.env.example
+      - path: apps/api/.env.example
+      - path: apps/api/.env
+        required: false
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql://trading:trading@postgres:5432/trading_intelligence
@@ -102,7 +106,9 @@ services:
     profiles:
       - workers
     env_file:
-      - apps/api/.env.example
+      - path: apps/api/.env.example
+      - path: apps/api/.env
+        required: false
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql://trading:trading@postgres:5432/trading_intelligence
@@ -122,7 +128,9 @@ services:
     profiles:
       - workers
     env_file:
-      - apps/api/.env.example
+      - path: apps/api/.env.example
+      - path: apps/api/.env
+        required: false
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql://trading:trading@postgres:5432/trading_intelligence

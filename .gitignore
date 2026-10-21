@@ -1,4 +1,5 @@
 docs/_local/
+.env
 apps/api/.venv/
 apps/web/.next/
 apps/web/node_modules/

@@ -204,6 +204,8 @@ class Settings(BaseSettings):
     auth_public_web_base_url: str = "http://localhost:3000"
     auth_email_from_address: str | None = None
     auth_email_from_name: str = "QuantRift"
+    resend_api_key: SecretStr | None = None
+    resend_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
     auth_smtp_host: str | None = None
     auth_smtp_port: int = Field(default=587, ge=1, le=65535)
     auth_smtp_username: str | None = None
@@ -509,8 +511,8 @@ class Settings(BaseSettings):
     @classmethod
     def validate_auth_email_provider(cls, value: str) -> str:
         normalized_value = value.strip().lower()
-        if normalized_value not in {"disabled", "smtp"}:
-            msg = "AUTH_EMAIL_PROVIDER must be disabled or smtp"
+        if normalized_value not in {"disabled", "resend", "smtp"}:
+            msg = "AUTH_EMAIL_PROVIDER must be disabled, resend, or smtp"
             raise ValueError(msg)
         return normalized_value
 
@@ -1070,6 +1072,13 @@ class Settings(BaseSettings):
                 raise ValueError(msg)
             if bool(self.auth_smtp_username) != (not secret_is_empty(self.auth_smtp_password)):
                 msg = "AUTH_SMTP_USERNAME and AUTH_SMTP_PASSWORD must be configured together"
+                raise ValueError(msg)
+        if self.auth_email_provider == "resend":
+            if secret_is_empty(self.resend_api_key) or not self.auth_email_from_address:
+                msg = (
+                    "RESEND_API_KEY and AUTH_EMAIL_FROM_ADDRESS are required when "
+                    "AUTH_EMAIL_PROVIDER=resend"
+                )
                 raise ValueError(msg)
         if (
             self.app_env in {AppEnvironment.STAGING, AppEnvironment.PRODUCTION}

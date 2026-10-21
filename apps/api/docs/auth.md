@@ -27,6 +27,10 @@ The API now has a production auth abstraction under `app.modules.auth`. It keeps
 - `AUTH_EMAIL_RESEND_COOLDOWN_SECONDS=60`
 - `AUTH_EMAIL_PROVIDER=disabled`
 - `AUTH_PUBLIC_WEB_BASE_URL=http://localhost:3000`
+- `AUTH_EMAIL_FROM_ADDRESS=`
+- `AUTH_EMAIL_FROM_NAME=QuantRift`
+- `RESEND_API_KEY=`
+- `RESEND_TIMEOUT_SECONDS=10`
 - `AUTH_DEV_USER_EMAIL=`
 - `AUTH_DEV_WORKSPACE_ID=`
 - `JWT_ISSUER=`
@@ -55,7 +59,21 @@ New verification tokens are cryptographically random, expire after
 Existing password credentials are marked verified by the migration so deployed users retain
 access.
 
-Verification delivery uses the `VerificationEmailProvider` interface. Configure SMTP with:
+Verification delivery uses the `VerificationEmailProvider` interface. Resend is the recommended
+production provider. Configure it with:
+
+- `AUTH_EMAIL_PROVIDER=resend`
+- `RESEND_API_KEY=re_...`
+- `AUTH_PUBLIC_WEB_BASE_URL=https://your-web-app.example`
+- `AUTH_EMAIL_FROM_ADDRESS=security@your-verified-domain.example`
+- `AUTH_EMAIL_FROM_NAME=QuantRift`
+- Optional: `RESEND_TIMEOUT_SECONDS=10`
+
+The API key stays server-side. Each request to Resend uses a verification-token-specific
+idempotency key and is marked sent only after Resend returns a successful response containing a
+message id. Verify the sender domain in Resend before using its address in production.
+
+SMTP remains supported for existing deployments:
 
 - `AUTH_EMAIL_PROVIDER=smtp`
 - `AUTH_PUBLIC_WEB_BASE_URL=https://your-web-app.example`

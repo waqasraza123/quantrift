@@ -610,6 +610,9 @@ AUTH_EMAIL_RESEND_COOLDOWN_SECONDS=60
 AUTH_EMAIL_PROVIDER=disabled
 AUTH_PUBLIC_WEB_BASE_URL=http://localhost:3000
 AUTH_EMAIL_FROM_ADDRESS=
+AUTH_EMAIL_FROM_NAME=QuantRift
+RESEND_API_KEY=
+RESEND_TIMEOUT_SECONDS=10
 AUTH_SMTP_HOST=
 AUTH_SMTP_PORT=587
 AUTH_SMTP_USERNAME=
@@ -823,9 +826,12 @@ BACKFILL_PLAN_MAX_LIMIT=10000
 `AUTH_MODE=session`, `AUTH_MODE=jwt`, `AUTH_MODE=api_key`, or `AUTH_MODE=mixed`; protected routes resolve an identity
 before applying workspace membership and permission checks. For first-party UI login, set `DATABASE_URL`
 to a migrated Neon Postgres database, use `AUTH_MODE=session`, and keep `AUTH_PASSWORD_ENABLED=true`.
-Password signup requires email verification and never creates a session before confirmation. Set
-`AUTH_EMAIL_PROVIDER=smtp`, the SMTP connection variables, `AUTH_EMAIL_FROM_ADDRESS`, and
-`AUTH_PUBLIC_WEB_BASE_URL` before enabling signup in staging or production. Verification tokens are
+Password signup requires email verification and never creates a session before confirmation. For
+Resend delivery, set `AUTH_EMAIL_PROVIDER=resend`, `RESEND_API_KEY`, a verified
+`AUTH_EMAIL_FROM_ADDRESS`, and `AUTH_PUBLIC_WEB_BASE_URL` before enabling signup in staging or
+production. The API calls Resend server-side with an idempotency key unique to each verification
+token and treats rejected or malformed provider responses as delivery failures. SMTP remains
+available through `AUTH_EMAIL_PROVIDER=smtp` for existing deployments. Verification tokens are
 random, hashed at rest, expiring, single-use, and replaceable through the rate-limited resend route.
 Password sessions support `/auth/sessions` inventory plus user-owned revoke-one and revoke-other
 operations without exposing raw token hashes. Session-authenticated users can rotate their password
