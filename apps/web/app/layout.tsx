@@ -33,18 +33,20 @@ export const metadata: Metadata = {
     title: product.name,
     description: product.description,
     siteName: product.name,
+    images: [{ url: "/quantrift-evidence.png", width: 1672, height: 941, alt: "QuantRift evidence-based market intelligence" }],
   },
   twitter: {
     card: "summary_large_image",
     title: product.name,
     description: product.description,
+    images: ["/quantrift-evidence.png"],
   },
   icons: { icon: "/icon.svg" },
 };
 
 export const viewport: Viewport = {
   colorScheme: "dark light",
-  themeColor: "#050811",
+  themeColor: "#061416",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useId, useState } from "react";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { Button } from "@/components/ui/Button";
 import {
   loginWithPassword,
@@ -91,7 +93,7 @@ export function AuthCard({ mode, nextPath }: AuthCardProps) {
   }
 
   return (
-    <section className="auth-card motion-reveal motion-reveal-scale grid w-full max-w-4xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#09111f]/95 text-slate-100 shadow-[0_32px_120px_rgba(0,0,0,0.5)] backdrop-blur-xl md:grid-cols-[0.88fr_1.12fr]">
+    <section className="auth-card motion-reveal motion-reveal-scale grid w-full max-w-5xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#071a1d]/95 text-slate-100 shadow-[0_32px_120px_rgba(0,0,0,0.5)] backdrop-blur-xl md:grid-cols-[0.94fr_1.06fr]">
       <AuthContextPanel isRegister={isRegister} />
       <div className="p-6 sm:p-8 md:p-10">
         <nav aria-label="Authentication mode" className="grid grid-cols-2 rounded-xl bg-white/[0.045] p-1">
@@ -99,7 +101,7 @@ export function AuthCard({ mode, nextPath }: AuthCardProps) {
           <AuthModeLink active={isRegister} href="/register" label="Create account" />
         </nav>
         <div className="mt-7" key={mode}>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-300">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#ff8b72]">
             {isRegister ? "New workspace" : "Secure access"}
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -161,7 +163,7 @@ export function AuthCard({ mode, nextPath }: AuthCardProps) {
               {errorMessage}
             </div>
           )}
-          <Button className="mt-1 w-full" loading={loading} loadingText={isRegister ? "Creating account…" : "Signing in…"} size="lg" type="submit" variant="primary">
+          <Button className="mt-1 w-full !border-[#ff7658] !bg-[#ff7658] ![background-image:none] hover:!bg-[#ff8c73]" loading={loading} loadingText={isRegister ? "Creating account…" : "Signing in…"} size="lg" type="submit" variant="primary">
             {isRegister ? "Create account" : "Sign in securely"}
           </Button>
           <p className="text-center text-xs leading-5 text-slate-500">
@@ -177,18 +179,27 @@ export function AuthCard({ mode, nextPath }: AuthCardProps) {
 
 function AuthContextPanel({ isRegister }: { isRegister: boolean }) {
   return (
-    <div className="relative hidden overflow-hidden border-r border-white/10 bg-white/[0.025] p-8 md:flex md:flex-col md:justify-between">
-      <div aria-hidden="true" className="absolute -left-24 top-16 h-64 w-64 rounded-full bg-teal-400/10 blur-3xl" />
+    <div className="relative hidden min-h-[38rem] overflow-hidden border-r border-white/10 bg-[#061416] p-8 md:flex md:flex-col md:justify-between">
+      <Image
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+        fill
+        sizes="(max-width: 768px) 0px, 44vw"
+        src="/quantrift-signal-panels.png"
+        style={{ objectPosition: "82% center" }}
+      />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,20,22,0.54)_0%,rgba(6,20,22,0.82)_48%,rgba(6,20,22,0.97)_100%)]" />
       <div className="relative">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl border border-teal-300/25 bg-teal-300/10 text-sm font-bold text-teal-200">QR</span>
-          <div><p className="font-semibold text-white">QuantRift</p><p className="text-xs text-slate-500">Research intelligence</p></div>
+          <BrandMark className="h-11 w-11 text-white drop-shadow-[0_0_18px_rgba(103,232,213,0.3)]" />
+          <div><p className="font-semibold text-white">QuantRift</p><p className="text-xs text-white/55">Research intelligence</p></div>
         </div>
-        <p className="mt-10 max-w-xs text-xl font-medium leading-8 text-slate-200">
+        <p className="mt-10 max-w-xs text-2xl font-bold leading-8 text-white">
           {isRegister ? "A focused workspace for evidence-based market research." : "Return to your daily research command center."}
         </p>
       </div>
-      <ul className="relative mt-10 space-y-3 text-sm text-slate-400">
+      <ul className="relative mt-10 space-y-3 text-sm text-white/65">
         <TrustItem label="Verified email access" />
         <TrustItem label="Secure server-managed sessions" />
         <TrustItem label="No broker execution" />
@@ -198,7 +209,7 @@ function AuthContextPanel({ isRegister }: { isRegister: boolean }) {
 }
 
 function TrustItem({ label }: { label: string }) {
-  return <li className="flex items-center gap-2.5"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-teal-300" />{label}</li>;
+  return <li className="flex items-center gap-2.5"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#ff7658]" />{label}</li>;
 }
 
 function AuthModeLink({ active, href, label }: { active: boolean; href: string; label: string }) {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { cn } from "@/lib/ui/cn";
 import { isActiveNavigationPath, navigationHref, navigationItems, navigationSections } from "@/lib/ui/navigation";
 import { AnimatedSection, MOTION_INTERACTIVE_CLASS, motionCardClass, motionRevealPresetClass, motionRevealDensityStyle } from "@/lib/ui/motion";
@@ -26,9 +27,7 @@ export function Sidebar({ appName, workspaceName, workspaceId }: SidebarProps) {
       )}
     >
       <Link href={navigationHref("commandCenter", workspaceId)} className={`group flex items-center gap-3 rounded-2xl p-2 transition hover:bg-[var(--surface-muted)] ${MOTION_INTERACTIVE_CLASS}`}>
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent)_0%,var(--info)_100%)] text-sm font-black text-white shadow-glow">
-          TI
-        </span>
+        <BrandMark className="h-11 w-11 text-[var(--accent-strong)] drop-shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_28%,transparent)]" />
         <span className="min-w-0">
           <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Market intelligence</span>
           <span className="block truncate text-base font-semibold text-[var(--strong)]">{appName}</span>

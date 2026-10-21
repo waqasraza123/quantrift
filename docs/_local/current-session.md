@@ -1858,3 +1858,32 @@ changes. Preserve unrelated worktree changes unless explicitly asked.
 - Excluded macOS `.DS_Store` metadata and Playwright `apps/web/test-results/` output from the commit.
 - No tests or verification commands were run during publication, per user instruction.
 
+## Bold Landing Theme
+
+- Redesigned the public landing page with a bold ink, violet, cyan, and acid-lime visual system,
+  stronger typography, rounded calls to action, numbered capability panels, and a four-step research
+  workflow.
+- Replaced the synthetic dashboard mockup with the supplied high-resolution market-intelligence
+  artwork and added its 1000x750 variant as Open Graph and Twitter preview media.
+- Added the web-ready assets under `apps/web/public/` while preserving the original documentation
+  copies.
+- Verification: production web build passed with four existing unused-import warnings; a clean
+  follow-up TypeScript check passed; desktop and 390px mobile full-page previews were visually
+  inspected. No automated tests or standalone lint command were run.
+
+## QuantRift Brand Imagery Rollout
+
+- Added the three supplied QuantRift visuals as project assets under `apps/web/public/` and used
+  them selectively: observatory artwork in the landing hero, magnifier artwork in one evidence
+  section, and glass-panel artwork only in the desktop sign-in/sign-up context panel.
+- Replaced the temporary chart mark with a reusable code-native diamond/slash `BrandMark` across
+  the public header/footer, authentication pages, desktop sidebar, mobile navigation, and favicon.
+- Aligned the bold theme to the supplied imagery with deep teal, coral, mint, and warm ivory while
+  preserving readable dark surfaces and existing product-safety messaging.
+- Verification: TypeScript passed; production build passed with four existing unused-import
+  warnings; landing desktop/mobile and desktop sign-in previews were visually inspected. No
+  automated tests or standalone lint command were run.
+- Prepared the completed brand and imagery rollout for commit and publication to `main`; local
+  macOS metadata and Playwright output remain excluded. No additional verification was run during
+  publication, per user instruction.
+
