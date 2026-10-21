@@ -115,7 +115,7 @@ async def test_request_logging_does_not_log_secrets(caplog: pytest.LogCaptureFix
     async def logging_test() -> dict[str, str]:
         return {"status": "ok"}
 
-    caplog.set_level(logging.INFO, logger="trading-intelligence-api")
+    caplog.set_level(logging.INFO, logger="quantrift-api")
     async with AsyncClient(
         transport=ASGITransport(app=test_app),
         base_url="http://test",

@@ -6,7 +6,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/candles"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/candles"
 )
 
 type MockProvider struct{}

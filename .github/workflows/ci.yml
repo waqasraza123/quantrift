@@ -62,11 +62,11 @@ jobs:
       - run: npm run build --if-present
         env:
           NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
-          NEXT_PUBLIC_APP_NAME: AI Trading SaaS Starter Kit
+          NEXT_PUBLIC_APP_NAME: QuantRift
 
   docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -f apps/api/Dockerfile -t trading-intelligence-api:ci .
-      - run: docker build -f apps/web/Dockerfile -t trading-intelligence-web:ci .
+      - run: docker build -f apps/api/Dockerfile -t quantrift-api:ci .
+      - run: docker build -f apps/web/Dockerfile -t quantrift-web:ci .

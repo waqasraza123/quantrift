@@ -10,12 +10,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/candles"
-	workerdb "github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/db"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/health"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/jobs"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/providers"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/safety"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/candles"
+	workerdb "github.com/waqasraza123/quantrift/apps/go/market-worker/internal/db"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/health"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/jobs"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/providers"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/safety"
 )
 
 type Service struct {

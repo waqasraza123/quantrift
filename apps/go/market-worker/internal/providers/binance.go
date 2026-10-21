@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/candles"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/candles"
 )
 
 type BinancePublicRESTProvider struct {
@@ -39,7 +39,7 @@ func (p *BinancePublicRESTProvider) FetchCandles(ctx context.Context, request Fe
 	if err != nil {
 		return FetchCandlesResult{}, err
 	}
-	httpRequest.Header.Set("User-Agent", "trading-intelligence-go-market-worker/0.1")
+	httpRequest.Header.Set("User-Agent", "quantrift-go-market-worker/0.1")
 	response, err := p.client.Do(httpRequest)
 	if err != nil {
 		return FetchCandlesResult{}, NewProviderError("binance_network_error", "Binance request failed before a response was received")

@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	workerdb "github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/db"
+	workerdb "github.com/waqasraza123/quantrift/apps/go/market-worker/internal/db"
 )
 
 type Repository struct {

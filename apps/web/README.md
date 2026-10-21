@@ -1,6 +1,6 @@
-# AI Trading SaaS Starter Kit Web App
+# QuantRift Web App
 
-Read-only Next.js dashboard for deterministic market intelligence. The app is an operator cockpit for daily analysis over backend artifacts; it is not a broker terminal, auto-trading system, execution workflow, or financial-advice surface.
+Next.js application for QuantRift, an Agentic AI quantitative market intelligence platform. The app is an operator cockpit for deterministic analysis, evidence-based research, and paper-only review over backend artifacts; it is not a broker terminal, auto-trading system, execution workflow, or financial-advice surface.
 
 ## Purpose
 
@@ -233,9 +233,9 @@ Create `apps/web/.env.local` when local defaults are not enough:
 
 ```sh
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
-NEXT_PUBLIC_APP_NAME=AI Trading SaaS Starter Kit
+NEXT_PUBLIC_APP_NAME=QuantRift
 NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000
-NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/Trading-Data-Analysis-Agent
+NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/quantrift
 NEXT_PUBLIC_AUTH_MODE=dev
 NEXT_PUBLIC_AUTH_DEV_USER_ID=
 NEXT_PUBLIC_AUTH_DEV_WORKSPACE_ID=
@@ -297,7 +297,7 @@ make web-check
 Run with Docker:
 
 ```sh
-docker build -f apps/web/Dockerfile -t trading-intelligence-web:latest .
+docker build -f apps/web/Dockerfile -t quantrift-web:latest .
 docker compose up --build web
 ```
 

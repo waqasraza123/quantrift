@@ -3,8 +3,8 @@ package polling
 import (
 	"github.com/google/uuid"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/candles"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/providers"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/candles"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/providers"
 )
 
 func NormalizeProviderCandles(items []candles.ProviderCandleInput, workspaceID uuid.UUID, sourceID uuid.UUID, symbolID uuid.UUID, timeframe string, requestID *uuid.UUID) ([]candles.Candle, []candles.ValidationIssue) {

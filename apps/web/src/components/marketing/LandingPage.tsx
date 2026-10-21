@@ -19,14 +19,14 @@ const featureGroups = [
   },
   {
     index: "03",
-    title: "Grounded AI workflows",
+    title: "Agentic research workflows",
     description:
-      "Layer explanations and paper-only planning over persisted evidence without letting a model rewrite source signals.",
+      "Compose explanations and paper-only plans from persisted evidence without letting agents rewrite source signals.",
     tags: ["Evidence-first", "Paper plans", "Human review"],
   },
   {
     index: "04",
-    title: "SaaS-ready operations",
+    title: "Production operations",
     description:
       "Start with Neon-backed accounts, workspace RBAC, job queues, worker health, audit trails, and fail-soft dashboards.",
     tags: ["Session auth", "Workspaces", "Observability"],
@@ -59,7 +59,7 @@ export function LandingPage() {
           <Link className="flex items-center gap-3 font-semibold tracking-tight" href="/">
             <BrandMark />
             <span className="hidden sm:inline">{product.name}</span>
-            <span className="sm:hidden">Trading SaaS Kit</span>
+            <span className="sm:hidden">QuantRift</span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm text-slate-400 md:flex" aria-label="Landing navigation">
             <a className="transition hover:text-white" href="#features">Features</a>
@@ -70,8 +70,8 @@ export function LandingPage() {
             <Link className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white" href="/login">
               Sign in
             </Link>
-            <a className="rounded-lg border border-teal-300/30 bg-teal-300 px-3.5 py-2 text-sm font-bold text-slate-950 transition hover:bg-teal-200" href={product.templateUrl}>
-              Use template
+            <a className="rounded-lg border border-teal-300/30 bg-teal-300 px-3.5 py-2 text-sm font-bold text-slate-950 transition hover:bg-teal-200" href={product.repositoryUrl}>
+              GitHub
             </a>
           </div>
         </div>
@@ -84,18 +84,18 @@ export function LandingPage() {
             Open-source · MIT licensed
           </div>
           <h1 className="max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
-            Ship an AI trading SaaS without rebuilding the foundation.
+            Agentic AI for quantitative market intelligence.
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-400 sm:text-xl">
-            A production-minded starter kit for market data, deterministic intelligence, grounded AI explanations, paper-only agent plans, and daily review workflows.
+            QuantRift combines deterministic signal analysis, grounded AI research, evidence quality, and human-reviewed paper planning in one auditable platform.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-300 px-5 text-sm font-bold text-slate-950 shadow-[0_18px_60px_rgba(45,212,191,0.2)] transition hover:-translate-y-0.5 hover:bg-teal-200" href={product.templateUrl}>
-              Start from this template <ArrowIcon />
-            </a>
-            <Link className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-bold text-white transition hover:border-white/30 hover:bg-white/10" href="/register">
-              Create a workspace
+            <Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-300 px-5 text-sm font-bold text-slate-950 shadow-[0_18px_60px_rgba(45,212,191,0.2)] transition hover:-translate-y-0.5 hover:bg-teal-200" href="/register">
+              Open QuantRift <ArrowIcon />
             </Link>
+            <a className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-bold text-white transition hover:border-white/30 hover:bg-white/10" href={product.repositoryUrl}>
+              View source
+            </a>
           </div>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-slate-500">
             <span>Next.js 15</span><span>FastAPI</span><span>Neon Postgres</span><span>Go</span><span>Docker</span>
@@ -113,7 +113,7 @@ export function LandingPage() {
       </section>
 
       <section className="relative z-10 mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-32" id="features">
-        <SectionHeading eyebrow="What you get" title="A vertical starter kit, not an empty dashboard." description="Use the full opinionated stack or replace modules behind typed boundaries as your product evolves." />
+        <SectionHeading eyebrow="Platform" title="An integrated quantitative research system." description="Use the full stack or replace modules behind typed, auditable boundaries as research requirements evolve." />
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 md:grid-cols-2">
           {featureGroups.map((feature) => (
             <article className="bg-[#080d18] p-7 sm:p-9" key={feature.index}>
@@ -161,13 +161,13 @@ export function LandingPage() {
       </section>
 
       <section className="relative z-10 mx-auto max-w-5xl px-5 py-24 text-center sm:px-8 lg:py-32" id="quick-start">
-        <SectionHeading centered eyebrow="Quick start" title="From template to local cockpit." description="Bring up the full development stack, apply the schema, and seed deterministic defaults." />
+        <SectionHeading centered eyebrow="Quick start" title="Run QuantRift locally." description="Bring up the development stack, apply the schema, and seed deterministic defaults." />
         <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-[#03050a] text-left shadow-2xl shadow-black/40">
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-3 font-mono text-xs text-slate-500"><span>terminal</span><span>three commands</span></div>
           <pre className="overflow-x-auto p-6 font-mono text-sm leading-8 text-slate-300"><code><span className="text-slate-600">$</span> make dev{"\n"}<span className="text-slate-600">$</span> make migrate{"\n"}<span className="text-slate-600">$</span> make seed</code></pre>
         </div>
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-          <a className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-300 px-5 text-sm font-bold text-slate-950 transition hover:bg-teal-200" href={product.templateUrl}>Use the GitHub template <ArrowIcon /></a>
+          <a className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-300 px-5 text-sm font-bold text-slate-950 transition hover:bg-teal-200" href={product.repositoryUrl}>View the repository <ArrowIcon /></a>
           <a className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/15 px-5 text-sm font-bold text-white transition hover:bg-white/5" href={`${product.repositoryUrl}#quick-start`}>Read the setup guide</a>
         </div>
       </section>
@@ -189,7 +189,7 @@ function DashboardPreview() {
       <div className="absolute -inset-10 -z-10 bg-[radial-gradient(circle,rgba(45,212,191,0.12),transparent_65%)]" />
       <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#080d17]/95 shadow-[0_30px_100px_rgba(0,0,0,0.55)]">
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_12px_#6ee7b7]" /><span className="font-mono text-[10px] uppercase tracking-[0.15em] text-slate-400">Command center · Live model</span></div>
+          <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_12px_#6ee7b7]" /><span className="font-mono text-[10px] uppercase tracking-[0.15em] text-slate-400">Command center · Demo model</span></div>
           <span className="font-mono text-[10px] text-slate-600">UTC 09:42</span>
         </div>
         <div className="grid grid-cols-3 gap-px bg-white/10">

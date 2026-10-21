@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/jobs"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/jobs"
 )
 
 func (r *Runner) handleJob(ctx context.Context, job jobs.Job) error {

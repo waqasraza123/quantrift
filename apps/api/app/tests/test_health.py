@@ -18,7 +18,7 @@ async def test_health_returns_service_status() -> None:
     assert response.status_code == 200
     assert response.json() == {
         "status": "healthy",
-        "service": "trading-intelligence-api",
+        "service": "quantrift-api",
         "environment": "test",
     }
 

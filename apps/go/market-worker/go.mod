@@ -1,4 +1,4 @@
-module github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker
+module github.com/waqasraza123/quantrift/apps/go/market-worker
 
 go 1.22
 

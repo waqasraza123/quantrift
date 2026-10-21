@@ -1,4 +1,4 @@
-# Trading Intelligence API
+# QuantRift API
 
 Demo mode is implemented under `/demo-mode`. It can create a labeled demo workspace, seed demo
 symbols and a synthetic JSON import source, import deterministic fixture candles, run deterministic
@@ -382,7 +382,7 @@ using the `dev` extra so pytest, Ruff, mypy, and HTTP test tooling stay outside 
 Build the production Docker image from the repository root:
 
 ```sh
-docker build -f apps/api/Dockerfile -t trading-intelligence-api:latest .
+docker build -f apps/api/Dockerfile -t quantrift-api:latest .
 ```
 
 Run the production image with runtime configuration injected by the orchestrator:
@@ -394,7 +394,7 @@ docker run --rm -p 8000:8000 \
   -e AUTH_ENABLED=true \
   -e AUTH_MODE=api_key \
   -e ADMIN_API_KEY=replace-with-secret-from-secret-manager \
-  trading-intelligence-api:latest
+  quantrift-api:latest
 ```
 
 `DATABASE_URL` is optional for liveness startup but required for database-backed product routes,
@@ -777,7 +777,7 @@ READ_MODEL_DEFAULT_LIMIT=200
 READ_MODEL_MAX_LIMIT=1000
 PROVIDER_POLLING_TIMEOUT_SECONDS=20
 PROVIDER_POLLING_MAX_CANDLES_PER_REQUEST=1000
-PROVIDER_POLLING_USER_AGENT=trading-intelligence-api-provider-polling/0.1
+PROVIDER_POLLING_USER_AGENT=quantrift-api-provider-polling/0.1
 BINANCE_PUBLIC_REST_BASE_URL=https://api.binance.com
 PROVIDER_CREDENTIALS_VERSION=v1
 PROVIDER_CREDENTIAL_TEST_TIMEOUT_SECONDS=10

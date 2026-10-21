@@ -1,4 +1,4 @@
-name: ai-trading-saas-starter
+name: quantrift
 
 services:
   postgres:
@@ -64,12 +64,12 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
-        NEXT_PUBLIC_APP_NAME: AI Trading SaaS Starter Kit
+        NEXT_PUBLIC_APP_NAME: QuantRift
     env_file:
       - apps/web/.env.example
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
-      NEXT_PUBLIC_APP_NAME: AI Trading SaaS Starter Kit
+      NEXT_PUBLIC_APP_NAME: QuantRift
     ports:
       - "3000:3000"
     depends_on:

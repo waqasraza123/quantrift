@@ -13,9 +13,9 @@ FROM node:22-slim AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
 
 ARG NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
-ARG NEXT_PUBLIC_APP_NAME="AI Trading SaaS Starter Kit"
-ARG NEXT_PUBLIC_SITE_URL=https://ai-trading-agent-seven.vercel.app
-ARG NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/Trading-Data-Analysis-Agent
+ARG NEXT_PUBLIC_APP_NAME="QuantRift"
+ARG NEXT_PUBLIC_SITE_URL=https://quantrift.vercel.app
+ARG NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/quantrift
 
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL} \
     NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME} \

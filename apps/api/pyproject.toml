@@ -1,7 +1,7 @@
 [project]
-name = "trading-intelligence-api"
+name = "quantrift-api"
 version = "0.1.0"
-description = "FastAPI backend for the AI Trading SaaS Starter Kit"
+description = "FastAPI backend for the QuantRift quantitative market intelligence platform"
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.14.0",

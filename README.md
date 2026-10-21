@@ -1,8 +1,8 @@
-# AI Trading SaaS Starter Kit
+# QuantRift
 
-[![CI](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/actions/workflows/ci.yml)
-[![API CI](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/actions/workflows/api-ci.yml/badge.svg)](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/actions/workflows/api-ci.yml)
-[![Web CI](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/actions/workflows/web-ci.yml/badge.svg)](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/actions/workflows/web-ci.yml)
+[![CI](https://github.com/waqasraza123/quantrift/actions/workflows/ci.yml/badge.svg)](https://github.com/waqasraza123/quantrift/actions/workflows/ci.yml)
+[![API CI](https://github.com/waqasraza123/quantrift/actions/workflows/api-ci.yml/badge.svg)](https://github.com/waqasraza123/quantrift/actions/workflows/api-ci.yml)
+[![Web CI](https://github.com/waqasraza123/quantrift/actions/workflows/web-ci.yml/badge.svg)](https://github.com/waqasraza123/quantrift/actions/workflows/web-ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
 ![Next.js](https://img.shields.io/badge/Next.js_15-React_19-111827?logo=next.js)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.12-05998b?logo=fastapi)
@@ -10,17 +10,17 @@
 ![Go](https://img.shields.io/badge/Go-market_worker-00add8?logo=go)
 ![Safety](https://img.shields.io/badge/safety-no_broker_execution-2563eb)
 
-An open-source, production-minded starter kit for building explainable AI trading intelligence products with Next.js, FastAPI, Neon Postgres, and Go.
+QuantRift is an open-source Agentic AI platform for quantitative market intelligence, signal analysis, and evidence-based research.
 
-It includes market-data ingestion, deterministic analysis, grounded AI explanations, workspace authentication, paper-only agent plans, review workflows, background jobs, and an operator cockpit. It does not place orders, connect to brokers for execution, or present model output as financial advice.
+It combines auditable market-data ingestion, deterministic analysis, grounded AI workflows, paper-only agent plans, human review, and production operations across Next.js, FastAPI, Neon Postgres, and Go. QuantRift does not place orders, connect to brokers for execution, or present model output as financial advice.
 
-[Live site](https://ai-trading-agent-seven.vercel.app) · [Use this template](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/generate) · [Development guide](docs/development.md) · [Deployment guide](docs/deployment.md)
+[Production](https://quantrift.vercel.app) · [Source](https://github.com/waqasraza123/quantrift) · [Development guide](docs/development.md) · [Deployment guide](docs/deployment.md)
 
-![AI Trading SaaS Starter Kit landing page](docs/assets/ai-trading-saas-starter-kit.png)
+![QuantRift landing page](docs/assets/quantrift-kit.png)
 
-## Why this starter kit
+## Why QuantRift
 
-Most SaaS starters stop at billing, authentication, and an empty dashboard. This repository provides a complete vertical foundation for trading-intelligence products:
+QuantRift provides an integrated foundation for quantitative research and market-intelligence workflows:
 
 - Normalize imported, provider-polled, and live candle data into one auditable model.
 - Run indicators, patterns, regimes, signal classification, confidence, quality gates, and outcome evaluation deterministically.
@@ -33,7 +33,7 @@ Most SaaS starters stop at billing, authentication, and an empty dashboard. This
 
 | Area | What is included |
 | --- | --- |
-| Public product | Developer landing page, starter-kit metadata, GitHub template calls to action, login, and registration |
+| Public product | Platform landing page, metadata, source links, login, and registration |
 | Daily workflow | Command center, brief, signal triage, setup review, scanner, readiness, and onboarding |
 | Research | Equity universes, fundamentals, earnings, catalysts, candidates, and background data operations |
 | Intelligence | Deterministic signals, evidence, scenarios, historical cases, confidence, quality, and outcomes |
@@ -67,13 +67,13 @@ Persisted artifacts are the source of truth. Deterministic engines classify and 
 
 ## Quick start
 
-### 1. Create your repository
+### 1. Clone the repository
 
-Use [this repository as a GitHub template](https://github.com/waqasraza123/Trading-Data-Analysis-Agent/generate), or clone it directly:
+Clone QuantRift directly:
 
 ```sh
-git clone https://github.com/waqasraza123/Trading-Data-Analysis-Agent.git
-cd Trading-Data-Analysis-Agent
+git clone https://github.com/waqasraza123/quantrift.git
+cd quantrift
 ```
 
 ### 2. Start the development stack
@@ -117,16 +117,16 @@ DATABASE_URL=postgresql://user:password@pooler-host/database?sslmode=require
 AUTH_MODE=session
 AUTH_PASSWORD_ENABLED=true
 AUTH_PASSWORD_SIGNUP_ENABLED=true
-CORS_ALLOWED_ORIGINS=https://your-web.example
+CORS_ALLOWED_ORIGINS=https://quantrift.vercel.app
 ```
 
 Configure the web runtime:
 
 ```txt
 NEXT_PUBLIC_API_BASE_URL=https://your-api.example
-NEXT_PUBLIC_APP_NAME=AI Trading SaaS Starter Kit
-NEXT_PUBLIC_SITE_URL=https://your-web.example
-NEXT_PUBLIC_REPOSITORY_URL=https://github.com/your-name/your-repository
+NEXT_PUBLIC_APP_NAME=QuantRift
+NEXT_PUBLIC_SITE_URL=https://quantrift.vercel.app
+NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/quantrift
 NEXT_PUBLIC_AUTH_MODE=session
 WEB_API_PROXY_BASE_URL=https://your-api.example
 WEB_AUTH_SESSION_COOKIE=trading_intelligence_session
@@ -136,13 +136,12 @@ Use a Neon pooled connection string for the application. Run Alembic migrations 
 
 Session tokens are stored as hashes in Postgres and transported to the browser only through secure HTTP-only cookies. New passwords use Argon2id; existing PBKDF2 credentials are upgraded after a successful login.
 
-## Customize the starter
+## Configure QuantRift
 
 - Set the public product name and repository/site URLs in `apps/web/.env.local`.
-- Replace the landing-page copy and preview in `apps/web/src/components/marketing`.
 - Configure strategy profiles, rule packs, scanner presets, and seeded symbols for your market niche.
 - Enable only the providers, workers, LLM layers, and notifications your deployment needs.
-- Keep broker execution separate. No order or brokerage contract exists in this starter.
+- Keep broker execution separate. No order or brokerage contract exists in this platform.
 
 ## Repository layout
 
@@ -174,7 +173,7 @@ Database integration tests require an explicit disposable `TEST_DATABASE_URL`. T
 
 ## Safety boundary
 
-The starter kit can ingest market data, persist deterministic intelligence, compose grounded explanations, create paper-only plans, and record observations. It intentionally does not:
+QuantRift can ingest market data, persist deterministic intelligence, compose grounded explanations, create paper-only plans, and record observations. It intentionally does not:
 
 - place orders or connect to brokers for execution;
 - auto-trade, copy-trade, or create direct order instructions;

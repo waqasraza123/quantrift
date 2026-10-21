@@ -217,7 +217,7 @@ class Settings(BaseSettings):
     live_feed_worker_poll_seconds: float = Field(default=10, gt=0)
     provider_polling_timeout_seconds: int = Field(default=20, ge=1)
     provider_polling_max_candles_per_request: int = Field(default=1000, ge=1, le=5000)
-    provider_polling_user_agent: str = "trading-intelligence-api-provider-polling/0.1"
+    provider_polling_user_agent: str = "quantrift-api-provider-polling/0.1"
     binance_public_rest_base_url: str = "https://api.binance.com"
     candle_ingestion_batch_size: int = Field(default=5000, ge=1, le=250000)
     candle_ingestion_max_rows_per_request: int = Field(default=250000, ge=1)
@@ -376,7 +376,7 @@ class Settings(BaseSettings):
     notification_max_payload_bytes: int = Field(default=16000, ge=1024, le=262144)
     notification_dedupe_window_seconds: int = Field(default=3600, ge=0, le=2_592_000)
     notification_default_quiet_hours_timezone: str = "UTC"
-    notification_webhook_user_agent: str = "trading-intelligence-notifications/0.1"
+    notification_webhook_user_agent: str = "quantrift-notifications/0.1"
     market_scan_worker_enabled: bool = False
     market_scan_worker_poll_seconds: float = Field(default=30, gt=0)
     market_scan_worker_batch_size: int = Field(default=10, ge=1, le=500)
@@ -454,8 +454,8 @@ class Settings(BaseSettings):
     workspace_setup_default_timeframes: str = "1m,5m,15m"
     backfill_plan_default_limit: int = Field(default=1000, ge=1)
     backfill_plan_max_limit: int = Field(default=10000, ge=1)
-    service_name: str = "trading-intelligence-api"
-    service_title: str = "Trading Intelligence API"
+    service_name: str = "quantrift-api"
+    service_title: str = "QuantRift API"
     service_version: str = "0.1.0"
     seed_default_workspace_name: str | None = None
     seed_default_admin_email: str | None = None

@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/candles"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/candles"
 )
 
 func ParseBinanceMessage(raw []byte, subscription Subscription) (ParsedEvent, error) {

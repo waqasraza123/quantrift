@@ -8,7 +8,7 @@ Production secrets must be injected by the deployment platform, never baked into
 Build from the repository root:
 
 ```sh
-docker build -f apps/api/Dockerfile -t trading-intelligence-api:latest .
+docker build -f apps/api/Dockerfile -t quantrift-api:latest .
 ```
 
 The API image:
@@ -25,7 +25,7 @@ Required production environment:
 ```txt
 APP_ENV=production
 DATABASE_URL=postgresql://...
-CORS_ALLOWED_ORIGINS=https://your-web-origin.example
+CORS_ALLOWED_ORIGINS=https://quantrift.vercel.app
 AUTH_ENABLED=true
 AUTH_MODE=session
 AUTH_PASSWORD_ENABLED=true
@@ -43,7 +43,7 @@ WORKER_SUPERVISOR_COMPONENTS=reasoning_actions,notifications,market_scans
 Run migrations before serving traffic:
 
 ```sh
-docker run --rm --env-file apps/api/.env trading-intelligence-api:latest alembic upgrade head
+docker run --rm --env-file apps/api/.env quantrift-api:latest alembic upgrade head
 ```
 
 ## Web Image
@@ -54,10 +54,10 @@ Build from the repository root:
 docker build \
   -f apps/web/Dockerfile \
   --build-arg NEXT_PUBLIC_API_BASE_URL=https://your-api-origin.example \
-  --build-arg NEXT_PUBLIC_APP_NAME="AI Trading SaaS Starter Kit" \
-  --build-arg NEXT_PUBLIC_SITE_URL=https://your-web-origin.example \
-  --build-arg NEXT_PUBLIC_REPOSITORY_URL=https://github.com/your-name/your-repository \
-  -t trading-intelligence-web:latest .
+  --build-arg NEXT_PUBLIC_APP_NAME="QuantRift" \
+  --build-arg NEXT_PUBLIC_SITE_URL=https://quantrift.vercel.app \
+  --build-arg NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/quantrift \
+  -t quantrift-web:latest .
 ```
 
 The web image:

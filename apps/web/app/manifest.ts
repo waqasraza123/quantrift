@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   const product = getProductConfig();
   return {
     name: product.name,
-    short_name: "Trading SaaS Kit",
+    short_name: "QuantRift",
     description: product.description,
     start_url: "/",
     display: "standalone",

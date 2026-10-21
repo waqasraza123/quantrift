@@ -121,7 +121,7 @@ an explicit `generic_adapter_not_configured` error.
 ```txt
 PROVIDER_POLLING_TIMEOUT_SECONDS=20
 PROVIDER_POLLING_MAX_CANDLES_PER_REQUEST=1000
-PROVIDER_POLLING_USER_AGENT=trading-intelligence-api-provider-polling/0.1
+PROVIDER_POLLING_USER_AGENT=quantrift-api-provider-polling/0.1
 BINANCE_PUBLIC_REST_BASE_URL=https://api.binance.com
 ```
 

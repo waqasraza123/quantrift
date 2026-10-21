@@ -178,7 +178,7 @@ def execute_public_endpoint_test(
     timeout_seconds: int,
     request_metadata: dict[str, Any],
 ) -> CredentialConnectionTestResult:
-    request = Request(endpoint, headers={"User-Agent": "trading-intelligence-provider-test/0.1"})
+    request = Request(endpoint, headers={"User-Agent": "quantrift-provider-test/0.1"})
     try:
         with urlopen(request, timeout=timeout_seconds) as response:
             response_body = response.read(1000).decode("utf-8", errors="replace")

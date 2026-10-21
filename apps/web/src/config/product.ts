@@ -1,16 +1,15 @@
-export const defaultProductName = "AI Trading SaaS Starter Kit";
+export const defaultProductName = "QuantRift";
 export const defaultProductDescription =
-  "Open-source infrastructure for building explainable, read-only AI trading intelligence products.";
-export const defaultSiteUrl = "https://ai-trading-agent-seven.vercel.app";
+  "QuantRift — Agentic AI platform for quantitative market intelligence, signal analysis, and evidence-based research.";
+export const defaultSiteUrl = "https://quantrift.vercel.app";
 export const defaultRepositoryUrl =
-  "https://github.com/waqasraza123/Trading-Data-Analysis-Agent";
+  "https://github.com/waqasraza123/quantrift";
 
 export type ProductConfig = {
   name: string;
   description: string;
   siteUrl: string;
   repositoryUrl: string;
-  templateUrl: string;
 };
 
 export function getProductConfig(): ProductConfig {
@@ -24,7 +23,6 @@ export function getProductConfig(): ProductConfig {
     description: defaultProductDescription,
     siteUrl: normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL, defaultSiteUrl),
     repositoryUrl,
-    templateUrl: `${repositoryUrl}/generate`,
   };
 }
 

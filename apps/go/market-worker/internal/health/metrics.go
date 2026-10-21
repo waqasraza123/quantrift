@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	workerdb "github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/db"
+	workerdb "github.com/waqasraza123/quantrift/apps/go/market-worker/internal/db"
 )
 
 type Metrics struct {

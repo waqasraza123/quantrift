@@ -14,10 +14,10 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/candles"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/config"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/db"
-	"github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/health"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/candles"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/config"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/db"
+	"github.com/waqasraza123/quantrift/apps/go/market-worker/internal/health"
 )
 
 var (

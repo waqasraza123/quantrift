@@ -51,7 +51,7 @@ export function AuthCard({ mode, nextPath }: AuthCardProps) {
         <p className="mt-2 text-sm leading-6 text-slate-400">
           {isRegister
             ? "Start with an isolated Neon-backed workspace and an administrator account."
-            : "Continue to your private trading-intelligence workspace."}
+            : "Continue to your private QuantRift workspace."}
         </p>
       </div>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>

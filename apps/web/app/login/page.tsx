@@ -14,7 +14,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="landing-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050811] px-4 py-10">
       <div className="landing-glow pointer-events-none absolute inset-0" />
-      <Link className="absolute left-5 top-5 z-10 text-sm font-semibold text-slate-400 transition hover:text-white" href="/">← Back to starter kit</Link>
+      <Link className="absolute left-5 top-5 z-10 text-sm font-semibold text-slate-400 transition hover:text-white" href="/">← Back to QuantRift</Link>
       <div className="relative z-10"><AuthCard mode="login" nextPath={params.next} /></div>
     </main>
   );

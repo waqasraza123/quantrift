@@ -1,6 +1,6 @@
 # Backend-Only Implementation Plan
 
-# AI Trading Intelligence Agent
+# QuantRift Backend Implementation Plan
 
 ## FastAPI + Neon PostgreSQL
 

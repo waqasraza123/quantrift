@@ -2,7 +2,17 @@
 
 ## Product
 
-This repository is for an AI Trading Intelligence Agent with a deterministic market intelligence backend and a first read-only daily dashboard web surface. The planned product is a market intelligence engine, not a chatbot, broker integration, or auto-trading system. It must support both CSV/imported historical candle data and live market data feed ingestion. Both ingestion paths must normalize into the same candle storage model and feed the same deterministic analysis engine.
+QuantRift is the MIT-licensed Agentic AI platform for quantitative market intelligence, signal
+analysis, and evidence-based research. `/` is the public platform landing page; product routes use
+the existing Neon-backed FastAPI password-session architecture when `AUTH_MODE=session`. The
+GitHub repository slug is `quantrift`, and the canonical web URL is
+`https://quantrift.vercel.app`.
+
+QuantRift has a deterministic market-intelligence backend and a read-only daily dashboard surface.
+It is not a chatbot, broker integration, auto-trading system, or financial-advice product. It
+supports CSV/imported historical candle data and live market-data ingestion; both paths normalize
+into the same candle model and feed the same deterministic analysis engine. Agentic workflows may
+compose evidence and paper-only plans but cannot execute trades or rewrite deterministic signals.
 
 ## Current Architecture
 
@@ -256,7 +266,7 @@ This repository is for an AI Trading Intelligence Agent with a deterministic mar
 
 - Initialized Git repository.
 - Added repo-driven Codex context system with durable and local memory files.
-- Added backend-only implementation plan for the AI Trading Intelligence Agent.
+- Added the backend-only implementation plan that became the QuantRift intelligence platform.
 - Added Phase 0 backend architecture plan covering the FastAPI + Neon foundation and unified CSV/live ingestion boundary.
 - Implemented Phase 1 FastAPI + Neon backend foundation under `apps/api/`.
 - Implemented Phase 2 core SQLAlchemy models, Alembic migration, and schema documentation.

@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/shopspring/decimal"
 
-	workerdb "github.com/waqasraza123/trading-data-analysis-agent/apps/go/market-worker/internal/db"
+	workerdb "github.com/waqasraza123/quantrift/apps/go/market-worker/internal/db"
 )
 
 type BatchWriter struct {
