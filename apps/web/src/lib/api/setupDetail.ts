@@ -7,6 +7,7 @@ import { getSignalAuditTimeline, getSignalReport } from "@/lib/api/reports";
 import { getSignal, getSignalMarketRegime, getSignalMarketSession } from "@/lib/api/signals";
 import { getSetupChartContext } from "@/lib/api/setupChart";
 import { getSignalSetupContext } from "@/lib/api/setup-context";
+import { listTradeAgentPlans } from "@/lib/api/tradeAgent";
 import type {
   ApiFailure,
   ApiResult,
@@ -69,6 +70,9 @@ export async function getSetupDetail(signalId: UUID): Promise<SetupDetailData> {
     workspaceId ? listJournalEntries({ workspaceId, signalId }) : null,
     crossAssetContext ? listCrossAssetContextResults(crossAssetContext.id) : null,
   ]);
+  const tradeAgentPlansResult = workspaceId
+    ? await listTradeAgentPlans({ workspaceId, signalId, limit: 1 })
+    : null;
   const setupChart = await getSetupChartContext({
     signalId,
     signal,
@@ -101,6 +105,9 @@ export async function getSetupDetail(signalId: UUID): Promise<SetupDetailData> {
     journalEntries: journalEntriesResult
       ? readResult("Journal entries", journalEntriesResult, [], failures)
       : [],
+    tradeAgentPlan: tradeAgentPlansResult
+      ? readResult("Paper trading plan", tradeAgentPlansResult, [], failures)[0] || null
+      : null,
     setupChart,
     failures,
     lastUpdatedAt: new Date().toISOString(),

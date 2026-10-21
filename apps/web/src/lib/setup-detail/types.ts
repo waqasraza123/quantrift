@@ -20,6 +20,7 @@ import type {
   UUID,
 } from "@/lib/api/types";
 import type { SetupChartContext } from "@/lib/api/setupChart";
+import type { TradeAgentPlan } from "@/lib/api/tradeAgent";
 
 export type SetupDetailFailure = {
   label: string;
@@ -47,6 +48,7 @@ export type SetupDetailData = {
   crossAssetContext: CrossAssetContextRun | null;
   crossAssetResults: CrossAssetContextResult[];
   journalEntries: JournalEntry[];
+  tradeAgentPlan: TradeAgentPlan | null;
   setupChart: SetupChartContext;
   failures: SetupDetailFailure[];
   lastUpdatedAt: string;
@@ -100,6 +102,7 @@ export type SetupDetailViewModel = {
   crossAssetContext: CrossAssetContextRun | null;
   crossAssetResults: CrossAssetContextResult[];
   journalEntries: JournalEntry[];
+  tradeAgentPlan: TradeAgentPlan | null;
   setupChart: SetupChartContext;
   actionPlanSection: JsonRecord | null;
   humanReviewSection: JsonRecord | null;

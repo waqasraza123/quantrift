@@ -16,6 +16,8 @@ from app.modules.product_readiness.repository import ProductReadinessRepository
 from app.modules.product_readiness.service import ProductReadinessService
 from app.modules.provider_health.service import ProviderHealthService
 from app.modules.signal_priority.service import SignalPriorityService
+from app.modules.signals.models import Signal
+from app.modules.trade_agent.service import TradeAgentService
 from app.modules.workspace_actions.schemas import (
     WorkspaceQuickActionRequest,
     WorkspaceQuickActionResponse,
@@ -29,6 +31,7 @@ ALLOWED_ACTIONS = {
     "score_recent_signals",
     "refresh_market_memory",
     "run_product_readiness",
+    "create_trade_agent_plan",
 }
 UNSAFE_ACTIONS = {
     "buy",
@@ -78,6 +81,8 @@ class WorkspaceQuickActionService:
             return await self.score_recent_signals(workspace_id, payload)
         if action_type == "refresh_market_memory":
             return await self.refresh_market_memory(workspace_id, payload)
+        if action_type == "create_trade_agent_plan":
+            return await self.create_trade_agent_plan(workspace_id, payload)
         return await self.run_product_readiness(workspace_id, payload)
 
     async def run_daily_workflow(
@@ -239,6 +244,47 @@ class WorkspaceQuickActionService:
                 "readinessScore": str(run.readiness_score),
                 "blockerCount": len(run.blockers_json),
                 "warningCount": len(run.warnings_json),
+            },
+        )
+
+    async def create_trade_agent_plan(
+        self,
+        workspace_id: UUID,
+        payload: WorkspaceQuickActionRequest,
+    ) -> WorkspaceQuickActionResponse:
+        signal_id_value = option_value(payload.options, "signal_id", None) or option_value(
+            payload.options,
+            "signalId",
+            None,
+        )
+        if signal_id_value is None:
+            raise AppError(
+                422,
+                "signal_id_required",
+                "A signalId option is required to create a paper plan.",
+            )
+        signal_id = UUID(str(signal_id_value))
+        signal = await self.session.get(Signal, signal_id)
+        if signal is None:
+            raise AppError(404, "signal_not_found", "Signal not found")
+        if signal.workspace_id != workspace_id:
+            raise AppError(422, "workspace_mismatch", "Signal belongs to a different workspace")
+        trade_agent_service = TradeAgentService(self.session, settings=self.settings)
+        plan = await trade_agent_service.create_plan_from_signal(
+            signal_id=signal_id,
+            force_recompute=bool(option_value(payload.options, "force", False)),
+        )
+        return WorkspaceQuickActionResponse(
+            workspace_id=workspace_id,
+            action_type="create_trade_agent_plan",
+            status=plan.status.value,
+            summary=plan.summary,
+            created_artifact_ids_json={"tradeAgentPlanId": str(plan.id)},
+            result_json={
+                "planId": str(plan.id),
+                "signalId": str(plan.signal_id),
+                "paperOnly": True,
+                "brokerExecution": False,
             },
         )
 

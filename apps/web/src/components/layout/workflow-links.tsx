@@ -19,6 +19,7 @@ export const primaryWorkflowTargets: WorkflowTarget[] = [
   "brief",
   "dataOnboarding",
   "scanner",
+  "tradeAgent",
   "triage",
   "quality",
   "notifications",

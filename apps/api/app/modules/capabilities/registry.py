@@ -809,6 +809,44 @@ DEFAULT_CAPABILITIES: tuple[CapabilityDefinition, ...] = (
         metadata=metadata(deterministic=True, read_only=False, mutates_intelligence_artifacts=True),
     ),
     CapabilityDefinition(
+        key="trade_agent_paper_plans",
+        name="Paper Trading Agent Plans",
+        category=CapabilityCategory.OPERATIONS,
+        execution_type=CapabilityExecutionType.MANUAL_ONLY,
+        safety_level=CapabilitySafetyLevel.REVIEW_REQUIRED,
+        module_path="app.modules.trade_agent",
+        status=CapabilityStatus.EXPERIMENTAL,
+        input_contracts=("signal_snapshot", "setup_context", "decision_readiness"),
+        output_contracts=("trade_agent_plan", "journal_entry"),
+        produced_artifacts=("trade_agent_plans", "trade_agent_reviews", "trade_agent_observations"),
+        route_refs=(
+            "/trade-agent/plans/from-signal/{signal_id}",
+            "/trade-agent/plans/{plan_id}/review",
+            "/trade-agent/plans/{plan_id}/observe",
+        ),
+        dependencies=(
+            "signal_classification",
+            "decision_readiness",
+            "trading_journal",
+            "safety_policies",
+        ),
+        metadata={
+            **metadata(
+                deterministic=True,
+                read_only=False,
+                mutates_intelligence_artifacts=True,
+                safe_to_run_automatically=False,
+                notes=(
+                    "Creates paper-only review plans and journal-linked decisions without "
+                    "broker execution."
+                ),
+            ),
+            "executionType": "human_review",
+            "safetyLevel": "paper_only",
+            "brokerExecution": False,
+        },
+    ),
+    CapabilityDefinition(
         key="rule_packs",
         name="Rule Packs and Reproducibility Manifests",
         category=CapabilityCategory.GOVERNANCE,

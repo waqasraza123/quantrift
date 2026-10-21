@@ -11,6 +11,7 @@ import { SetupEvidenceReviewPanel } from "./SetupEvidenceReviewPanel";
 import { SetupHistoricalReviewPanel } from "./SetupHistoricalReviewPanel";
 import { SetupIntelligenceContextPanel } from "./SetupIntelligenceContextPanel";
 import { SetupJournalReviewPanel } from "./SetupJournalReviewPanel";
+import { SetupPaperPlanPanel } from "./SetupPaperPlanPanel";
 import { SetupReasoningReviewPanel } from "./SetupReasoningReviewPanel";
 import { SetupReviewHeader } from "./SetupReviewHeader";
 import { SetupWaitAvoidReviewPanel } from "./SetupWaitAvoidReviewPanel";
@@ -45,7 +46,7 @@ export function SetupReviewView({ data }: SetupReviewViewProps) {
       <AnimatedListItem as="section" style={motionRevealDensityStyle(1)}>
         <WorkflowLinks
           workspaceId={workspaceId}
-          targets={["commandCenter", "brief", "triage", "scanner", "dataOnboarding", "review", "journal"]}
+          targets={["commandCenter", "brief", "triage", "tradeAgent", "scanner", "dataOnboarding", "review", "journal"]}
         />
       </AnimatedListItem>
       <AnimatedListItem as="section" style={motionRevealDensityStyle(2)}>
@@ -77,13 +78,20 @@ export function SetupReviewView({ data }: SetupReviewViewProps) {
             <SetupIntelligenceContextPanel model={model} />
           </AnimatedListItem>
           <AnimatedListItem as="section" style={motionRevealDensityStyle(4)}>
-            <SetupJournalReviewPanel
+            <SetupPaperPlanPanel
               workspaceId={workspaceId}
               signalId={data.signalId}
               model={model}
             />
           </AnimatedListItem>
           <AnimatedListItem as="section" style={motionRevealDensityStyle(5)}>
+            <SetupJournalReviewPanel
+              workspaceId={workspaceId}
+              signalId={data.signalId}
+              model={model}
+            />
+          </AnimatedListItem>
+          <AnimatedListItem as="section" style={motionRevealDensityStyle(6)}>
             <SetupAuditReviewPanel model={model} />
           </AnimatedListItem>
         </aside>

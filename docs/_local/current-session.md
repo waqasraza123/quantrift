@@ -1,5 +1,152 @@
 # Current Session
 
+## Authentication Verification and UI
+
+- Reworked first-party password signup so it creates an unverified account and a hashed,
+  cryptographically random, expiring, single-use verification token without creating a session.
+- Added migration `202610211200_email_verification`; existing password credentials are backfilled
+  as verified, and new token records retain delivery, expiry, consumption, and invalidation state.
+- Added Resend API and SMTP verification delivery behind a provider interface, fail-closed delivery
+  behavior, resend invalidation/cooldown, dedicated auth rate limits, verified-login enforcement,
+  and unverified-session rejection. Resend uses a server-only API key, per-token idempotency keys,
+  provider-confirmed message ids, a bounded timeout, and a verified sender address.
+- Added `/auth/email/verify` and `/auth/email/resend`, plus same-origin web handlers and
+  `/verify-email`. The login proxy now strips raw session tokens before responding to browser code;
+  session mode no longer reads bearer tokens from browser storage; logout clears the matching
+  HttpOnly, SameSite cookie.
+- Redesigned login/register and verification states with responsive layouts, accessible validation,
+  password visibility, reduced-motion-aware transitions, inline loading indicators, resend, and
+  accurate success/error messaging.
+- Verification:
+  - focused API Ruff passed;
+  - focused API tests: `31 passed, 4 skipped` (DB integration tests skipped without
+    `TEST_DATABASE_URL`);
+  - full API pytest: `413 passed, 56 skipped, 1 unrelated failure` in the isolated intelligence
+    quality route test because its test app has no `app.state.settings`;
+  - full API Ruff remains blocked by 16 existing equity-data violations;
+  - full API mypy remains blocked by 300 existing errors across 70 files;
+  - Alembic reports one head: `202610211200_email_verification`;
+  - web lint passed with four existing warnings, typecheck passed, and production build passed;
+  - focused auth Playwright: `9 passed`;
+  - full Playwright: `43 passed, 5 unrelated failures` in setup-detail, journal/notifications motion
+    visibility, and onboarding locator cases.
+  - strict motion rollout audit recognizes `verify-email` as an auth-surface exemption and remains
+    blocked only by the pre-existing untracked `trade-agent` route missing from its manifest.
+- Resend provider tests were added but not run at the user's request; no lint, type check, build, or
+  end-to-end command was run for the Resend change.
+- Added an ignored `apps/api/.env` for local session auth and Resend configuration, with the API key
+  and verified sender intentionally blank for local secret entry. Docker Compose API and worker
+  services now load this local file instead of the tracked example.
+
+## QuantRift Rebrand
+
+- Rebranded the public repository and application from the previous starter-kit identity to
+  QuantRift, an Agentic AI quantitative market-intelligence platform.
+- Updated README copy and badges, canonical repository and production URLs, product metadata, SEO
+  keywords, landing-page copy, package/service names, Docker and CI labels, deployment docs, API
+  identity, Go module imports, environment defaults, tests, and the tracked landing-page image.
+- Preserved the no-broker-execution, paper-only, human-review, and non-advisory boundaries.
+- Preserved persistence-sensitive database names, cookie names, and browser-storage keys.
+- Renamed GitHub repository to `waqasraza123/quantrift`, set the requested description and homepage,
+  replaced repository topics with the QuantRift AI-agent/quantitative-finance technology set, and
+  updated local `origin` to `https://github.com/waqasraza123/quantrift`.
+- Commit `740ec41` (`Rebrand platform as QuantRift`) was pushed to `main`.
+- Verification:
+  - `make web-check` passed with four existing warnings;
+  - focused API Ruff and pytest passed: `30 passed`;
+  - focused Playwright landing tests passed: `2 passed`;
+  - `git diff --check` passed;
+  - `https://quantrift.vercel.app` returned HTTP 200, but the live deployment still served the prior
+    landing copy immediately after the push, so the Vercel Git connection/environment and production
+    redeployment need confirmation.
+  - GitHub API CI and combined CI failed on 16 pre-existing equity-data Ruff violations; Web CI
+    completed with 31 passed and 8 existing browser failures outside the focused landing coverage.
+- Existing paper-agent working-tree changes and portfolio assets were excluded from the rebrand
+  commit.
+
+## Portfolio Verification and Cover Asset
+
+- Tested the current working tree without changing application code.
+- Web verification:
+  - `make web-check` passed lint, TypeScript, and the production Next.js build;
+  - lint reported four existing unused-import warnings and no errors;
+  - Playwright completed with `32 passed` and `7 failed` across 39 tests;
+  - browser failures cover two quick actions, populated signal detail, journal/notifications
+    visibility, and two onboarding locator/runtime cases.
+- API verification:
+  - direct pytest completed with `406 passed`, `52 skipped`, and `2 failed`;
+  - failures are the isolated intelligence-quality app missing `app.state.settings` and the
+    unexempted `PATCH /auth/profile` RBAC coverage check;
+  - Ruff reports 16 existing equity-data lint errors;
+  - mypy reports 300 existing errors across 70 files;
+  - Alembic reports one head: `202605151000_trade_agent`.
+- The Go suite was not run because the local `go` executable is unavailable.
+- Generated and visually checked portfolio assets:
+  - `docs/assets/ai-trading-intelligence-portfolio-cover.png` (1448x1086);
+  - `docs/assets/ai-trading-intelligence-portfolio-cover-1000x750.png` (Upwork-ready 4:3 export).
+- The cover uses demo market data and visibly states paper-only, human-approval, and no-broker-
+  execution constraints; it does not claim account performance or live execution.
+
+## AI Trading SaaS Starter Kit
+
+- Repositioned the repository as the MIT-licensed AI Trading SaaS Starter Kit while preserving the
+  existing GitHub slug and the no-broker-execution product boundary.
+- Replaced the `/` command-center redirect with a responsive dark developer landing page, native
+  cockpit/architecture previews, public metadata routes, starter-kit SEO defaults, and a local
+  README screenshot.
+- Rewrote the root README for template adoption and updated web/package/Docker/CI branding plus
+  Neon session deployment documentation.
+- Hardened first-party authentication:
+  - fixed auth route initialization ordering;
+  - added Argon2id password hashing with legacy PBKDF2 verification and lazy rehash;
+  - added authenticated name-only `PATCH /auth/profile` and account UI;
+  - forwarded HTTP-only sessions through server-rendered API reads and the browser proxy;
+  - added same-origin mutation checks, backend-derived cookie expiry, safe login redirects, and
+    registration-to-onboarding behavior.
+- Verification:
+  - focused Ruff, mypy, and auth tests passed: `9 passed`;
+  - `npm run typecheck` and production `npm run build` passed;
+  - `make web-check` passed with four existing unused-import warnings;
+  - landing Playwright coverage passed: `2 passed`;
+  - `git diff --check` passed;
+  - full `make api-check` reached Ruff and remains blocked by existing equity-data lint debt
+    outside this task.
+
+## AI Paper Trading Agent
+
+- Added a paper-only AI trade-agent planning layer:
+  - backend module `apps/api/app/modules/trade_agent/`;
+  - Alembic revision `202605151000_trade_agent`;
+  - persisted `trade_agent_plans`, `trade_agent_reviews`, and `trade_agent_observations`;
+  - API routes under `/trade-agent` for create-from-signal, list/get, review, and observe;
+  - reviews create linked trading-journal entries and observations reuse stored signal outcomes;
+  - critical decision-readiness blockers reject plan creation;
+  - safety metadata explicitly records paper-only, no broker execution, no live execution, no advice.
+- Added guarded quick action `create_trade_agent_plan` while existing unsafe workspace actions remain blocked.
+- Registered capability `trade_agent_paper_plans` with metadata `executionType=human_review`,
+  `safetyLevel=paper_only`, and `brokerExecution=false`.
+- Added web support:
+  - typed `tradeAgent` API client;
+  - `/trade-agent` paper-plan review route;
+  - setup-detail hydration of optional paper plans;
+  - `SetupPaperPlanPanel` on signal review pages;
+  - navigation/workflow link entry for Paper Agent.
+- Added tests:
+  - unit helper coverage in `app/tests/unit/trade_agent/test_trade_agent_service.py`;
+  - integration API coverage in `app/tests/test_trade_agent_integration.py`.
+- Verification:
+  - `python3 -m py_compile` for new/changed backend files passed;
+  - `uv run ruff check ...` for targeted backend files passed;
+  - `npx tsc --noEmit` passed;
+  - targeted `npx eslint ...` passed;
+  - `git diff --check` passed;
+  - `uv run alembic heads` returned single head `202605151000_trade_agent`;
+  - started `apps/web` dev server on `http://localhost:3001`, verified `/trade-agent`
+    with `agent-browser` for page content, no Next error overlay, and empty console error list,
+    then stopped the server;
+  - pytest could not collect because existing `app.modules.auth.routes` import fails with
+    `NameError: require_session_user_identity is not defined`.
+
 ## Equity Data Operation Recovery Plan
 
 - Started from a clean `main`; there was no pre-existing local work to commit before this pass.
@@ -1696,3 +1843,18 @@ changes. Preserve unrelated worktree changes unless explicitly asked.
   - `git diff --check` passed;
   - touched backend Python files passed `py_compile` syntax checks via the API virtualenv;
   - no tests, lint, typecheck, or build commands were run per user instruction.
+## Client-Focused Landing Page
+
+- Reworked `apps/web/src/components/marketing/LandingPage.tsx` into a concise, product-led front page.
+- Replaced developer-facing architecture, stack, repository, and local setup content with customer outcomes, a product preview, and register/demo calls to action.
+- Kept the human-review and no-broker-execution boundaries visible without repeating technical detail.
+- Updated `apps/web/tests/e2e/landing.spec.ts` to match the new messaging and actions.
+- Verification completed before the user requested no further tests: targeted TypeScript and ESLint checks passed; the landing Playwright spec also finished with 2 passing tests while the stop request was being handled.
+
+## Current Work Publication
+
+- Prepared the AI paper trading agent, client-focused landing page, supporting tests, project memory,
+  and portfolio cover assets for publication to `main`.
+- Excluded macOS `.DS_Store` metadata and Playwright `apps/web/test-results/` output from the commit.
+- No tests or verification commands were run during publication, per user instruction.
+

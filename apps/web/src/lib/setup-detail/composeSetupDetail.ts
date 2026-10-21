@@ -43,6 +43,7 @@ export function composeSetupDetail(data: SetupDetailData): SetupDetailViewModel 
     crossAssetContext: data.crossAssetContext,
     crossAssetResults: data.crossAssetResults,
     journalEntries: data.journalEntries,
+    tradeAgentPlan: data.tradeAgentPlan,
     setupChart: data.setupChart,
     actionPlanSection,
     humanReviewSection,

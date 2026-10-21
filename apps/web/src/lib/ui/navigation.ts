@@ -8,6 +8,7 @@ export type NavigationTarget =
   | "dataOnboarding"
   | "scanner"
   | "equityResearch"
+  | "tradeAgent"
   | "triage"
   | "quality"
   | "notifications"
@@ -33,6 +34,7 @@ export const navigationItems: NavigationItem[] = [
   { key: "dataOnboarding", href: "/data/onboarding", label: "Data", section: "Data", description: "Freshness, source, and gap readiness" },
   { key: "scanner", href: "/scanner", label: "Scanner", section: "Scanner", description: "Watchlists and deterministic scan configs" },
   { key: "equityResearch", href: "/equity-research", label: "Equity Research", shortLabel: "Equities", section: "Scanner", description: "Stock universes and swing setup candidate review" },
+  { key: "tradeAgent", href: "/trade-agent", label: "Paper Agent", section: "Triage", description: "Paper-only plan review and journal-linked decisions" },
   { key: "triage", href: "/triage", label: "Triage", section: "Triage", description: "Prioritized deterministic signal review" },
   { key: "quality", href: "/quality", label: "Quality", section: "Quality", description: "Observed behavior and reliability diagnostics" },
   { key: "notifications", href: "/notifications", label: "Notifications", shortLabel: "Inbox", section: "Notifications", description: "In-app intelligence event review" },
@@ -52,6 +54,7 @@ export const primaryNavigationTargets: NavigationTarget[] = [
   "dataOnboarding",
   "scanner",
   "equityResearch",
+  "tradeAgent",
   "triage",
   "quality",
   "notifications",

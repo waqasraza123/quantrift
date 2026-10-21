@@ -196,6 +196,7 @@ from app.modules.timeframe_aggregation.models import (
     DerivedCandleLineage,
     MultiTimeframeContext,
 )
+from app.modules.trade_agent.models import TradeAgentObservation, TradeAgentPlan, TradeAgentReview
 from app.modules.trading_journal.models import (
     JournalEntry,
     JournalEntryAttachment,
@@ -385,6 +386,9 @@ __all__ = [
     "StrategyProfileSimulationResult",
     "StrategyProfileSimulationRun",
     "Symbol",
+    "TradeAgentObservation",
+    "TradeAgentPlan",
+    "TradeAgentReview",
     "User",
     "WalkForwardValidationComparison",
     "WalkForwardValidationRun",
