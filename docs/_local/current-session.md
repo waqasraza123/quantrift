@@ -1,5 +1,24 @@
 # Current Session
 
+## Neon Migration Reliability
+
+- Hardened Alembic for Neon by disabling asyncpg prepared-statement caches during migrations and
+  making the `alembic_version.version_num` resize conditional instead of issuing DDL on every run.
+- Added merge revision `202610221000_auth_trade_agent_merge` so the trade-agent and email-
+  verification branches converge to one head.
+- Updated migration documentation to use Neon's direct endpoint and refreshed the migration-head
+  integration assertions.
+- Repaired historical migrations that double-formatted check-constraint names, exceeded
+  PostgreSQL's identifier limit, recreated seven tables from sibling canonical migrations, or used
+  the reserved `limit` identifier unquoted in a check expression.
+- Enabled per-migration transactions after committing version-table setup so long remote upgrades
+  retain completed revisions and can resume safely after a later failure.
+- Verification: focused Ruff and Python compilation passed; the complete offline migration graph
+  renders successfully; Alembic resolves exactly one head; `git diff --check` passed; and the live
+  Neon database configured in `apps/api/.env` was upgraded from `202604291030` to
+  `202610221000_auth_trade_agent_merge`. A final `alembic current -v` through the configured pooled
+  URL confirmed the database is at head.
+
 ## Authentication Verification and UI
 
 - Reworked first-party password signup so it creates an unverified account and a hashed,

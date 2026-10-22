@@ -1,7 +1,7 @@
 from asyncio import run
 from logging.config import fileConfig
 
-from sqlalchemy import pool
+from sqlalchemy import inspect, pool, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
@@ -15,6 +15,35 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = metadata
+
+VERSION_NUM_LENGTH = 64
+
+
+def ensure_version_table(connection: Connection) -> None:
+    inspector = inspect(connection)
+    if not inspector.has_table("alembic_version"):
+        connection.execute(
+            text(
+                f"CREATE TABLE alembic_version ("
+                f"version_num varchar({VERSION_NUM_LENGTH}) NOT NULL, "
+                f"CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"
+            )
+        )
+        return
+
+    version_column = next(
+        column
+        for column in inspector.get_columns("alembic_version")
+        if column["name"] == "version_num"
+    )
+    current_length = getattr(version_column["type"], "length", None)
+    if current_length is not None and current_length < VERSION_NUM_LENGTH:
+        connection.execute(
+            text(
+                "ALTER TABLE alembic_version "
+                f"ALTER COLUMN version_num TYPE varchar({VERSION_NUM_LENGTH})"
+            )
+        )
 
 
 def get_database_url() -> str:
@@ -38,7 +67,13 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    ensure_version_table(connection)
+    connection.commit()
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        transaction_per_migration=True,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -51,6 +86,10 @@ async def run_migrations_online() -> None:
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={
+            "prepared_statement_cache_size": 0,
+            "statement_cache_size": 0,
+        },
     )
 
     async with connectable.connect() as connection:

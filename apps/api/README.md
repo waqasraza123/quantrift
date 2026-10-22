@@ -426,8 +426,12 @@ Run the development server:
 Run migrations:
 
 ```sh
-.venv/bin/alembic upgrade head
+DATABASE_URL='postgresql://user:password@direct-host/database?sslmode=require' \
+  .venv/bin/alembic upgrade head
 ```
+
+Use Neon's direct, non-pooler endpoint for schema migrations. The application can use the pooled
+endpoint during normal runtime.
 
 Run product readiness:
 

@@ -19,9 +19,11 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.drop_constraint("ck_data_sources_source_type_allowed", "data_sources", type_="check")
+    op.drop_constraint(
+        op.f("ck_data_sources_source_type_allowed"), "data_sources", type_="check"
+    )
     op.create_check_constraint(
-        "ck_data_sources_source_type_allowed",
+        op.f("ck_data_sources_source_type_allowed"),
         "data_sources",
         "source_type in ('csv_upload', 'json_import', 'api_polling', "
         "'websocket_live', 'manual_seed', 'chart_screenshot', 'derived_aggregation')",
@@ -258,9 +260,11 @@ def downgrade() -> None:
     )
     op.drop_index("ix_candle_aggregation_runs_status_created", table_name="candle_aggregation_runs")
     op.drop_table("candle_aggregation_runs")
-    op.drop_constraint("ck_data_sources_source_type_allowed", "data_sources", type_="check")
+    op.drop_constraint(
+        op.f("ck_data_sources_source_type_allowed"), "data_sources", type_="check"
+    )
     op.create_check_constraint(
-        "ck_data_sources_source_type_allowed",
+        op.f("ck_data_sources_source_type_allowed"),
         "data_sources",
         "source_type in ('csv_upload', 'json_import', 'api_polling', "
         "'websocket_live', 'manual_seed', 'chart_screenshot')",

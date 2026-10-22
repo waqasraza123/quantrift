@@ -72,7 +72,7 @@ def upgrade() -> None:
             name="provider_polling_requests_counts_non_negative",
         ),
         sa.CheckConstraint(
-            "limit is null or limit > 0",
+            '"limit" is null or "limit" > 0',
             name="provider_polling_requests_limit_positive",
         ),
         sa.ForeignKeyConstraint(["source_id"], ["data_sources.id"], ondelete="RESTRICT"),
@@ -81,7 +81,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
-        "ix_provider_polling_requests_workspace_provider_symbol_timeframe",
+        "ix_provider_polling_workspace_provider_symbol_timeframe",
         "provider_polling_requests",
         ["workspace_id", "provider", "symbol_id", "timeframe"],
     )
@@ -148,7 +148,7 @@ def downgrade() -> None:
         table_name="provider_polling_requests",
     )
     op.drop_index(
-        "ix_provider_polling_requests_workspace_provider_symbol_timeframe",
+        "ix_provider_polling_workspace_provider_symbol_timeframe",
         table_name="provider_polling_requests",
     )
     op.drop_table("provider_polling_requests")

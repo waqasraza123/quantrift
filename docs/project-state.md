@@ -25,6 +25,13 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
   and same-origin proxy calls, and authenticated users can update only their own display name
   through `PATCH /auth/profile`.
 - The production hardening foundation branches are reconciled through Alembic merge revision `202605061100_production_hardening_merge`. Runtime supervisor state, provider credential references, dashboard read models, auth/RBAC, product readiness, job queue, candle ingestion performance, and observability SLO snapshots now converge to one migration head while preserving local/dev auth behavior and read-only cockpit fallbacks.
+- The trade-agent and email-verification branches converge through Alembic merge revision
+  `202610221000_auth_trade_agent_merge`. Alembic migrations disable asyncpg prepared-statement
+  caches, resize the version column only when needed, and commit each revision independently so
+  Neon schema upgrades do not reuse stale pooled query plans or lose earlier progress on failure.
+  Historical migration blockers involving duplicate tables, constraint formatting, identifier
+  length, and the reserved `limit` identifier are repaired; the configured Neon database was
+  verified at this head on 2026-10-23.
 
 - Workspace intelligence catalog metadata indexing and search endpoints exist for cross-artifact discovery without external search infrastructure or raw payload storage.
 

@@ -117,27 +117,18 @@ def upgrade() -> None:
             "relationship_type in ('produced', 'derived_from', 'explained_by', "
             "'evaluated_by', 'correlated_with', 'reasoned_from', 'planned_from', "
             "'replayed_from', 'corrected_from', 'diagnosed_by', 'exported_from')",
-            name=(
-                "ck_intelligence_artifact_dependencies_"
-                "intelligence_artifact_dependency_relationship_allowed"
-            ),
+            name="relationship_allowed",
         ),
         sa.ForeignKeyConstraint(
             ["source_artifact_record_id"],
             ["intelligence_artifacts.id"],
-            name=(
-                "fk_intelligence_artifact_dependencies_"
-                "source_artifact_record_id_intelligence_artifacts"
-            ),
+            name="fk_artifact_dependencies_source_artifact",
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["target_artifact_record_id"],
             ["intelligence_artifacts.id"],
-            name=(
-                "fk_intelligence_artifact_dependencies_"
-                "target_artifact_record_id_intelligence_artifacts"
-            ),
+            name="fk_artifact_dependencies_target_artifact",
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
@@ -198,14 +189,12 @@ def upgrade() -> None:
             "reason_code in ('source_data_changed', 'rule_pack_changed', "
             "'strategy_profile_changed', 'correction_accepted', 'replay_requested', "
             "'manual_invalidation', 'data_quality_changed', 'parser_version_changed')",
-            name="ck_artifact_invalidation_events_artifact_invalidation_event_reason_allowed",
+            name="reason_allowed",
         ),
         sa.ForeignKeyConstraint(
             ["source_artifact_record_id"],
             ["intelligence_artifacts.id"],
-            name=(
-                "fk_artifact_invalidation_events_source_artifact_record_id_intelligence_artifacts"
-            ),
+            name="fk_artifact_invalidations_source_artifact",
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
@@ -252,15 +241,13 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["artifact_record_id"],
             ["intelligence_artifacts.id"],
-            name="fk_artifact_invalidation_items_artifact_record_id_intelligence_artifacts",
+            name="fk_artifact_invalidation_items_artifact",
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["invalidation_event_id"],
             ["artifact_invalidation_events.id"],
-            name=(
-                "fk_artifact_invalidation_items_invalidation_event_id_artifact_invalidation_events"
-            ),
+            name="fk_artifact_invalidation_items_event",
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(

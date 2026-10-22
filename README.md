@@ -132,7 +132,9 @@ WEB_API_PROXY_BASE_URL=https://your-api.example
 WEB_AUTH_SESSION_COOKIE=trading_intelligence_session
 ```
 
-Use a Neon pooled connection string for the application. Run Alembic migrations before enabling traffic. Never put database credentials, API keys, or provider secrets in `NEXT_PUBLIC_*` variables.
+Use a Neon pooled connection string for the application and a direct, non-pooler connection string
+for Alembic migrations. Run migrations before enabling traffic. Never put database credentials,
+API keys, or provider secrets in `NEXT_PUBLIC_*` variables.
 
 Session tokens are stored as hashes in Postgres and transported to the browser only through secure HTTP-only cookies. New passwords use Argon2id; existing PBKDF2 credentials are upgraded after a successful login.
 

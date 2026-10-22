@@ -19,9 +19,9 @@ STATUS_CONSTRAINT = "ck_chart_screenshot_runs_chart_screenshot_runs_status_allow
 
 
 def upgrade() -> None:
-    op.drop_constraint(STATUS_CONSTRAINT, "chart_screenshot_runs", type_="check")
+    op.drop_constraint(op.f(STATUS_CONSTRAINT), "chart_screenshot_runs", type_="check")
     op.create_check_constraint(
-        STATUS_CONSTRAINT,
+        op.f(STATUS_CONSTRAINT),
         "chart_screenshot_runs",
         "status in ('received', 'parsing', 'ingested', 'review_required', "
         "'analysis_triggered', 'analysis_failed', 'failed', 'completed')",
@@ -32,9 +32,9 @@ def downgrade() -> None:
     op.execute(
         "update chart_screenshot_runs set status = 'completed' where status = 'review_required'"
     )
-    op.drop_constraint(STATUS_CONSTRAINT, "chart_screenshot_runs", type_="check")
+    op.drop_constraint(op.f(STATUS_CONSTRAINT), "chart_screenshot_runs", type_="check")
     op.create_check_constraint(
-        STATUS_CONSTRAINT,
+        op.f(STATUS_CONSTRAINT),
         "chart_screenshot_runs",
         "status in ('received', 'parsing', 'ingested', 'analysis_triggered', "
         "'analysis_failed', 'failed', 'completed')",
