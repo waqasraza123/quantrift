@@ -70,6 +70,8 @@ class PasswordAuthService:
         normalized_email = normalize_email(email)
         normalized_name = normalize_required_text(name, "name")
         normalized_workspace_name = normalize_required_text(workspace_name, "workspace_name")
+        if await self.get_credential_by_email(normalized_email) is not None:
+            raise AppError(409, "account_conflict", "Account already exists")
         password_hash = hash_password(password)
         workspace_id = uuid4()
         user_id = uuid4()
@@ -89,10 +91,12 @@ class PasswordAuthService:
             status=AuthIdentityStatus.ACTIVE.value,
             failed_attempts=0,
         )
-        self.session.add(workspace)
-        self.session.add(user)
-        self.session.add(credential)
         try:
+            self.session.add(workspace)
+            await self.session.flush()
+            self.session.add(user)
+            await self.session.flush()
+            self.session.add(credential)
             await self.session.flush()
             verification = await EmailVerificationService(
                 self.session,
@@ -106,7 +110,9 @@ class PasswordAuthService:
             await self.session.commit()
         except IntegrityError as error:
             await self.session.rollback()
-            raise AppError(409, "account_conflict", "Account already exists") from error
+            if is_account_email_conflict(error):
+                raise AppError(409, "account_conflict", "Account already exists") from error
+            raise
         return RegisteredAccount(verification=verification)
 
     async def login(self, *, email: str, password: str) -> CreatedSession:
@@ -511,3 +517,7 @@ def decode_part(value: str) -> bytes:
 
 def invalid_credentials_error() -> AppError:
     return AppError(401, "invalid_credentials", "Credentials are invalid")
+
+
+def is_account_email_conflict(error: IntegrityError) -> bool:
+    return "uq_auth_password_credentials_email" in str(error.orig)

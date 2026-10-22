@@ -1,5 +1,23 @@
 # Current Session
 
+## Registration/Login Failure Diagnosis
+
+- Confirmed the configured auth database had five `invalid_credentials` login failures and two
+  `account_conflict` registration failures, while `users`, `workspaces`,
+  `auth_password_credentials`, and `auth_email_verification_tokens` all contained zero rows.
+- Reproduced registration in a rollback-only transaction. The real failure is the
+  `fk_auth_password_credentials_user_id_users` foreign-key constraint: the ORM flush attempts to
+  insert `auth_password_credentials` before its `users` row.
+- `PasswordAuthService.register()` catches every `IntegrityError` and reports `Account already
+  exists`, masking this ordering failure. The transaction then rolls back, so subsequent login
+  correctly finds no credential and returns `Credentials are invalid`.
+- Fixed registration by checking for an existing credential first and flushing workspace, user,
+  credential, and verification-token records in dependency order. Only the credential email unique
+  constraint is now translated to `account_conflict`; unrelated integrity failures propagate.
+- Verification: focused Ruff passed; focused auth tests passed (`14 passed, 4 skipped`); and a full
+  register, verify, and login flow succeeded against the configured Neon database inside an outer
+  transaction that was rolled back. No diagnostic or verification account data was retained.
+
 ## Neon Migration Reliability
 
 - Hardened Alembic for Neon by disabling asyncpg prepared-statement caches during migrations and
