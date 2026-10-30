@@ -1,5 +1,16 @@
 # Current Session
 
+## Main Publication
+
+- Published all pending OpenAI/LangGraph, homepage, workspace, README, and migration changes to
+  `origin/main` in `482e7ca` on 2026-10-31. All older local branch commits were already included in
+  the remote main history; no additional branch merges were needed.
+- Added ignore rules for `.DS_Store`, `apps/api/build/`, and `apps/web/test-results/`; local
+  generated artifacts remain on disk and are excluded from source publication.
+- No tests, builds, lint, type checks, migrations, or live provider calls were run. Runtime and
+  visual verification remain with the user; feature activation still requires the documented
+  migration, server-side key/configuration, and dedicated suggestion worker.
+
 ## Product Homepage and Workspace Redesign
 
 - Rebuilt the public homepage around charts, setup reasoning, independent risk review, and
@@ -15,7 +26,7 @@
 - Preserved earlier uncommitted OpenAI/LangGraph implementation and unrelated untracked artifacts.
 - Per user instruction, no tests, builds, lint, type checks, preview servers, browser checks,
   screenshots, migrations, or deployments were run. Runtime/visual verification remains with the
-  user. No commit or push requested.
+  user. Published with the implementation in `482e7ca`.
 
 ## LangGraph OpenAI Trade Suggestions
 
@@ -31,7 +42,7 @@
 - Installed the new Python dependencies locally. At the user's explicit request, no tests,
   builds, lint, type checks, migrations, or live provider calls were executed for this task.
 - Verification is left to the user; the feature has not been runtime verified. Existing untracked
-  `.DS_Store`, API build artifacts, and web test results were preserved. No commit or push requested.
+  `.DS_Store`, API build artifacts, and web test results were preserved and are now ignored.
 
 ## Registration/Login Failure Diagnosis
 
