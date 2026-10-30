@@ -47,5 +47,5 @@ export function ApiStatusIndicator({ apiBaseUrl }: ApiStatusIndicatorProps) {
     };
   }, [apiBaseUrl]);
 
-  return <StatusPill label="API" value={state.label} tone={state.tone} />;
+  return <StatusPill label="Connection" value={state.label} tone={state.tone} />;
 }

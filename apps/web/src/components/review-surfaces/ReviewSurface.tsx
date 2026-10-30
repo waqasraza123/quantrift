@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 type SurfaceTone = "neutral" | "good" | "warning" | "danger" | "info";
 
@@ -42,18 +43,7 @@ const toneClassName: Record<SurfaceTone, string> = {
 
 export function ReviewSurfaceHero({ eyebrow, title, description, actions, meta }: SurfaceHeroProps) {
   return (
-    <section className="relative overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--panel)] p-5 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-6">
-      <div className="absolute inset-x-0 top-0 h-1 bg-[var(--accent)]" />
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">{eyebrow}</p>
-          <h2 className="mt-2 text-3xl font-semibold text-[var(--strong)] sm:text-4xl">{title}</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</p>
-          {meta && <div className="mt-4 flex flex-wrap gap-2">{meta}</div>}
-        </div>
-        {actions && <div className="flex shrink-0 flex-wrap items-center gap-3">{actions}</div>}
-      </div>
-    </section>
+    <PageHeader eyebrow={eyebrow} title={title} description={description} actions={actions} meta={meta} />
   );
 }
 

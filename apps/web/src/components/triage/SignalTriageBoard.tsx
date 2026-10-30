@@ -1,70 +1,45 @@
 import { EmptyState } from "@/components/empty-states/empty-state";
-import { WorkflowLinks } from "@/components/layout/workflow-links";
-import { Metric } from "@/components/ui/Metric";
+import { Panel } from "@/components/layout/panel";
+import { SetupList } from "@/components/setups/SetupList";
+import { ButtonLink } from "@/components/ui/Button";
+import { DisclosurePanel } from "@/components/ui/DisclosurePanel";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { triageColumns } from "@/lib/triage/labels";
+import { WorkspaceStats } from "@/components/ui/WorkspaceStats";
+import { humanizeLabel, shortIdentifier } from "@/lib/formatting/labels";
 import type { TriageBoardData } from "@/lib/triage/types";
-import { cn } from "@/lib/ui/cn";
-import { motionRevealPresetClass, motionRevealDensityStyle } from "@/lib/ui/motion";
-import { SignalTriageColumn } from "./SignalTriageColumn";
-import { TriageEmptyState } from "./TriageEmptyState";
+import { navigationHref } from "@/lib/ui/navigation";
 import { TriageErrorState } from "./TriageErrorState";
 import { TriageFilters } from "./TriageFilters";
-import { TriageSummary } from "./TriageSummary";
 
 export function SignalTriageBoard({ data }: { data: TriageBoardData }) {
+  const workspaceId = data.workspace?.id;
   return (
-    <div className={cn("space-y-6", motionRevealPresetClass())}>
-      <div style={motionRevealDensityStyle(0)}>
-        <PageHeader
-          className={motionRevealPresetClass()}
-          eyebrow="Premium review workflow"
-          title="Setup triage"
-          description="Review stored deterministic setups by priority, freshness, evidence quality, unresolved context, and observed behavior."
-          actions={
-            <>
-              <Metric label="Workspace" value={data.workspace?.name || "Not selected"} />
-              <WorkflowLinks workspaceId={data.workspace?.id} targets={["commandCenter", "brief", "scanner", "dataOnboarding", "preferences", "review"]} />
-            </>
-          }
-        />
-      </div>
-      {!data.workspace ? (
-        <div style={motionRevealDensityStyle(1)}>
-          <EmptyState
-            title="No workspace available"
-            message="Seed or create a workspace in the API before workspace-scoped triage can load."
-          />
-        </div>
-      ) : (
+    <div className="space-y-6">
+      <PageHeader eyebrow="Find your next review" title="Trade setups" description="A focused list of market ideas. Open a chart to inspect the evidence and request an AI assessment."
+        actions={<><ButtonLink href={navigationHref("preferences", workspaceId)} variant="quiet">Review preferences</ButtonLink><ButtonLink href={navigationHref("scanner", workspaceId)} variant="primary">Scan for setups</ButtonLink></>} />
+      {!data.workspace ? <div className="space-y-4"><EmptyState title="Set up your research workspace" message="Add a workspace and choose markets before reviewing setups." /><ButtonLink href="/onboarding">Get started</ButtonLink></div> : (
         <>
-          <div style={motionRevealDensityStyle(2)}>
-            <TriageSummary data={data} />
-          </div>
-          <div style={motionRevealDensityStyle(3)}>
-            <TriageFilters data={data} />
-          </div>
-          <div style={motionRevealDensityStyle(4)}>
-            <TriageErrorState failures={data.failures} />
-          </div>
-          {data.candidates.length === 0 ? (
-            <div style={motionRevealDensityStyle(5)}>
-              <TriageEmptyState />
-            </div>
-          ) : (
-            <div className="overflow-x-auto pb-3" style={motionRevealDensityStyle(6)}>
-              <div className="grid min-w-[1920px] grid-cols-6 gap-4">
-                {triageColumns.map((column, index) => (
-                  <SignalTriageColumn
-                    key={column.key}
-                    column={column}
-                    candidates={data.candidates.filter((candidate) => candidate.classification.column === column.key)}
-                    style={motionRevealDensityStyle(index, "compact")}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          <WorkspaceStats items={[
+            { label: "In this view", value: data.candidates.length },
+            { label: "Stronger context", value: data.allCandidates.filter((item) => item.classification.column === "high_quality_context").length },
+            { label: "Waiting for confirmation", value: data.allCandidates.filter((item) => item.classification.column === "needs_confirmation").length },
+            { label: "Data needs attention", value: data.allCandidates.filter((item) => item.classification.column === "stale_data_issue").length },
+          ]} />
+          <TriageFilters data={data} />
+          <Panel title="Setups to explore" action={<span className="text-xs text-[var(--muted)]">{data.candidates.length} shown</span>}>
+            <SetupList items={data.candidates.map((candidate) => {
+              const signal = candidate.signal.signal;
+              return {
+                id: signal.id, symbol: candidate.symbol?.symbol || shortIdentifier(signal.symbol_id),
+                timeframe: signal.timeframe, bias: humanizeLabel(signal.bias),
+                confidence: humanizeLabel(signal.confidence_label),
+                status: candidate.classification.mainReason.label,
+                reason: candidate.classification.reasons.map((reason) => reason.label).slice(0, 2).join(" · ") || signal.summary,
+                href: `/signals/${signal.id}?workspaceId=${encodeURIComponent(signal.workspace_id)}`,
+              };
+            })} emptyTitle="No setups match these filters" emptyDescription="Try a different symbol or timeframe, clear your filters, or run a new scan." />
+          </Panel>
+          {data.failures.length > 0 && <DisclosurePanel title="Data availability" description="Some context may be unavailable. Review the details before relying on a setup."><TriageErrorState failures={data.failures} /></DisclosurePanel>}
         </>
       )}
     </div>

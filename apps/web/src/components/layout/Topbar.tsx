@@ -1,41 +1,13 @@
-import { Badge } from "@/components/ui/Badge";
-import { ApiStatusIndicator } from "./ApiStatusIndicator";
-import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
-import { AnimatedSection } from "@/lib/ui/motion";
-import { motionRevealDensityStyle } from "@/lib/ui/motion";
-import { cn } from "@/lib/ui/cn";
 import { AuthStatus } from "@/components/auth/AuthStatus";
+import { ApiStatusIndicator } from "./ApiStatusIndicator";
 
-type TopbarProps = {
-  apiBaseUrl: string;
-  workspaceName?: string | null;
-  workspaceId?: string | null;
-};
-
-export function Topbar({ apiBaseUrl, workspaceName, workspaceId }: TopbarProps) {
+export function Topbar({ apiBaseUrl, workspaceName }: {
+  apiBaseUrl: string; workspaceName?: string | null; workspaceId?: string | null;
+}) {
   return (
-    <AnimatedSection
-      as="header"
-      preset="fade-up"
-      style={motionRevealDensityStyle(0, "regular")}
-      className={cn(
-        "sticky top-0 z-20 hidden border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_72%,transparent)] px-8 py-4 backdrop-blur-xl lg:block",
-      )}
-    >
-      <div className="flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Trading intelligence cockpit</p>
-          <h1 className="mt-1 truncate text-lg font-semibold text-[var(--strong)]">Daily read-only workspace</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <AuthStatus />
-          <ApiStatusIndicator apiBaseUrl={apiBaseUrl} />
-          <Badge value={apiBaseUrl} tone="neutral" className="max-w-72" />
-          <div className="w-72">
-            <WorkspaceSwitcher workspaceId={workspaceId} workspaceName={workspaceName} />
-          </div>
-        </div>
-      </div>
-    </AnimatedSection>
+    <header className="sticky top-0 z-20 hidden h-[72px] items-center justify-between gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-8 lg:flex">
+      <p className="text-sm text-[var(--muted)]">Your workspace <span className="mx-2 opacity-40">/</span><span className="font-medium text-[var(--strong)]">{workspaceName || "Market research"}</span></p>
+      <div className="flex items-center gap-4"><ApiStatusIndicator apiBaseUrl={apiBaseUrl} /><AuthStatus /></div>
+    </header>
   );
 }

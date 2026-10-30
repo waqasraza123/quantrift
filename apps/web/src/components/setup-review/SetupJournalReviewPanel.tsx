@@ -12,7 +12,7 @@ export function SetupJournalReviewPanel({ workspaceId, signalId, model }: SetupJ
   const signal = model.signal?.signal || null;
 
   return (
-    <div id="journal">
+    <div id="journal" className="scroll-mt-40 xl:scroll-mt-24">
       <SetupJournalPanel
         workspaceId={workspaceId}
         signalId={signalId}

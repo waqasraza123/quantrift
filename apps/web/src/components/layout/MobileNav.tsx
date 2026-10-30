@@ -2,71 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { BrandMark } from "@/components/brand/BrandMark";
-import { cn } from "@/lib/ui/cn";
-import { isActiveNavigationPath, navigationHref, primaryNavigationTargets, navigationItems } from "@/lib/ui/navigation";
-import { ApiStatusIndicator } from "./ApiStatusIndicator";
-import { AnimatedSection, MOTION_INTERACTIVE_CLASS, motionRevealPresetClass, motionRevealDensityStyle } from "@/lib/ui/motion";
 import { AuthStatus } from "@/components/auth/AuthStatus";
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { cn } from "@/lib/ui/cn";
+import { isActiveNavigationPath, navigationHref, navigationItems, primaryNavigationTargets, secondaryNavigationTargets } from "@/lib/ui/navigation";
 
-type MobileNavProps = {
-  appName: string;
-  apiBaseUrl: string;
-  workspaceName?: string | null;
-  workspaceId?: string | null;
-};
-
-export function MobileNav({ appName, apiBaseUrl, workspaceName, workspaceId }: MobileNavProps) {
+export function MobileNav({ appName, workspaceName, workspaceId }: {
+  appName: string; apiBaseUrl: string; workspaceName?: string | null; workspaceId?: string | null;
+}) {
   const pathname = usePathname();
-  const items = primaryNavigationTargets
-    .map((target) => navigationItems.find((item) => item.key === target))
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
-
   return (
-    <AnimatedSection
-      as="header"
-      preset="fade-up"
-      style={motionRevealDensityStyle(0, "regular")}
-      className="border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_90%,transparent)] px-4 py-3 shadow-soft backdrop-blur-xl"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <Link href={navigationHref("commandCenter", workspaceId)} className="flex min-w-0 items-center gap-2.5">
-          <BrandMark className="h-9 w-9 text-[var(--accent-strong)]" />
-          <span className="min-w-0">
-            <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Market intelligence</span>
-            <span className="block truncate text-base font-semibold text-[var(--strong)]">{appName}</span>
-          </span>
-        </Link>
-        <Badge value={workspaceName || (workspaceId ? "Workspace" : "Global")} tone={workspaceId ? "info" : "neutral"} />
+    <header className="border-b border-[var(--line)] bg-[var(--surface)] px-4 pt-3">
+      <div className="flex min-h-10 items-center justify-between gap-3">
+        <Link href={navigationHref("commandCenter", workspaceId)} className="flex items-center gap-2 font-semibold tracking-tight text-[var(--strong)]"><BrandMark className="h-7 w-7 text-[var(--accent-strong)]" />{appName}</Link>
+        <AuthStatus />
       </div>
-      <div className="mt-2 flex items-center justify-between gap-3">
-        <p className="min-w-0 truncate text-xs text-[var(--text-muted)]">API {apiBaseUrl}</p>
-        <div className="flex items-center gap-2">
-          <ApiStatusIndicator apiBaseUrl={apiBaseUrl} />
-          <AuthStatus />
-        </div>
+      <div className="mt-1 flex items-center justify-between gap-2">
+        <p className="truncate text-[11px] text-[var(--muted)]">{workspaceName || "Your workspace"}</p>
+        <details key={pathname} className="group relative">
+          <summary className="cursor-pointer list-none py-2 text-xs font-medium text-[var(--muted)] [&::-webkit-details-marker]:hidden">More ▾</summary>
+          <nav aria-label="More navigation" className="absolute right-0 top-full z-50 grid max-h-[60vh] w-56 overflow-auto rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 shadow-lg">
+            <div className="mb-2 border-b border-[var(--line)] pb-2"><WorkspaceSwitcher workspaceId={workspaceId} workspaceName={workspaceName} /></div>
+            {secondaryNavigationTargets.map((key) => {
+              const item = navigationItems.find((candidate) => candidate.key === key);
+              return item && <Link key={key} href={navigationHref(key, workspaceId)} className="rounded-lg px-3 py-2.5 text-sm hover:bg-[var(--surface-muted)]">{item.label}</Link>;
+            })}
+          </nav>
+        </details>
       </div>
-      <nav className="mt-3 flex gap-2 overflow-x-auto pb-1">
-        {items.map((item, index) => {
+      <nav aria-label="Main navigation" className="flex gap-1 overflow-x-auto">
+        {primaryNavigationTargets.map((key) => {
+          const item = navigationItems.find((candidate) => candidate.key === key);
+          if (!item) return null;
           const active = isActiveNavigationPath(pathname, item.href);
-          return (
-            <Link
-              key={item.key}
-              className={cn(
-                "shrink-0 rounded-full px-3 py-2 text-xs font-semibold transition",
-                motionRevealPresetClass(),
-                MOTION_INTERACTIVE_CLASS,
-                active ? "bg-[var(--accent-soft)] text-[var(--accent-strong)]" : "bg-[var(--surface-muted)] text-[var(--text-muted)]",
-              )}
-              href={navigationHref(item.key, workspaceId)}
-              style={motionRevealDensityStyle(index, "compact")}
-            >
-              {item.shortLabel || item.label}
-            </Link>
-          );
+          return <Link key={key} href={navigationHref(key, workspaceId)} aria-current={active ? "page" : undefined} className={cn("shrink-0 border-b-2 px-3 py-3 text-xs font-semibold", active ? "border-[var(--accent)] text-[var(--accent-strong)]" : "border-transparent text-[var(--muted)]")}>{item.label}</Link>;
         })}
       </nav>
-    </AnimatedSection>
+    </header>
   );
 }

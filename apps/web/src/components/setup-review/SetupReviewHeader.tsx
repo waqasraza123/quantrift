@@ -1,77 +1,20 @@
-import Link from "next/link";
 import { Badge } from "@/components/status/badge";
 import { BiasBadge } from "@/components/status/BiasBadge";
 import { ConfidenceBadge } from "@/components/status/ConfidenceBadge";
 import { SetupQualityBadge } from "@/components/status/SetupQualityBadge";
-import { formatPercent } from "@/lib/formatting/numbers";
-import { AnimatedListItem, motionCardClass, motionRevealDensityStyle } from "@/lib/ui/motion";
-import type { SetupReviewMetric, SetupReviewModel } from "@/lib/setup-review/types";
+import type { SetupReviewModel } from "@/lib/setup-review/types";
 
-type SetupReviewHeaderProps = {
-  model: SetupReviewModel;
-};
-
-export function SetupReviewHeader({ model }: SetupReviewHeaderProps) {
-  const header = model.header;
-
+export function SetupReviewHeader({ model }: { model: SetupReviewModel }) {
+  const { header } = model;
   return (
-    <section className={`sticky top-24 z-10 rounded-lg border border-[var(--line)] bg-[var(--panel)]/95 p-4 shadow-xl backdrop-blur ${motionCardClass}`}>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase text-slate-500">Setup review</p>
-          <h1 className="mt-1 truncate text-2xl font-semibold text-[var(--strong)]">{header.symbol}</h1>
-          <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600 dark:text-slate-300">{header.summary}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Badge value={header.timeframe} tone="info" />
-            <BiasBadge value={header.bias} />
-            <ConfidenceBadge value={header.confidenceLabel} />
-            <SetupQualityBadge value={header.setupQualityLabel} />
-            <Badge value={`Priority ${priorityText(model)}`} tone="warning" />
-          </div>
-        </div>
-        <nav className="flex flex-wrap gap-2 text-sm font-semibold">
-          <Link
-            className={`rounded-md border border-[var(--line)] px-3 py-2 text-[var(--strong)] ${motionCardClass}`}
-            href="#audit"
-          >
-            Audit
-          </Link>
-          <Link
-            className={`rounded-md border border-[var(--line)] px-3 py-2 text-[var(--strong)] ${motionCardClass}`}
-            href="#reasoning"
-          >
-            Report
-          </Link>
-          <Link
-            className={`rounded-md border border-[var(--line)] px-3 py-2 text-[var(--strong)] ${motionCardClass}`}
-            href="#journal"
-          >
-            Journal
-          </Link>
-        </nav>
+    <header className="space-y-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Chart & setup review</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3"><h1 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--strong)]">{header.symbol}</h1><Badge value={header.timeframe} tone="neutral" /></div>
+        <div className="flex flex-wrap gap-2"><BiasBadge value={header.bias} /><ConfidenceBadge value={header.confidenceLabel} /><SetupQualityBadge value={header.setupQualityLabel} /></div>
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
-        {model.summaryMetrics.map((metric, index) => (
-          <AnimatedListItem as="article" key={metric.label} style={motionRevealDensityStyle(index, "compact")}>
-            <HeaderMetric metric={metric} />
-          </AnimatedListItem>
-        ))}
-      </div>
-    </section>
+      <p className="max-w-3xl text-sm leading-7 text-[var(--muted)]">{header.summary}</p>
+      <p className="text-[11px] text-[var(--muted)]">The original signal and AI assessment are separate perspectives. Check the candle timestamps and invalidation conditions.</p>
+    </header>
   );
-}
-
-function HeaderMetric({ metric }: { metric: SetupReviewMetric }) {
-  return (
-    <div className="rounded-lg border border-[var(--line)] bg-[var(--panel-muted)] p-3">
-      <p className="text-xs font-semibold uppercase text-slate-500">{metric.label}</p>
-      <p className="mt-1 truncate text-base font-semibold text-[var(--strong)]">{metric.value}</p>
-      {metric.detail && <p className="mt-1 truncate text-xs text-slate-500">{metric.detail}</p>}
-    </div>
-  );
-}
-
-function priorityText(model: SetupReviewModel): string {
-  const priorityMetric = model.summaryMetrics.find((metric) => metric.label === "Priority");
-  return priorityMetric?.value || formatPercent(null);
 }

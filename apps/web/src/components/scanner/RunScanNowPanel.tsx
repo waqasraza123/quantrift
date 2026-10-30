@@ -64,14 +64,13 @@ export function RunScanNowPanel({ data }: { data: ScannerData }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-            Run scan now
+            Scan your watchlist
           </p>
           <h2 className="mt-1 text-xl font-semibold text-[var(--strong)]">
-            Explicit deterministic backend scan
+            Look for fresh setups
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Choose a config, confirm the target, and run stored-candle analysis. Running a scan does
-            not call brokers, place orders, or send external messages.
+            Choose a saved scan and check the markets it covers. Results use your stored candle data.
           </p>
         </div>
         <Badge value={data.dueScanConfigs.length > 0 ? `${data.dueScanConfigs.length} due` : "No due configs"} tone={data.dueScanConfigs.length > 0 ? "info" : "neutral"} />
@@ -84,7 +83,7 @@ export function RunScanNowPanel({ data }: { data: ScannerData }) {
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="rounded-lg border border-[var(--line)] bg-[var(--panel-muted)] p-4">
           <label className="block text-sm font-semibold text-[var(--strong)]">
-            Scan config
+            Saved scan
             <select
               className="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-sm"
               value={selectedConfigId}
@@ -107,15 +106,14 @@ export function RunScanNowPanel({ data }: { data: ScannerData }) {
             </div>
           ) : (
             <div className="mt-4 rounded-md border border-dashed border-[var(--line)] p-4 text-sm text-slate-500">
-              No active config is available for run-now execution.
+              Add a watchlist and an active scan in Watchlists & scan settings below.
             </div>
           )}
         </div>
         <div className="rounded-lg border border-[var(--line)] bg-[var(--panel)] p-4">
-          <p className="text-sm font-semibold text-[var(--strong)]">Confirmation</p>
+          <p className="text-sm font-semibold text-[var(--strong)]">Ready to scan?</p>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            The backend will create analysis run records from configured candle windows and return a
-            scan run id for review.
+            Your results will appear below. Open a setup to inspect its chart and supporting evidence.
           </p>
           <div className="mt-4 grid gap-2">
             <button

@@ -11,79 +11,41 @@ import { ScannerPresetGallery } from "@/components/scanner/ScannerPresetGallery"
 import { WatchlistManager } from "@/components/scanner/WatchlistManager";
 import { DailyWorkflowPanel } from "@/components/daily-workflows/DailyWorkflowPanel";
 import { RunScanNowPanel } from "@/components/scanner/RunScanNowPanel";
+import { DisclosurePanel } from "@/components/ui/DisclosurePanel";
 import { getScannerData } from "@/lib/api/scanner";
-import { AnimatedListItem, AnimatedSection, motionRevealDensityStyle } from "@/lib/ui/motion";
 
-type ScannerPageProps = {
-  searchParams: Promise<{
-    workspaceId?: string;
-    runId?: string;
-    workflowRunId?: string;
-  }>;
-};
+type ScannerPageProps = { searchParams: Promise<{ workspaceId?: string; runId?: string; workflowRunId?: string }> };
 
 export default async function ScannerPage({ searchParams }: ScannerPageProps) {
   const params = await searchParams;
   const data = await getScannerData(params);
-
+  const needsConfiguration = data.scanConfigs.every((config) => config.status !== "active");
   return (
     <AppShell appName={data.appName} workspaceId={data.workspace?.id} workspaceName={data.workspace?.name}>
-      <AnimatedSection as="section" className="space-y-6">
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(0, "comfortable")}>
-          <ScannerHero data={data} />
-        </AnimatedListItem>
-        {!data.workspace && (
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(1, "comfortable")}>
-            <ScannerEmptyState
-              title="No workspace available"
-              message="Seed or create a workspace before scanner controls can create watchlists or scheduled scans."
-            />
-          </AnimatedListItem>
-        )}
-        <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="space-y-6">
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(2, "compact")}>
+      <div className="space-y-6">
+        <ScannerHero data={data} />
+        {!data.workspace ? <ScannerEmptyState title="Choose your first markets" message="Create a workspace to add watchlists and start scanning." /> : (
+          <>
+            {needsConfiguration && <div className="rounded-xl border border-[var(--line)] bg-[var(--accent-soft)] p-4 text-sm text-[var(--strong)]">Start with a preset below, or add your own watchlist and scan schedule.</div>}
+            {!needsConfiguration && <RunScanNowPanel data={data} />}
+            <ScanResultSignalList data={data} />
+            <DisclosurePanel id="scanner-configuration" title="Watchlists & scan settings" description="Add markets, choose a preset, or manage recurring scans." open={needsConfiguration}>
               <ScannerPresetGallery data={data} />
-            </AnimatedListItem>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(3, "compact")}>
               <WatchlistManager data={data} />
-            </AnimatedListItem>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(4, "compact")}>
               <ScanConfigForm data={data} />
-            </AnimatedListItem>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(5, "compact")}>
-              <RunScanNowPanel data={data} />
-            </AnimatedListItem>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(6, "compact")}>
               <ScanConfigList data={data} />
-            </AnimatedListItem>
-          </div>
-          <div className="space-y-6">
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(7, "compact")}>
-              <DailyWorkflowPanel
-                workspaceId={data.workspace?.id || null}
-                watchlistId={data.watchlists[0]?.watchlist.id || null}
-                runs={data.dailyWorkflowRuns}
-                selectedRun={data.selectedDailyWorkflowRun}
-                selectedSteps={data.selectedDailyWorkflowSteps}
-                basePath="/scanner"
-              />
-            </AnimatedListItem>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(8, "compact")}>
+            </DisclosurePanel>
+            <DisclosurePanel title="Scan history & details" description="Revisit a previous scan and its data context." open={Boolean(params.runId)}>
               <ScanRunHistory data={data} />
-            </AnimatedListItem>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(9, "compact")}>
               <ScanRunDetail data={data} />
-            </AnimatedListItem>
-          </div>
-        </div>
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(10, "regular")}>
-          <ScanResultSignalList data={data} />
-        </AnimatedListItem>
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(11, "regular")}>
-          <ScannerErrorState failures={data.failures} />
-        </AnimatedListItem>
-      </AnimatedSection>
+            </DisclosurePanel>
+            <DisclosurePanel title="Daily research workflow" description="Run and inspect the longer data-to-brief workflow." open={Boolean(params.workflowRunId)}>
+              <DailyWorkflowPanel workspaceId={data.workspace.id} watchlistId={data.watchlists[0]?.watchlist.id || null} runs={data.dailyWorkflowRuns} selectedRun={data.selectedDailyWorkflowRun} selectedSteps={data.selectedDailyWorkflowSteps} basePath="/scanner" />
+            </DisclosurePanel>
+            {data.failures.length > 0 && <DisclosurePanel title="Data availability" description="Review missing sources or connection issues."><ScannerErrorState failures={data.failures} /></DisclosurePanel>}
+          </>
+        )}
+      </div>
     </AppShell>
   );
 }

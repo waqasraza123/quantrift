@@ -47,6 +47,12 @@ class JobQueueSeedResult:
 def default_job_queue_definitions() -> list[DefaultJobQueueDefinition]:
     return [
         DefaultJobQueueDefinition(
+            "trade_agent_suggest", "AI trade suggestion",
+            "Runs an explicitly requested paper setup through analyst and risk-review agents.",
+            "trade_suggestions", JobQueueJobType.TRADE_AGENT_SUGGEST,
+            timeout_seconds=180,
+        ),
+        DefaultJobQueueDefinition(
             "import_csv",
             "CSV import",
             "Processes bounded CSV market data import work.",

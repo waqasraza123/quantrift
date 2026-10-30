@@ -2,139 +2,43 @@ import Link from "next/link";
 import { EmptyState } from "@/components/empty-states/empty-state";
 import { Panel } from "@/components/layout/panel";
 import { Badge, toneForBias, toneForQuality } from "@/components/status/badge";
+import { ProductIcon } from "@/components/ui/ProductIcon";
 import type { DashboardData } from "@/lib/api/dashboard";
-import type { MarketMemorySnapshot, SymbolRead, WatchlistItem } from "@/lib/api/types";
+import type { MarketMemorySnapshot } from "@/lib/api/types";
 import { formatRelativeTime } from "@/lib/formatting/dates";
 import { humanizeLabel, shortIdentifier } from "@/lib/formatting/labels";
-import { AnimatedListItem, motionCardClass, motionRevealDensityStyle } from "@/lib/ui/motion";
-
-type MarketBoardRow = {
-  id: string;
-  symbol: SymbolRead | null;
-  symbolId: string;
-  timeframe: string;
-  memory: MarketMemorySnapshot | null;
-  watchlistItem: WatchlistItem | null;
-};
+import { navigationHref } from "@/lib/ui/navigation";
 
 export function MarketBoard({ data }: { data: DashboardData }) {
-  const rows = buildRows(data);
-
+  const symbols = new Map(data.symbols.map((symbol) => [symbol.id, symbol]));
+  const rows = new Map<string, { symbolId: string; timeframe: string; memory: MarketMemorySnapshot | null }>();
+  for (const snapshot of data.memorySnapshots) {
+    rows.set(`${snapshot.symbol_id}:${snapshot.timeframe}`, { symbolId: snapshot.symbol_id, timeframe: snapshot.timeframe, memory: snapshot });
+  }
+  for (const { items } of data.watchlists) {
+    for (const item of items) {
+      const key = `${item.symbol_id}:${item.timeframe}`;
+      if (!rows.has(key)) rows.set(key, { symbolId: item.symbol_id, timeframe: item.timeframe, memory: null });
+    }
+  }
   return (
-    <Panel title="Market Board" eyebrow="Watchlist state">
-      {rows.length === 0 ? (
-        <EmptyState
-          title="No symbol state available"
-          message="Add watchlist items or refresh market memory snapshots to populate this board."
-        />
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-          {rows.map((row, index) => (
-            <AnimatedListItem
-              as="article"
-              key={row.id}
-              className={`${motionCardClass} muted-surface rounded-lg p-4`}
-              preset="scale-subtle"
-              style={motionRevealDensityStyle(index, "compact")}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <Link
-                    className="text-lg font-semibold text-[var(--strong)] hover:text-[var(--accent)]"
-                    href={`/symbols/${row.symbolId}${data.workspace ? `?workspaceId=${data.workspace.id}` : ""}`}
-                  >
-                    {row.symbol?.symbol || shortIdentifier(row.symbolId)}
-                  </Link>
-                  <p className="mt-1 text-sm text-slate-500">{row.symbol?.display_name || "Symbol metadata unavailable"}</p>
-                </div>
-                <Badge value={row.timeframe} tone="info" />
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Badge value={row.memory?.freshness_label || "No freshness state"} tone={toneForQuality(row.memory?.freshness_label)} />
-                <Badge value={row.memory?.data_quality_label || "No quality state"} tone={toneForQuality(row.memory?.data_quality_label)} />
-                <Badge value={row.memory?.latest_signal_bias || "No directional signal"} tone={toneForBias(row.memory?.latest_signal_bias)} />
-                <Badge value={row.memory?.latest_signal_confidence_label || "Not scored"} tone={toneForQuality(row.memory?.latest_signal_confidence_label)} />
-              </div>
-              <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                <Detail label="Pattern" value={humanizeLabel(row.memory?.latest_signal_pattern_type)} />
-                <Detail label="Regime" value={humanizeLabel(row.memory?.market_regime_label)} />
-                <Detail label="Session" value={humanizeLabel(row.memory?.market_session_label)} />
-                <Detail label="Latest final candle" value={formatRelativeTime(row.memory?.latest_final_candle_time)} />
-              </dl>
-              {row.memory?.latest_signal_id && (
-                <Link
-                  className="mt-4 inline-flex rounded-md border border-[var(--line)] px-3 py-2 text-sm font-medium hover:bg-white dark:hover:bg-slate-900"
-                  href={`/dashboard?workspaceId=${row.memory.workspace_id}&signalId=${row.memory.latest_signal_id}`}
-                >
-                  Focus signal
-                </Link>
-              )}
-              {row.memory?.warnings_json?.length ? (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {row.memory.warnings_json.slice(0, 3).map((warning, index) => (
-                    <Badge key={`${row.id}-warning-${index}`} value={warningLabel(warning)} tone="warning" />
-                  ))}
-                </div>
-              ) : null}
-            </AnimatedListItem>
-          ))}
+    <Panel title="Your markets" action={<Link href={navigationHref("scanner", data.workspace?.id)} className="text-xs font-semibold text-[var(--accent-strong)]">Edit watchlists →</Link>}>
+      {!rows.size ? <div className="space-y-4"><EmptyState title="Build your watchlist" message="Choose a few markets in the scanner. Their latest context will appear here after analysis." /><Link href={navigationHref("scanner", data.workspace?.id)} className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-strong)]">Choose markets<ProductIcon name="arrow" className="h-4 w-4" /></Link></div> : (
+        <div className="overflow-hidden rounded-xl border border-[var(--line)]">
+          <div aria-hidden="true" className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_100px] gap-4 border-b border-[var(--line)] bg-[var(--surface-muted)] px-4 py-3 text-[10px] font-medium uppercase tracking-wider text-[var(--muted)] md:grid"><span>Market</span><span>Direction</span><span>Pattern</span><span>Last candle</span><span /></div>
+          <ul className="divide-y divide-[var(--line)]">{Array.from(rows.entries()).map(([key, row]) => {
+            const symbol = symbols.get(row.symbolId);
+            const href = row.memory?.latest_signal_id ? `/signals/${row.memory.latest_signal_id}?workspaceId=${data.workspace?.id || ""}` : `/symbols/${row.symbolId}?workspaceId=${data.workspace?.id || ""}`;
+            return <li key={key}><Link href={href} className="group grid grid-cols-2 items-center gap-3 px-4 py-4 transition-colors hover:bg-[var(--surface-muted)] md:grid-cols-[1.1fr_1fr_1fr_1fr_100px] md:gap-4">
+              <div><p className="text-sm font-semibold">{symbol?.symbol || shortIdentifier(row.symbolId)}</p><p className="mt-1 text-xs text-[var(--muted)]">{row.timeframe}</p></div>
+              <div className="justify-self-end md:justify-self-start"><Badge value={row.memory?.latest_signal_bias || "Awaiting data"} tone={toneForBias(row.memory?.latest_signal_bias)} /></div>
+              <p className="text-xs text-[var(--muted)]">{humanizeLabel(row.memory?.latest_signal_pattern_type || "Not analyzed")}</p>
+              <div className="text-right md:text-left"><p className="text-[11px] text-[var(--muted)]">{formatRelativeTime(row.memory?.latest_final_candle_time)}</p>{row.memory && <span className="mt-1 inline-block"><Badge value={row.memory.freshness_label || "Unknown"} tone={toneForQuality(row.memory.freshness_label)} /></span>}</div>
+              <span className="col-span-2 inline-flex items-center gap-2 text-xs font-medium text-[var(--accent-strong)] md:col-span-1 md:justify-self-end">{row.memory?.latest_signal_id ? "Open setup" : "View market"}<ProductIcon name="arrow" className="h-3.5 w-3.5" /></span>
+            </Link></li>;
+          })}</ul>
         </div>
       )}
     </Panel>
   );
-}
-
-function Detail({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-xs font-medium uppercase text-slate-500">{label}</dt>
-      <dd className="mt-1 text-sm font-medium text-[var(--strong)]">{value}</dd>
-    </div>
-  );
-}
-
-function buildRows(data: DashboardData): MarketBoardRow[] {
-  const symbolMap = new Map(data.symbols.map((symbol) => [symbol.id, symbol]));
-  const rows = new Map<string, MarketBoardRow>();
-  for (const snapshot of data.memorySnapshots) {
-    rows.set(`${snapshot.symbol_id}:${snapshot.timeframe}`, {
-      id: `${snapshot.symbol_id}:${snapshot.timeframe}`,
-      symbol: symbolMap.get(snapshot.symbol_id) || null,
-      symbolId: snapshot.symbol_id,
-      timeframe: snapshot.timeframe,
-      memory: snapshot,
-      watchlistItem: null,
-    });
-  }
-  for (const watchlist of data.watchlists) {
-    for (const item of watchlist.items) {
-      const key = `${item.symbol_id}:${item.timeframe}`;
-      const existing = rows.get(key);
-      rows.set(key, {
-        id: key,
-        symbol: symbolMap.get(item.symbol_id) || existing?.symbol || null,
-        symbolId: item.symbol_id,
-        timeframe: item.timeframe,
-        memory: existing?.memory || null,
-        watchlistItem: item,
-      });
-    }
-  }
-  return Array.from(rows.values()).sort((left, right) => {
-    const leftLabel = left.symbol?.symbol || left.symbolId;
-    const rightLabel = right.symbol?.symbol || right.symbolId;
-    return `${leftLabel}:${left.timeframe}`.localeCompare(`${rightLabel}:${right.timeframe}`);
-  });
-}
-
-function warningLabel(value: Record<string, unknown>): string {
-  const code = value.code;
-  const message = value.message;
-  if (typeof message === "string") {
-    return message;
-  }
-  if (typeof code === "string") {
-    return code;
-  }
-  return "Review recommended";
 }

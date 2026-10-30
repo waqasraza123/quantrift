@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { AnimatedSection, MOTION_INTERACTIVE_CLASS } from "@/lib/ui/motion";
 import { cn } from "@/lib/ui/cn";
 
 type PageHeaderProps = {
@@ -13,27 +12,14 @@ type PageHeaderProps = {
 
 export function PageHeader({ eyebrow, title, description, meta, actions, className }: PageHeaderProps) {
   return (
-    <AnimatedSection
-      as="section"
-      preset="fade-up"
-      className={cn(
-        "relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--surface)_96%,transparent),color-mix(in_srgb,var(--accent-soft)_28%,var(--surface)))] p-5 shadow-panel sm:p-6 lg:p-7",
-        MOTION_INTERACTIVE_CLASS,
-        className,
-      )}
-    >
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/20" />
-      <div className="relative flex flex-wrap items-end justify-between gap-5">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent-strong)]">{eyebrow}</p>
-          <h2 className="mt-2 text-3xl font-semibold text-[var(--strong)] sm:text-4xl">{title}</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--text-muted)]">{description}</p>
-        </div>
-        {actions && <div className="flex max-w-full flex-wrap items-center justify-end gap-3">{actions}</div>}
+    <header className={cn("flex flex-col gap-5 py-1 lg:flex-row lg:items-end lg:justify-between", className)}>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{eyebrow}</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[var(--strong)] sm:text-[34px]">{title}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{description}</p>
+        {meta && <div className="mt-3 flex flex-wrap gap-2">{meta}</div>}
       </div>
-      <div className="relative">
-        {meta && <div className="mt-4 flex flex-wrap gap-2">{meta}</div>}
-      </div>
-    </AnimatedSection>
+      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+    </header>
   );
 }

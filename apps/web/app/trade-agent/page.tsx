@@ -1,62 +1,31 @@
 import { AppShell } from "@/components/layout/AppShell";
-import { WorkflowLinks } from "@/components/layout/workflow-links";
 import { EmptyState } from "@/components/empty-states/empty-state";
-import {
-  ReviewMetricGrid,
-  ReviewSurfaceHero,
-  ReviewSurfaceMetric,
-} from "@/components/review-surfaces/ReviewSurface";
+import { ButtonLink } from "@/components/ui/Button";
+import { DisclosurePanel } from "@/components/ui/DisclosurePanel";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { WorkspaceStats } from "@/components/ui/WorkspaceStats";
 import { TradeAgentPlanBoard } from "@/components/trade-agent/TradeAgentPlanBoard";
 import { getTradeAgentData } from "@/lib/api/tradeAgent";
-import { AnimatedListItem, AnimatedSection, motionRevealDensityStyle } from "@/lib/ui/motion";
+import { navigationHref } from "@/lib/ui/navigation";
 
-type TradeAgentPageProps = {
+export default async function TradeAgentPage({ searchParams }: {
   searchParams: Promise<Record<string, string | undefined>>;
-};
-
-export default async function TradeAgentPage({ searchParams }: TradeAgentPageProps) {
-  const params = await searchParams;
-  const data = await getTradeAgentData(params);
-  const activePlans = data.plans.filter((plan) => plan.status === "ready_for_review").length;
-  const followedPlans = data.plans.filter((plan) => plan.status === "paper_followed").length;
-  const reviewedPlans = data.plans.filter((plan) => plan.status === "reviewed").length;
-
+}) {
+  const data = await getTradeAgentData(await searchParams);
   return (
     <AppShell appName={data.appName} workspaceId={data.workspace?.id} workspaceName={data.workspace?.name}>
-      <AnimatedSection as="section" className="space-y-6">
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(0, "comfortable")}>
-          <ReviewSurfaceHero
-            eyebrow="AI paper trading agent"
-            title="Paper plan review"
-            description="Review paper-only setup plans composed from stored intelligence artifacts. This surface records observational decisions and excludes live execution."
-            actions={
-              <WorkflowLinks
-                workspaceId={data.workspace?.id}
-                targets={["commandCenter", "triage", "brief", "journal", "review"]}
-              />
-            }
-          />
-        </AnimatedListItem>
-        {data.failures.some((failure) => !failure.missing) && (
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(1, "regular")}>
-            <EmptyState
-              title="Some paper planning context failed"
-              message={data.failures.filter((failure) => !failure.missing).map((failure) => failure.message).join(" | ")}
-            />
-          </AnimatedListItem>
-        )}
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(2, "regular")}>
-          <ReviewMetricGrid>
-            <ReviewSurfaceMetric label="Plans" value={data.plans.length} detail="Current workspace" tone="info" />
-            <ReviewSurfaceMetric label="Ready" value={activePlans} detail="Waiting for review" tone="warning" />
-            <ReviewSurfaceMetric label="Paper followed" value={followedPlans} detail="Journal-linked decisions" tone="good" />
-            <ReviewSurfaceMetric label="Observed" value={reviewedPlans} detail="Outcome reflection recorded" />
-          </ReviewMetricGrid>
-        </AnimatedListItem>
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(3, "compact")}>
-          <TradeAgentPlanBoard data={data} />
-        </AnimatedListItem>
-      </AnimatedSection>
+      <div className="space-y-6">
+        <PageHeader eyebrow="Keep your research together" title="Paper plans" description="Revisit the setups you saved, review their context, and link your observations to your journal."
+          actions={<><ButtonLink href={navigationHref("journal", data.workspace?.id)} variant="quiet">Open journal</ButtonLink><ButtonLink href={navigationHref("triage", data.workspace?.id)} variant="primary">Explore setups</ButtonLink></>} />
+        <WorkspaceStats items={[
+          { label: "Saved plans", value: data.plans.length },
+          { label: "Ready to review", value: data.plans.filter((plan) => plan.status === "ready_for_review").length },
+          { label: "Paper followed", value: data.plans.filter((plan) => plan.status === "paper_followed").length },
+        ]} />
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-5 py-4 text-sm leading-6 text-[var(--muted)]">Looking for a new AI assessment? Open a setup chart and choose <span className="font-medium text-[var(--strong)]">Analyze with AI</span>. This page holds your saved paper plans.</div>
+        <TradeAgentPlanBoard data={data} />
+        {data.failures.some((failure) => !failure.missing) && <DisclosurePanel title="Data availability" description="Review connection details for any missing planning context."><EmptyState title="Some planning context is unavailable" message={data.failures.filter((failure) => !failure.missing).map((failure) => failure.message).join(" · ")} /></DisclosurePanel>}
+      </div>
     </AppShell>
   );
 }

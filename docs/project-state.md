@@ -16,6 +16,24 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
+- The web product now centers Overview (`/command-center`), Markets (`/dashboard`), Setups
+  (`/triage`), Scanner, and Journal. The homepage is a chart-first, product-focused presentation
+  with explicitly illustrative interactive data. Shared headers, compact statistics, responsive
+  setup lists, and native disclosures simplify daily pages; research/configuration/diagnostic
+  routes remain accessible through secondary navigation. Setup review gives the chart and
+  separate AI assessment full width. Existing URLs, workspace scoping, API contracts, and
+  auth flows are preserved. UI guidance: `apps/web/docs/product-experience.md`.
+
+- Optional LangGraph trade suggestions live under `trade_agent/suggestions` and
+  `/trade-agent/suggestions`. An on-demand analyst plus independent risk-review agent uses
+  OpenAI Responses structured output over a bounded latest-final-candle snapshot. It persists
+  separate `trade_suggestion_runs` and may propose BUY/SELL/WAIT independently of deterministic
+  signals, with decimal level validation, minimum 2:1 reward/risk, one revision/four-call limit,
+  workspace quotas, explicit RBAC, and expiring chart overlays. This is a scoped expansion of the
+  older explanation-only AI boundary; it does not reclassify source signals or execute orders.
+  Disabled by default; requires the `trade_suggestions` queue worker and migration
+  `202610311200_trade_suggestions`. Configuration and handoff: `docs/trade-suggestions.md`.
+
 - Production auth and workspace RBAC exist under `apps/api/app/modules/auth/` and `apps/api/app/modules/permissions/`. `AUTH_MODE=dev` with `AUTH_ENABLED=false` remains the local/test pass-through default; production modes support first-party password sessions backed by Postgres, user-owned password rotation plus session inventory/revocation/activity APIs, hashed auth activity events, legacy admin API-key compatibility, hashed persisted API keys, RS256 JWT identity lookup through `auth_identities`, workspace membership enforcement, permission dependencies, and `/auth/me` plus `/auth/context` without adding broker execution, auto-trading, copy trading, or financial-advice behavior.
 - New password credentials use Argon2id while legacy PBKDF2-SHA256 credentials are upgraded after
   successful login. New accounts require expiring, single-use email verification backed by hashed

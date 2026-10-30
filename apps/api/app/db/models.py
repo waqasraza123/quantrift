@@ -197,6 +197,7 @@ from app.modules.timeframe_aggregation.models import (
     MultiTimeframeContext,
 )
 from app.modules.trade_agent.models import TradeAgentObservation, TradeAgentPlan, TradeAgentReview
+from app.modules.trade_agent.suggestions.models import TradeSuggestionRun
 from app.modules.trading_journal.models import (
     JournalEntry,
     JournalEntryAttachment,
@@ -389,6 +390,7 @@ __all__ = [
     "TradeAgentObservation",
     "TradeAgentPlan",
     "TradeAgentReview",
+    "TradeSuggestionRun",
     "User",
     "WalkForwardValidationComparison",
     "WalkForwardValidationRun",

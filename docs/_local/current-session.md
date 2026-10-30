@@ -1,5 +1,38 @@
 # Current Session
 
+## Product Homepage and Workspace Redesign
+
+- Rebuilt the public homepage around charts, setup reasoning, independent risk review, and
+  research journaling; added an interactive, clearly illustrative BTC/ETH preview and native FAQ.
+- Simplified shared shell, desktop/mobile navigation, workspace switching, headers, colors, and
+  surfaces. Primary routes are Overview, Markets, Setups, Scanner, and Journal; secondary routes
+  remain available under Research & tools/More. Removed visible API URLs and repeated page links.
+- Replaced the six-column triage board with responsive setup rows and collapsible advanced filters.
+  Simplified overview/markets/brief/scanner/paper-plan/journal pages and chart review; charts and
+  existing AI suggestions retain the full saved-context and expiry behavior.
+- Rewrote README around the product workflow, local startup, and optional AI activation. Added
+  `apps/web/docs/product-experience.md` for interface conventions and manual review handoff.
+- Preserved earlier uncommitted OpenAI/LangGraph implementation and unrelated untracked artifacts.
+- Per user instruction, no tests, builds, lint, type checks, preview servers, browser checks,
+  screenshots, migrations, or deployments were run. Runtime/visual verification remains with the
+  user. No commit or push requested.
+
+## LangGraph OpenAI Trade Suggestions
+
+- Added an optional analyst/risk-review graph, strict structured outputs, latest closed-candle
+  context, decimal setup validation, scoped evidence checks, and independent BUY/SELL/WAIT results.
+- Added suggestion persistence, migration `202610311200_trade_suggestions`, workspace ownership
+  enforcement, deduplication/quotas, queued generation with lease heartbeat and bounded execution,
+  and a dedicated Compose worker for the `trade_suggestions` queue.
+- Added the signal-chart AI panel with progress, saved history, entry/stop/target overlays,
+  expiry handling, and deterministic-signal disagreement labels.
+- Feature defaults off. Activation needs the migration, backend `OPENAI_API_KEY`,
+  `TRADE_SUGGESTIONS_ENABLED=true`, and the dedicated worker. See `docs/trade-suggestions.md`.
+- Installed the new Python dependencies locally. At the user's explicit request, no tests,
+  builds, lint, type checks, migrations, or live provider calls were executed for this task.
+- Verification is left to the user; the feature has not been runtime verified. Existing untracked
+  `.DS_Store`, API build artifacts, and web test results were preserved. No commit or push requested.
+
 ## Registration/Login Failure Diagnosis
 
 - Confirmed the configured auth database had five `invalid_credentials` login failures and two

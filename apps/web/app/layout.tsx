@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { getProductConfig } from "@/config/product";
 import "./globals.css";
+import "./marketing.css";
 
 const product = getProductConfig();
 

@@ -1,192 +1,75 @@
-import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { BrandMark } from "@/components/brand/BrandMark";
+import { ProductIcon, type ProductIconName } from "@/components/ui/ProductIcon";
 import { getProductConfig } from "@/config/product";
+import { MarketPreview } from "./MarketPreview";
 
-const capabilities = [
-  {
-    index: "01",
-    title: "See what matters",
-    description: "Turn noisy market data into ranked, review-ready setups.",
-    icon: <SignalIcon key="signal" />,
-  },
-  {
-    index: "02",
-    title: "Trust the evidence",
-    description: "Trace every signal to its data, context, and quality checks.",
-    icon: <EvidenceIcon key="evidence" />,
-  },
-  {
-    index: "03",
-    title: "Stay in control",
-    description: "Use AI for research and paper plans while decisions stay human.",
-    icon: <ControlIcon key="control" />,
-  },
+const workflow: { title: string; description: string; icon: ProductIconName }[] = [
+  { title: "Find your focus", description: "Follow the symbols that matter to you and scan for setups worth a closer look.", icon: "scanner" },
+  { title: "Read the chart", description: "See the candles, market structure, and evidence behind each setup in one place.", icon: "chart" },
+  { title: "Get another perspective", description: "Ask AI for a conditional setup. Read the reasoning and the independent risk review.", icon: "sparkles" },
+  { title: "Keep a record", description: "Save your observations and come back to see how the setup developed.", icon: "journal" },
 ];
 
-const workflow = ["Ingest market data", "Rank the signal", "Review the evidence", "Make the call"];
+const questions = [
+  { question: "What does the AI actually suggest?", answer: "When enabled, an analyst proposes BUY, SELL, or WAIT from stored closed candles. BUY describes a long setup; SELL describes a short setup. An independent risk reviewer challenges the proposal, and code checks the prices and minimum 2:1 reward-to-risk before the result is shown." },
+  { question: "Does QuantRift place trades?", answer: "No. QuantRift is a research workspace. It provides charts, evidence, conditional paper setups, and a journal. You make your own decisions; there is no broker execution or automatic order placement." },
+  { question: "Is the preview showing live prices?", answer: "The preview on this page uses illustrative sample data. Inside your workspace, timestamps and data-quality checks show which stored candles each assessment uses. New data can make an earlier suggestion outdated." },
+  { question: "What do I need to get started?", answer: "Create a workspace, choose symbols, and connect or import candle data. Self-hosted deployments need the API and database running. AI suggestions additionally require a server-side OpenAI key and the suggestion worker; your administrator can enable them." },
+];
 
 export function LandingPage() {
   const product = getProductConfig();
-
   return (
-    <main className="landing-grid min-h-screen overflow-hidden bg-[#061416] text-[#f7fbfa]">
-      <div className="landing-glow pointer-events-none fixed inset-0" />
-
-      <header className="relative z-20 border-b border-white/10 bg-[#061416]/80 backdrop-blur-2xl">
-        <div className="mx-auto flex min-h-20 max-w-[88rem] items-center justify-between px-5 sm:px-8 lg:px-10">
-          <Link className="flex items-center gap-3 text-base font-black tracking-[-0.02em]" href="/">
-            <BrandMark className="h-9 w-9 text-[#dff7f2] drop-shadow-[0_0_18px_rgba(103,232,213,0.24)]" />
-            <span>{product.name}</span>
-          </Link>
-          <nav className="flex items-center gap-2" aria-label="Primary navigation">
-            <Link className="rounded-full px-4 py-2.5 text-sm font-bold text-white/65 transition hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-[#67e8d5]" href="/login">Sign in</Link>
-            <Link className="rounded-full bg-[#ff7658] px-5 py-2.5 text-sm font-black text-white shadow-[0_0_35px_rgba(255,118,88,0.2)] transition hover:-translate-y-0.5 hover:bg-[#ff8c73] focus-visible:ring-4 focus-visible:ring-[#ff7658]/30" href="/register">Get started</Link>
-          </nav>
+    <main className="marketing-page">
+      <a href="#main-content" className="marketing-skip">Skip to content</a>
+      <header className="marketing-nav">
+        <div className="marketing-container marketing-nav-inner">
+          <Link href="/" className="marketing-brand" aria-label={`${product.name} home`}><BrandMark className="h-8 w-8" />{product.name}</Link>
+          <nav aria-label="Homepage navigation" className="marketing-links"><a href="#workflow">How it works</a><a href="#ai-research">AI research</a><a href="#questions">Questions</a></nav>
+          <div className="marketing-nav-actions"><Link href="/login" className="marketing-signin">Sign in</Link><Link href="/register" className="marketing-button marketing-button-small">Get started<ProductIcon name="arrow" className="h-3.5 w-3.5" /></Link></div>
         </div>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-[88rem] px-5 pb-16 pt-14 sm:px-8 sm:pt-20 lg:px-10 lg:pb-24 lg:pt-24">
-        <div className="grid gap-12 lg:grid-cols-[0.86fr_1.14fr] lg:items-center">
-          <div className="motion-reveal motion-reveal-up">
-            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-[#67e8d5]/35 bg-[#67e8d5]/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-[#9cf2e6]">
-              <span className="h-2 w-2 rounded-full bg-[#ff7658] shadow-[0_0_14px_#ff7658]" />
-              Quantitative market intelligence
-            </div>
-            <h1 className="max-w-3xl text-[clamp(3.5rem,7vw,7.5rem)] font-black leading-[0.84] tracking-[-0.075em] text-white">
-              Find the signal.
-              <span className="mt-2 block bg-gradient-to-r from-[#ff7658] via-[#f8e5cf] to-[#67e8d5] bg-clip-text text-transparent">Review the evidence.</span>
-            </h1>
-            <p className="mt-8 max-w-xl text-lg font-medium leading-8 text-white/58 sm:text-xl">QuantRift turns market data into clear, evidence-backed setups for faster, more disciplined research.</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-[#ff7658] px-6 text-sm font-black text-white shadow-[0_18px_60px_rgba(255,118,88,0.16)] transition hover:-translate-y-0.5 hover:bg-[#ff8c73] focus-visible:ring-4 focus-visible:ring-[#ff7658]/30" href="/register">Start researching <ArrowIcon /></Link>
-              <Link className="inline-flex min-h-13 items-center justify-center rounded-full border border-white/15 bg-white/[0.055] px-6 text-sm font-black text-white transition hover:-translate-y-0.5 hover:border-[#67e8d5]/70 hover:bg-[#67e8d5]/10 focus-visible:ring-4 focus-visible:ring-[#67e8d5]/30" href="/demo">Explore the demo</Link>
-            </div>
-            <div className="mt-8 grid max-w-xl grid-cols-3 border-y border-white/10 py-5 text-xs font-bold uppercase tracking-[0.12em] text-white/42">
-              <span>Evidence-backed</span>
-              <span className="border-x border-white/10 px-4 text-center">Human-reviewed</span>
-              <span className="text-right">No broker execution</span>
-            </div>
-          </div>
-
-          <ProductShowcase />
+      <section className="marketing-hero marketing-container" id="main-content">
+        <div className="marketing-hero-copy">
+          <p className="marketing-kicker"><span />A clearer view of your next setup</p>
+          <h1>See the setup.<br />Understand<br className="marketing-desktop-break" /> <em>the why.</em></h1>
+          <p className="marketing-intro">Your charts, market evidence, and AI trade ideas in one focused workspace. Spend less time sorting through signals and more time understanding them.</p>
+          <div className="marketing-hero-actions"><Link href="/register" className="marketing-button">Create your workspace<ProductIcon name="arrow" className="h-4 w-4" /></Link><a href="#product-preview" className="marketing-text-link">Take a closer look<span aria-hidden="true">↘</span></a></div>
+          <p className="marketing-hero-caption"><ProductIcon name="check" className="h-3.5 w-3.5" />Open source <span>·</span> Evidence you can inspect <span>·</span> Your decision</p>
         </div>
+        <div id="product-preview" className="marketing-hero-preview"><MarketPreview /><p className="marketing-preview-caption">Explore the preview: switch markets or toggle the chart levels.</p></div>
       </section>
 
-      <section className="relative z-10 border-y border-white/10 bg-[#0d0e19]/80">
-        <div className="mx-auto grid max-w-[88rem] md:grid-cols-3">
-          {capabilities.map(({ index, title, description, icon }, capabilityIndex) => (
-            <article className={`group relative min-h-72 overflow-hidden px-7 py-9 sm:px-9 ${capabilityIndex < capabilities.length - 1 ? "border-b border-white/10 md:border-b-0 md:border-r" : ""}`} key={title}>
-              <span className="absolute right-5 top-1 text-8xl font-black tracking-[-0.08em] text-white/[0.035] transition group-hover:text-[#67e8d5]/10">{index}</span>
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0b4b4d] text-[#8ff1e3] shadow-[0_0_38px_rgba(103,232,213,0.18)]">{icon}</div>
-              <p className="mt-12 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff8b72]">Signal layer {index}</p>
-              <h2 className="mt-3 text-2xl font-black tracking-[-0.035em] text-white">{title}</h2>
-              <p className="mt-3 max-w-sm text-base font-medium leading-7 text-white/50">{description}</p>
-            </article>
-          ))}
-        </div>
+      <div className="marketing-principles"><div className="marketing-container"><span><ProductIcon name="chart" />Charts with context</span><span><ProductIcon name="layers" />Evidence behind the idea</span><span><ProductIcon name="shield" />A separate risk review</span><span><ProductIcon name="journal" />A record of your thinking</span></div></div>
+
+      <section className="marketing-section marketing-container" id="workflow">
+        <div className="marketing-section-heading"><div><p className="marketing-eyebrow">A simpler research routine</p><h2>From market noise<br />to a considered decision.</h2></div><p>One connected workflow. Start with a watchlist, look closer at a setup, and keep the reasoning alongside your notes.</p></div>
+        <ol className="marketing-workflow">{workflow.map((step, index) => <li key={step.title}><div className="marketing-step-top"><ProductIcon name={step.icon} className="h-6 w-6" /><span>0{index + 1}</span></div><h3>{step.title}</h3><p>{step.description}</p></li>)}</ol>
       </section>
 
-      <section className="relative z-10 mx-auto grid max-w-[88rem] gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-10 lg:py-28">
-        <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#f5f4ef] p-2 shadow-[0_36px_100px_rgba(0,0,0,0.3)]">
-          <Image
-            alt="QuantRift evidence analysis interface with a magnifying glass over market signals"
-            className="h-auto w-full rounded-[1.5rem]"
-            height={941}
-            sizes="(max-width: 1024px) 100vw, 60vw"
-            src="/quantrift-evidence.png"
-            width={1672}
-          />
-        </div>
-        <div className="lg:pl-4">
-          <p className="font-mono text-xs font-black uppercase tracking-[0.2em] text-[#ff8b72]">Evidence before action</p>
-          <h2 className="mt-5 text-4xl font-black leading-[0.96] tracking-[-0.055em] text-white sm:text-6xl">Signal over noise.</h2>
-          <p className="mt-6 max-w-xl text-lg font-medium leading-8 text-white/52">Inspect the context behind each setup, surface data-quality concerns, and keep the final decision with the reviewer.</p>
-          <div className="mt-8 flex flex-wrap gap-3 text-xs font-black uppercase tracking-[0.12em] text-[#9cf2e6]">
-            <span className="rounded-full border border-[#67e8d5]/25 bg-[#67e8d5]/10 px-4 py-2">Traceable evidence</span>
-            <span className="rounded-full border border-[#67e8d5]/25 bg-[#67e8d5]/10 px-4 py-2">Quality checks</span>
+      <section className="marketing-research" id="ai-research">
+        <div className="marketing-container marketing-research-inner">
+          <div className="marketing-research-copy"><p className="marketing-eyebrow">AI that shows its work</p><h2>An idea is only as useful<br />as the reasoning behind it.</h2><p>Go beyond a directional label. See the proposed entry, stop, targets, and what would invalidate the idea. Then read a second agent’s assessment before deciding what to do.</p><ul><li><ProductIcon name="check" />Based on your stored closed candles</li><li><ProductIcon name="check" />Independent analyst and risk reviewer</li><li><ProductIcon name="check" />WAIT when a setup does not qualify</li><li><ProductIcon name="check" />Saved context, timestamps, and expiry</li></ul><Link href="/register" className="marketing-text-link">Make room for a better research process<ProductIcon name="arrow" className="h-4 w-4" /></Link></div>
+          <div className="marketing-agent-stack">
+            <article className="marketing-agent"><div className="marketing-agent-heading"><span className="marketing-agent-icon"><ProductIcon name="sparkles" /></span><div><p>01 / Analyst</p><h3>Build the case.</h3></div><span className="marketing-agent-tag">Propose</span></div><p>Read the candles and technical context. Propose a conditional setup with specific levels and evidence references.</p><div className="marketing-agent-pills"><span>BUY</span><span>SELL</span><span>WAIT</span></div></article>
+            <div className="marketing-agent-connector"><span />Then challenge it<span /></div>
+            <article className="marketing-agent"><div className="marketing-agent-heading"><span className="marketing-agent-icon"><ProductIcon name="shield" /></span><div><p>02 / Risk reviewer</p><h3>Question the case.</h3></div><span className="marketing-agent-tag">Review</span></div><p>Look for conflicting evidence, weak levels, and unclear conditions. Approve, request a revision, or recommend waiting.</p><div className="marketing-validation"><ProductIcon name="check" className="h-4 w-4" />Price checks · evidence checks · minimum 2:1</div></article>
+            <p className="marketing-agent-footnote">AI suggestions are optional and require backend configuration. These are conditional paper setups, not guaranteed outcomes.</p>
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto max-w-[88rem] px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
-        <div className="grid gap-12 lg:grid-cols-[0.74fr_1.26fr] lg:items-end">
-          <div>
-            <p className="font-mono text-xs font-black uppercase tracking-[0.2em] text-[#67e8d5]">A sharper research loop</p>
-            <h2 className="mt-5 max-w-xl text-4xl font-black leading-[0.96] tracking-[-0.055em] text-white sm:text-6xl">One clear view of the market.</h2>
-          </div>
-          <p className="max-w-2xl text-lg font-medium leading-8 text-white/52 lg:justify-self-end">Monitor data quality, prioritize opportunities, inspect supporting evidence, and record your review in one decisive workspace.</p>
-        </div>
-        <ol className="mt-14 grid overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] sm:grid-cols-2 lg:grid-cols-4">
-          {workflow.map((step, index) => (
-            <li className={`relative p-7 ${index < workflow.length - 1 ? "border-b border-white/10 sm:[&:nth-child(odd)]:border-r lg:border-b-0 lg:border-r" : ""}`} key={step}>
-              <span className="font-mono text-xs font-black text-[#ff8b72]">0{index + 1}</span>
-              <p className="mt-8 text-lg font-black tracking-[-0.025em] text-white">{step}</p>
-            </li>
-          ))}
-        </ol>
+      <section className="marketing-section marketing-container marketing-notebook">
+        <div className="marketing-journal-preview"><div className="marketing-journal-top"><ProductIcon name="journal" className="h-5 w-5" /><span>Research journal</span><span className="marketing-journal-tag">Sample note</span></div><div className="marketing-journal-entry"><span className="marketing-eyebrow">BTC / USD · 1h</span><h3>A good reason to wait.</h3><p>The setup looked promising, but the next candle did not confirm support. Kept the idea on watch and recorded what would change my view.</p><div><span>Observation saved</span><ProductIcon name="check" className="h-4 w-4" /></div></div><div className="marketing-journal-lines"><span /><span /><span /></div></div>
+        <div><p className="marketing-eyebrow">Close the loop</p><h2>Keep the thinking.<br />Learn from the follow-through.</h2><p className="marketing-body-copy">The useful part of a research session should not disappear when you close a tab. Keep your notes, paper plans, and observed outcomes together so the next review starts with context.</p><Link href="/register" className="marketing-text-link">Start your research journal<ProductIcon name="arrow" className="h-4 w-4" /></Link></div>
       </section>
 
-      <section className="relative z-10 px-5 pb-20 sm:px-8 lg:px-10 lg:pb-28">
-        <div className="relative mx-auto max-w-[88rem] overflow-hidden rounded-[2.5rem] bg-[#dff7f2] px-6 py-14 text-[#082b2e] sm:px-10 lg:flex lg:items-end lg:justify-between lg:px-16 lg:py-16">
-          <div className="absolute -right-16 -top-28 h-80 w-80 rounded-full border-[60px] border-[#ff7658]/25" />
-          <div className="relative max-w-3xl">
-            <p className="font-mono text-xs font-black uppercase tracking-[0.2em]">The market moves fast. Your process should be clear.</p>
-            <h2 className="mt-5 text-4xl font-black leading-[0.94] tracking-[-0.055em] sm:text-6xl">Research with context. Decide with conviction.</h2>
-          </div>
-          <Link className="relative mt-9 inline-flex min-h-14 shrink-0 items-center justify-center gap-2 rounded-full bg-[#ff7658] px-7 text-sm font-black text-white shadow-[0_20px_60px_rgba(7,8,17,0.18)] transition hover:-translate-y-0.5 hover:bg-[#0b4b4d] lg:mt-0" href="/register">Create your workspace <ArrowIcon /></Link>
-        </div>
-      </section>
+      <section className="marketing-section marketing-container marketing-faq" id="questions"><div><p className="marketing-eyebrow">A few useful answers</p><h2>Know what’s<br />behind the workspace.</h2><a href={product.repositoryUrl} className="marketing-text-link" target="_blank" rel="noreferrer">Explore the source code ↗</a></div><div>{questions.map((item) => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</div></section>
 
-      <footer className="relative z-10 border-t border-white/10 bg-[#05060c]">
-        <div className="mx-auto flex max-w-[88rem] flex-col gap-5 px-5 py-9 text-sm font-medium text-white/42 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10">
-          <div className="flex items-center gap-3 font-black text-white"><BrandMark className="h-9 w-9 text-[#dff7f2]" /><span>{product.name}</span></div>
-          <p>Market intelligence for human decision-making. Not financial advice.</p>
-          <Link className="w-fit font-bold transition hover:text-[#ff8b72]" href="/login">Sign in</Link>
-        </div>
-      </footer>
+      <section className="marketing-container marketing-final"><div><p className="marketing-eyebrow">Less noise. More context.</p><h2>Your next idea deserves<br />a closer look.</h2></div><div><Link href="/register" className="marketing-button">Get started with {product.name}<ProductIcon name="arrow" className="h-4 w-4" /></Link><p>Built for research. Decisions stay with you.</p></div></section>
+      <footer className="marketing-footer marketing-container"><Link href="/" className="marketing-brand"><BrandMark className="h-7 w-7" />{product.name}</Link><p>Market research and conditional paper setups. Not financial advice.</p><div><a href={product.repositoryUrl} target="_blank" rel="noreferrer">GitHub ↗</a><Link href="/login">Sign in</Link></div></footer>
     </main>
   );
-}
-
-function ProductShowcase() {
-  return (
-    <div className="motion-reveal motion-reveal-scale relative mx-auto w-full max-w-4xl [animation-delay:140ms]">
-      <div className="absolute -inset-8 -z-10 rounded-[3rem] bg-[#67e8d5]/14 blur-3xl" />
-      <div className="absolute -left-3 -top-4 z-10 rounded-full bg-[#ff7658] px-4 py-2 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(255,118,88,0.2)] sm:-left-5">Research intelligence</div>
-      <div className="absolute -bottom-5 right-3 z-10 rounded-2xl border border-white/15 bg-[#121420]/92 px-4 py-3 shadow-2xl backdrop-blur-xl sm:right-7">
-        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-white/40">Decision model</p>
-        <p className="mt-1 text-sm font-black text-[#67e8d5]">Human approval required</p>
-      </div>
-      <div className="overflow-hidden rounded-[1.7rem] border border-white/15 bg-[#0d101b] p-2 shadow-[0_40px_120px_rgba(0,0,0,0.58)] sm:rounded-[2rem] sm:p-3">
-        <Image
-          alt="QuantRift agentic market intelligence observatory with market research cards"
-          className="h-auto w-full rounded-[1.25rem] border border-white/10"
-          height={941}
-          priority
-          sizes="(max-width: 1024px) 100vw, 58vw"
-          src="/quantrift-observatory.png"
-          width={1672}
-        />
-      </div>
-      <p className="mt-4 text-right font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-white/30">Illustrative demo data · paper-only workflow</p>
-    </div>
-  );
-}
-
-function SignalIcon() {
-  return <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24"><path d="M4 16l4-5 4 3 7-8" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /><path d="M16 6h3v3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>;
-}
-
-function EvidenceIcon() {
-  return <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24"><path d="M8 4h8l3 3v13H5V4h3Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" /><path d="M9 11h6M9 15h4" stroke="currentColor" strokeLinecap="round" strokeWidth="2" /></svg>;
-}
-
-function ControlIcon() {
-  return <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" /><path d="m9 12 2 2 4-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>;
-}
-
-function ArrowIcon(): ReactNode {
-  return <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" /></svg>;
 }

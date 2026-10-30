@@ -22,7 +22,7 @@ type ButtonLinkProps = {
 };
 
 const variantClassName: Record<ButtonVariant, string> = {
-  primary: "border-[var(--accent)] bg-[linear-gradient(135deg,var(--accent)_0%,var(--accent-strong)_100%)] text-white shadow-soft hover:shadow-glow",
+  primary: "border-[var(--accent-strong)] bg-[var(--accent-strong)] text-white shadow-soft hover:brightness-95 dark:text-[#10291f]",
   secondary: "premium-control text-[var(--strong)]",
   ghost: "border-transparent bg-transparent text-[var(--strong)] hover:bg-[var(--surface-muted)]",
   quiet: "border-transparent bg-[var(--surface-muted)] text-[var(--strong)] hover:bg-[var(--surface-elevated)]",

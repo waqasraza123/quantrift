@@ -1,6 +1,6 @@
 export const defaultProductName = "QuantRift";
 export const defaultProductDescription =
-  "QuantRift — Agentic AI platform for quantitative market intelligence, signal analysis, and evidence-based research.";
+  "Research trade setups with clear charts, market evidence, and AI reasoning. Scan your watchlist, review conditional paper setups, and keep your decisions in one workspace.";
 export const defaultSiteUrl = "https://quantrift.vercel.app";
 export const defaultRepositoryUrl =
   "https://github.com/waqasraza123/quantrift";

@@ -64,6 +64,7 @@ class JobQueueJobType(StrEnum):
     LLM_EXPLAIN = "llm.explain"
     REPORT_BUILD = "report.build"
     EQUITY_DATA_OPERATION = "equity_data.operation"
+    TRADE_AGENT_SUGGEST = "trade_agent.suggest"
 
 
 class JobQueueDefinition(Base):
@@ -78,7 +79,7 @@ class JobQueueDefinition(Base):
             "'daily_workflow.run', 'outcome.evaluate', 'reasoning.generate', "
             "'notification.deliver', 'read_model.rebuild', 'backfill.item', "
             "'data_quality.run', 'retention.apply', 'llm.explain', 'report.build', "
-            "'equity_data.operation')",
+            "'equity_data.operation', 'trade_agent.suggest')",
             name="job_queue_definitions_job_type_allowed",
         ),
         CheckConstraint(
@@ -137,7 +138,7 @@ class JobQueueItem(Base):
             "'daily_workflow.run', 'outcome.evaluate', 'reasoning.generate', "
             "'notification.deliver', 'read_model.rebuild', 'backfill.item', "
             "'data_quality.run', 'retention.apply', 'llm.explain', 'report.build', "
-            "'equity_data.operation')",
+            "'equity_data.operation', 'trade_agent.suggest')",
             name="job_queue_items_job_type_allowed",
         ),
         CheckConstraint("attempts >= 0", name="job_queue_items_attempts_non_negative"),

@@ -1,5 +1,8 @@
+import { ButtonLink } from "@/components/ui/Button";
+import { DisclosurePanel } from "@/components/ui/DisclosurePanel";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { WorkspaceStats } from "@/components/ui/WorkspaceStats";
 import { formatDateTime } from "@/lib/formatting/dates";
-import { formatInteger } from "@/lib/formatting/numbers";
 import { humanizeLabel, shortIdentifier } from "@/lib/formatting/labels";
 import { navigationHref } from "@/lib/ui/navigation";
 import { toneForBias, toneForDataQuality, toneForOutcome, toneForPriority } from "@/lib/ui/statusStyles";
@@ -18,105 +21,40 @@ import type {
 import {
   BriefBadge,
   BriefEmptyBlock,
-  BriefMetric,
   BriefPanel,
-  BriefTextLink,
 } from "./BriefNarrativePrimitives";
 
 export function BriefNarrative({ brief }: { brief: WorkspaceBrief }) {
   return (
-    <div className={cn("space-y-6", motionRevealPresetClass("scale-subtle"))}>
+    <div className="space-y-6">
       <BriefHero brief={brief} />
-      {brief.backendUnavailable && (
-        <BriefPanel
-          title="Backend unavailable"
-          eyebrow="Brief state"
-          className={motionRevealPresetClass()}
-          style={motionRevealDensityStyle(1)}
-        >
-          <BriefEmptyBlock
-            title="Backend unavailable"
-            message="The brief is limited to any optional endpoint responses that were returned before the backend became unavailable."
-          />
-        </BriefPanel>
+      {brief.backendUnavailable && <p role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm text-[var(--muted)]">Some sources are unavailable. This brief includes only the research context that could be loaded.</p>}
+      {!brief.workspace ? <BriefEmptyBlock title="Start with a workspace" message="Choose markets and add a data source to build your daily brief." /> : (
+        <>
+          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(280px,.7fr)]">
+            <div className="space-y-6"><WhatChangedSection brief={brief} /><ReviewFirstSection items={brief.activeSetups} /><OutcomeReadySection items={brief.outcomeUpdates} /></div>
+            <aside className="space-y-6"><NeedsConfirmationSection items={brief.reviewNeeded} /><AvoidConditionsSection items={brief.avoidConditions} /><WatchNextSection items={brief.watchNext} /></aside>
+          </div>
+          <DisclosurePanel title="Market coverage & follow-ups" description="Freshness, data quality, and pending research tasks."><FreshSymbolsSection brief={brief} /><DataQualitySection items={brief.dataQualityIssues} workspaceId={brief.workspace.id} /><PendingActionsSection items={brief.pendingActions} /></DisclosurePanel>
+        </>
       )}
-      {!brief.workspace && (
-        <BriefPanel
-          title="No workspace available"
-          eyebrow="Empty state"
-          className={motionRevealPresetClass()}
-          style={motionRevealDensityStyle(2)}
-        >
-          <BriefEmptyBlock
-            title="No workspace available"
-            message="Create or seed a workspace before a structured daily brief can be generated."
-          />
-        </BriefPanel>
-      )}
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)]">
-        <div className="space-y-6">
-          <WhatChangedSection brief={brief} />
-          <ReviewFirstSection items={brief.activeSetups} />
-          <FreshSymbolsSection brief={brief} />
-          <OutcomeReadySection items={brief.outcomeUpdates} />
-        </div>
-        <aside className="space-y-6">
-          <NeedsConfirmationSection items={brief.reviewNeeded} />
-          <AvoidConditionsSection items={brief.avoidConditions} />
-          <WatchNextSection items={brief.watchNext} />
-          <PendingActionsSection items={brief.pendingActions} />
-        </aside>
-      </section>
-      <DataQualitySection items={brief.dataQualityIssues} workspaceId={brief.workspace?.id || null} />
     </div>
   );
 }
 
 function BriefHero({ brief }: { brief: WorkspaceBrief }) {
-  const period = periodLabel(brief);
-  const watchlist = brief.watchlistId ? `Watchlist ${shortIdentifier(brief.watchlistId)}` : "Workspace filter";
   return (
-    <section
-      className={cn(
-        "rounded-3xl border border-white/70 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_34%),linear-gradient(135deg,#ffffff,rgba(240,253,250,0.95)_46%,rgba(239,246,255,0.95))] p-5 shadow-[0_30px_100px_rgba(15,23,42,0.10)] dark:border-slate-800 dark:bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.16),transparent_34%),linear-gradient(135deg,#020617,#0f172a_52%,#082f49)] sm:p-7",
-        motionRevealPresetClass(),
-      )}
-    >
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-4xl">
-          <div className="flex flex-wrap gap-2">
-            <BriefBadge tone="info">{brief.sourceLabel}</BriefBadge>
-            <BriefBadge tone={brief.backendUnavailable ? "danger" : "good"}>{brief.backendUnavailable ? "Backend unavailable" : "Brief data loaded"}</BriefBadge>
-            <BriefBadge tone="neutral">{watchlist}</BriefBadge>
-          </div>
-          <p className="mt-6 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Daily Brief</p>
-          <h1 className="mt-2 max-w-4xl text-4xl font-semibold text-slate-950 dark:text-white sm:text-5xl">
-            {brief.workspace?.name || brief.appName}
-          </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300">
-            Structured narrative context for what changed, fresh symbols, review-first setup context, confirmation needs, avoid conditions, observed outcomes, and backend-safe follow-up.
-          </p>
-        </div>
-        <div className="min-w-[280px] rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-700 dark:bg-slate-950/65">
-          <p className="text-xs font-semibold uppercase text-slate-500">Period</p>
-          <p className="mt-2 text-xl font-semibold text-[var(--strong)]">{period}</p>
-          <p className="mt-2 text-sm text-slate-500">Generated {formatDateTime(brief.generatedAt)}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <BriefTextLink href={navigationHref("commandCenter", brief.workspace?.id)}>Open command center</BriefTextLink>
-            <BriefTextLink href={navigationHref("triage", brief.workspace?.id)}>Open triage</BriefTextLink>
-          </div>
-        </div>
-      </div>
-      <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-7">
-        <BriefMetric label="Symbols reviewed" value={formatInteger(brief.summary.totalSymbolsReviewed)} detail="Brief focus rows" />
-        <BriefMetric label="Fresh symbols" value={formatInteger(brief.summary.freshSymbols)} detail="Data fresh" />
-        <BriefMetric label="Stale/degraded" value={formatInteger(brief.summary.staleOrDegradedSymbols)} detail="Review recommended" />
-        <BriefMetric label="Review first" value={formatInteger(brief.summary.activeSetupCount)} detail="Setup context" />
-        <BriefMetric label="Needs review" value={formatInteger(brief.summary.reviewRecommendedCount)} detail="Confirmation or avoid" />
-        <BriefMetric label="Outcomes ready" value={formatInteger(brief.summary.recentOutcomeUpdateCount)} detail="Observed horizons" />
-        <BriefMetric label="Pending actions" value={formatInteger(brief.summary.pendingBackendActionCount)} detail="Backend-safe" />
-      </div>
-    </section>
+    <div className="space-y-6">
+      <PageHeader eyebrow="Your daily research" title="The market brief" description="What changed, which setups deserve a look, and what to keep on watch."
+        meta={<span className="text-xs text-[var(--muted)]">Updated {formatDateTime(brief.generatedAt)}</span>}
+        actions={<><ButtonLink href={navigationHref("commandCenter", brief.workspace?.id)} variant="quiet">Overview</ButtonLink><ButtonLink href={navigationHref("triage", brief.workspace?.id)}>Explore setups</ButtonLink></>} />
+      <WorkspaceStats items={[
+        { label: "Markets reviewed", value: brief.summary.totalSymbolsReviewed },
+        { label: "Setups in focus", value: brief.summary.activeSetupCount },
+        { label: "Needs a closer look", value: brief.summary.reviewRecommendedCount },
+        { label: "Outcome updates", value: brief.summary.recentOutcomeUpdateCount },
+      ]} />
+    </div>
   );
 }
 

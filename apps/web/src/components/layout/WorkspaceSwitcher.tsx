@@ -8,7 +8,7 @@ type WorkspaceSwitcherProps = {
 
 export function WorkspaceSwitcher({ workspaceName, workspaceId }: WorkspaceSwitcherProps) {
   return (
-    <Suspense fallback={<div className="muted-surface h-24 rounded-lg" />}>
+    <Suspense fallback={<div className="muted-surface h-16 rounded-lg" />}>
       <WorkspaceSelector workspaceId={workspaceId} workspaceName={workspaceName} />
     </Suspense>
   );

@@ -77,6 +77,29 @@ def metadata(
 
 DEFAULT_CAPABILITIES: tuple[CapabilityDefinition, ...] = (
     CapabilityDefinition(
+        key="trade_agent_suggestions",
+        name="LangGraph AI Trade Suggestions",
+        category=CapabilityCategory.REASONING,
+        execution_type=CapabilityExecutionType.LLM_PROVIDER,
+        safety_level=CapabilitySafetyLevel.REVIEW_REQUIRED,
+        module_path="app.modules.trade_agent.suggestions",
+        status=CapabilityStatus.EXPERIMENTAL,
+        requires_external_credentials=True,
+        produced_artifacts=("trade_suggestion_runs",),
+        route_refs=("/trade-agent/suggestions", "/trade-agent/suggestions/from-signal/{signal_id}"),
+        dependencies=("signal_classification", "job_queue"),
+        metadata={
+            **metadata(
+                deterministic=False, read_only=False, mutates_intelligence_artifacts=True,
+                module_setting="trade_suggestions_enabled",
+                credential_settings=("openai_api_key",),
+                notes="On-demand analyst and risk-review agents create conditional paper setups.",
+            ),
+            "executionType": "human_review", "safetyLevel": "paper_only",
+            "brokerExecution": False, "independentDirectionalSuggestions": True,
+        },
+    ),
+    CapabilityDefinition(
         key="candle_imports",
         name="Historical Candle Imports",
         category=CapabilityCategory.INGESTION,

@@ -12,6 +12,7 @@ from app.modules.job_queue.dispatcher import JobQueueDispatcher
 from app.modules.job_queue.models import JobQueueJobType
 from app.modules.job_queue.service import JobQueueService
 from app.modules.runtime_supervisor.heartbeats import RuntimeWorkerHeartbeatClient
+from app.modules.trade_agent.suggestions.jobs import handle_trade_suggestion_job
 
 
 class JobQueueWorkerRuntime:
@@ -75,7 +76,11 @@ class JobQueueWorkerRuntime:
             jobs = await service.claim_jobs(
                 queue_name=self.queue_name,
                 worker_id=self.worker_id,
-                limit=self.settings.job_queue_claim_batch_size,
+                limit=(
+                    min(self.settings.job_queue_claim_batch_size, self.max_concurrency)
+                    if self.queue_name == "trade_suggestions"
+                    else self.settings.job_queue_claim_batch_size
+                ),
             )
             job_ids = [job.id for job in jobs]
         await self.dispatch_jobs(job_ids)
@@ -92,6 +97,10 @@ class JobQueueWorkerRuntime:
                 dispatcher.register_handler(
                     JobQueueJobType.EQUITY_DATA_OPERATION.value,
                     handle_equity_data_operation_job,
+                )
+                dispatcher.register_handler(
+                    JobQueueJobType.TRADE_AGENT_SUGGEST.value,
+                    handle_trade_suggestion_job,
                 )
                 await dispatcher.dispatch_job(job_id, self.worker_id)
 

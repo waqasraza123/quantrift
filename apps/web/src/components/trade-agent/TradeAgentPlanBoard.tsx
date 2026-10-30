@@ -30,7 +30,9 @@ export function TradeAgentPlanBoard({ data }: TradeAgentPlanBoardProps) {
     return (
       <EmptyState
         title="No paper plans"
-        message="Open a setup from triage and create a paper-only plan when the backend has enough context."
+        message="Open a setup chart and save a paper plan when there is enough context to review."
+        href={`/triage?workspaceId=${data.workspace.id}`}
+        actionLabel="Explore setups"
       />
     );
   }

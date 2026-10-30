@@ -1,10 +1,11 @@
-import { WorkflowLinks } from "@/components/layout/workflow-links";
 import { SetupEmptySection } from "@/components/setup-detail/SetupEmptySection";
 import { SetupErrorSection } from "@/components/setup-detail/SetupErrorSection";
 import { SetupVisualPanel } from "@/components/setup-detail/SetupVisualPanel";
+import { ButtonLink } from "@/components/ui/Button";
+import { DisclosurePanel } from "@/components/ui/DisclosurePanel";
 import { composeSetupReview } from "@/lib/setup-review/composeSetupReview";
 import type { SetupDetailData } from "@/lib/setup-detail/types";
-import { AnimatedListItem, AnimatedSection, motionRevealDensityStyle } from "@/lib/ui/motion";
+import { navigationHref } from "@/lib/ui/navigation";
 import { SetupAuditReviewPanel } from "./SetupAuditReviewPanel";
 import { SetupContextReviewPanel } from "./SetupContextReviewPanel";
 import { SetupEvidenceReviewPanel } from "./SetupEvidenceReviewPanel";
@@ -16,86 +17,34 @@ import { SetupReasoningReviewPanel } from "./SetupReasoningReviewPanel";
 import { SetupReviewHeader } from "./SetupReviewHeader";
 import { SetupWaitAvoidReviewPanel } from "./SetupWaitAvoidReviewPanel";
 
-type SetupReviewViewProps = {
-  data: SetupDetailData;
-};
-
-export function SetupReviewView({ data }: SetupReviewViewProps) {
+export function SetupReviewView({ data }: { data: SetupDetailData }) {
   const model = composeSetupReview(data);
   const signal = model.signal?.signal || null;
   const workspaceId = signal?.workspace_id || model.setupContext?.workspace_id || model.report?.workspace_id || null;
-
   if (!model.signal && !model.report && !model.setupContext) {
-    return (
-      <AnimatedSection as="section" className="space-y-6">
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(0)}>
-          <SetupEmptySection title="Setup not available" message="No setup, signal, or report payload was returned for this identifier." />
-        </AnimatedListItem>
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(1)}>
-          <SetupErrorSection failures={model.failures} />
-        </AnimatedListItem>
-      </AnimatedSection>
-    );
+    return <div className="space-y-5"><ButtonLink href={navigationHref("triage", workspaceId)} variant="quiet">← Back to setups</ButtonLink><SetupEmptySection title="Setup not available" message="This setup could not be loaded. Return to your setup list or check the connection details." /><SetupErrorSection failures={model.failures} /></div>;
   }
-
   return (
-    <AnimatedSection as="section" className="space-y-6">
-      <AnimatedListItem as="section" style={motionRevealDensityStyle(0)}>
-        <SetupReviewHeader model={model} />
-      </AnimatedListItem>
-      <AnimatedListItem as="section" style={motionRevealDensityStyle(1)}>
-        <WorkflowLinks
-          workspaceId={workspaceId}
-          targets={["commandCenter", "brief", "triage", "tradeAgent", "scanner", "dataOnboarding", "review", "journal"]}
-        />
-      </AnimatedListItem>
-      <AnimatedListItem as="section" style={motionRevealDensityStyle(2)}>
-        <SetupErrorSection failures={model.failures.filter((failure) => !failure.missing)} />
-      </AnimatedListItem>
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <main className="space-y-6">
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(3)}>
-            <SetupVisualPanel model={model} />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(4)}>
-            <SetupContextReviewPanel model={model} />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(5)}>
-            <SetupEvidenceReviewPanel model={model} />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(6)}>
-            <SetupWaitAvoidReviewPanel model={model} />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(7)}>
-            <SetupHistoricalReviewPanel model={model} />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(8)}>
-            <SetupReasoningReviewPanel model={model} />
-          </AnimatedListItem>
-        </main>
-        <aside className="space-y-6 xl:sticky xl:top-56 xl:self-start">
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(3)}>
-            <SetupIntelligenceContextPanel model={model} />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(4)}>
-            <SetupPaperPlanPanel
-              workspaceId={workspaceId}
-              signalId={data.signalId}
-              model={model}
-            />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(5)}>
-            <SetupJournalReviewPanel
-              workspaceId={workspaceId}
-              signalId={data.signalId}
-              model={model}
-            />
-          </AnimatedListItem>
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(6)}>
-            <SetupAuditReviewPanel model={model} />
-          </AnimatedListItem>
-        </aside>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3"><ButtonLink href={navigationHref("triage", workspaceId)} variant="quiet" size="sm">← All setups</ButtonLink><a href="#journal" className="text-xs font-medium text-[var(--accent-strong)]">Add a research note ↓</a></div>
+      <SetupReviewHeader model={model} />
+      {model.failures.some((failure) => !failure.missing) && <p role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-[var(--muted)]">Some supporting context could not be loaded. Check data availability below before relying on this setup.</p>}
+      <SetupVisualPanel model={model} />
+      <div className="grid items-start gap-6 xl:grid-cols-2"><SetupContextReviewPanel model={model} /><SetupEvidenceReviewPanel model={model} /></div>
+      <SetupWaitAvoidReviewPanel model={model} />
+      <div className="grid items-start gap-6 xl:grid-cols-2">
+        <SetupJournalReviewPanel workspaceId={workspaceId} signalId={data.signalId} model={model} />
+        <SetupPaperPlanPanel workspaceId={workspaceId} signalId={data.signalId} model={model} />
       </div>
-    </AnimatedSection>
+      <DisclosurePanel title="More market context" description="Historical cases, related markets, timeframe agreement, and prior reasoning.">
+        <SetupHistoricalReviewPanel model={model} />
+        <SetupIntelligenceContextPanel model={model} />
+        <SetupReasoningReviewPanel model={model} />
+      </DisclosurePanel>
+      <DisclosurePanel title="Data availability & audit trail" description="Source events, missing context, and the setup’s analysis history.">
+        <SetupErrorSection failures={model.failures} />
+        <SetupAuditReviewPanel model={model} />
+      </DisclosurePanel>
+    </div>
   );
 }

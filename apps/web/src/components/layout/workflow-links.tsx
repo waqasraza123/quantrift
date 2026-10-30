@@ -4,48 +4,21 @@ import { navigationHref, navigationItems, type NavigationTarget } from "@/lib/ui
 
 export type WorkflowTarget = NavigationTarget;
 
-type WorkflowLinksProps = {
-  workspaceId?: string | null;
-  targets?: WorkflowTarget[];
-  className?: string;
-};
-
 export const workflowTargets: Record<WorkflowTarget, { href: string; label: string }> = {
   ...(Object.fromEntries(navigationItems.map((item) => [item.key, { href: item.href, label: item.label }])) as Record<NavigationTarget, { href: string; label: string }>),
 };
 
-export const primaryWorkflowTargets: WorkflowTarget[] = [
-  "commandCenter",
-  "brief",
-  "dataOnboarding",
-  "scanner",
-  "tradeAgent",
-  "triage",
-  "quality",
-  "notifications",
-  "review",
-  "journal",
-  "preferences",
-];
+export const primaryWorkflowTargets: WorkflowTarget[] = ["commandCenter", "triage", "scanner", "journal"];
 
-const linkClassName =
-  "premium-control rounded-xl px-3 py-2 text-sm font-semibold";
-
-export function WorkflowLinks({
-  workspaceId,
-  targets = primaryWorkflowTargets,
-  className = "",
-}: WorkflowLinksProps) {
+export function WorkflowLinks({ workspaceId, targets = primaryWorkflowTargets, className = "" }: {
+  workspaceId?: string | null; targets?: WorkflowTarget[]; className?: string;
+}) {
+  const visible = targets.slice(0, 3);
+  const remaining = targets.slice(3);
   return (
-    <div className={cn("flex flex-wrap gap-2", className)}>
-      {targets.map((target) => {
-        const item = workflowTargets[target];
-        return (
-          <Link key={target} className={linkClassName} href={workflowHref(target, workspaceId)}>
-            {item.label}
-          </Link>
-        );
-      })}
+    <div className={cn("flex flex-wrap items-center gap-2", className)}>
+      {visible.map((target) => <Link key={target} href={workflowHref(target, workspaceId)} className="rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-medium text-[var(--muted)] hover:bg-[var(--surface-muted)]">{workflowTargets[target].label}</Link>)}
+      {remaining.length > 0 && <details className="relative"><summary className="cursor-pointer list-none rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-medium text-[var(--muted)] [&::-webkit-details-marker]:hidden">More ▾</summary><div className="absolute right-0 top-full z-30 mt-2 grid min-w-44 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 shadow-lg">{remaining.map((target) => <Link key={target} href={workflowHref(target, workspaceId)} className="whitespace-nowrap rounded-lg px-3 py-2 text-xs hover:bg-[var(--surface-muted)]">{workflowTargets[target].label}</Link>)}</div></details>}
     </div>
   );
 }

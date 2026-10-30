@@ -1,206 +1,160 @@
 # QuantRift
 
-[![CI](https://github.com/waqasraza123/quantrift/actions/workflows/ci.yml/badge.svg)](https://github.com/waqasraza123/quantrift/actions/workflows/ci.yml)
-[![API CI](https://github.com/waqasraza123/quantrift/actions/workflows/api-ci.yml/badge.svg)](https://github.com/waqasraza123/quantrift/actions/workflows/api-ci.yml)
-[![Web CI](https://github.com/waqasraza123/quantrift/actions/workflows/web-ci.yml/badge.svg)](https://github.com/waqasraza123/quantrift/actions/workflows/web-ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
-![Next.js](https://img.shields.io/badge/Next.js_15-React_19-111827?logo=next.js)
-![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.12-05998b?logo=fastapi)
-![Neon](https://img.shields.io/badge/Neon-Postgres-00e599?logo=postgresql)
-![Go](https://img.shields.io/badge/Go-market_worker-00add8?logo=go)
-![Safety](https://img.shields.io/badge/safety-no_broker_execution-2563eb)
+**See the setup. Understand the why.**
 
-QuantRift is an open-source Agentic AI platform for quantitative market intelligence, signal analysis, and evidence-based research.
+QuantRift is an open-source research workspace for following markets, reviewing trade setups, and getting a second perspective from AI. Keep your charts, supporting evidence, conditional paper setups, and research notes together.
 
-It combines auditable market-data ingestion, deterministic analysis, grounded AI workflows, paper-only agent plans, human review, and production operations across Next.js, FastAPI, Neon Postgres, and Go. QuantRift does not place orders, connect to brokers for execution, or present model output as financial advice.
+[Open QuantRift](https://quantrift.vercel.app) · [Get started locally](#get-started-locally) · [Enable AI research](docs/trade-suggestions.md) · [Deployment guide](docs/deployment.md)
 
-[Production](https://quantrift.vercel.app) · [Source](https://github.com/waqasraza123/quantrift) · [Development guide](docs/development.md) · [Deployment guide](docs/deployment.md)
+## A clearer research routine
 
-![QuantRift landing page](docs/assets/quantrift-kit.png)
+1. **Follow your markets.** Build a watchlist and connect or import candle data.
+2. **Find a setup.** Run a scan and review a focused list of ideas, with direction, data freshness, and a reason to look closer.
+3. **Understand the chart.** Inspect closed candles, market structure, supporting evidence, and invalidation conditions.
+4. **Ask for another perspective.** Request an AI assessment and compare the analyst’s proposal with an independent risk review.
+5. **Keep the thinking.** Save a paper plan or journal note, then revisit the observed outcome.
 
-## Why QuantRift
+You make the final decision. QuantRift does not connect to brokers for order execution or place trades.
 
-QuantRift provides an integrated foundation for quantitative research and market-intelligence workflows:
+## Inside the workspace
 
-- Normalize imported, provider-polled, and live candle data into one auditable model.
-- Run indicators, patterns, regimes, signal classification, confidence, quality gates, and outcome evaluation deterministically.
-- Let AI explain or compare persisted evidence without allowing it to rewrite source signals.
-- Review ranked setups, daily briefs, scans, data health, paper plans, outcomes, and journal notes in a real product UI.
-- Start with Neon-backed workspace accounts, RBAC, HTTP-only sessions, queues, workers, health checks, and audit trails.
-- Keep optional backend modules fail-soft so one unavailable integration does not break the cockpit.
-
-## Included product surfaces
-
-| Area | What is included |
+| Page | What you do |
 | --- | --- |
-| Public product | Platform landing page, metadata, source links, login, and registration |
-| Daily workflow | Command center, brief, signal triage, setup review, scanner, readiness, and onboarding |
-| Research | Equity universes, fundamentals, earnings, catalysts, candidates, and background data operations |
-| Intelligence | Deterministic signals, evidence, scenarios, historical cases, confidence, quality, and outcomes |
-| Paper agent | Human-reviewed paper plans and observations with no live-order path |
-| Accounts | Neon-backed registration, login, logout, profile, password change, session inventory, revocation, and activity |
-| Operations | Job queue, Python workers, Go market worker, provider health, runtime supervisor, and observability |
+| **Overview** | See priority setups, ideas waiting for confirmation, data needing attention, and research follow-ups. |
+| **Markets** | Follow your watchlists and open the latest available setup for a symbol. |
+| **Setups** | Search and filter a responsive setup list, then open a chart to review the evidence. |
+| **Scanner** | Run a saved scan and read its results. Expand watchlists and settings when you need to change them. |
+| **Journal** | Write observations, link them to setups, and revisit your previous thinking. |
 
-## Architecture
+Daily briefs, paper plans, outcome reviews, equity research, data management, preferences, and account tools remain available under **Research & tools**. Secondary configuration and diagnostics sit behind expandable sections so the main workflow stays readable.
 
-```mermaid
-flowchart LR
-    Browser[Next.js web] -->|HTTP-only session proxy| API[FastAPI]
-    API --> Neon[(Neon Postgres)]
-    API --> Redis[(Redis)]
-    Python[Python workers] --> Neon
-    Go[Go market worker] --> Neon
-    Providers[Market data providers] --> Go
-    Imports[CSV / JSON imports] --> API
-    API --> Engine[Deterministic intelligence]
-    Engine --> Evidence[Persisted evidence]
-    Evidence --> AI[Grounded AI explanations]
-```
+The homepage includes an interactive preview with clearly labeled illustrative data. Its prices and assessments are examples, not live market quotes.
 
-Python owns the API, product workflows, database contracts, and deterministic intelligence. Go is an additive ingestion sidecar. Neon stores the source of truth. Redis supports distributed rate limits and queued work where configured.
+## AI research with a second review
 
-Core rule:
+An optional LangGraph workflow uses OpenAI to assess the latest stored closed candles:
 
-```txt
-Persisted artifacts are the source of truth. Deterministic engines classify and score. AI may only explain supplied evidence.
-```
+- The **analyst** proposes a conditional **BUY**, **SELL**, or **WAIT** idea and explains its evidence.
+- The **risk reviewer** challenges the idea, its levels, and contradictory context.
+- Code validates prices, evidence references, and a minimum **2:1 reward-to-risk** at the least favorable entry price.
+- The chart shows the proposed entry zone, stop, and targets. Saved results retain their data cutoff and become outdated as fresh candles arrive.
 
-## Quick start
+BUY means a proposed long setup; SELL means a proposed short setup. WAIT contains no trade levels. AI assessments are stored separately from deterministic signals and cannot rewrite them.
 
-### 1. Clone the repository
+AI research is **disabled by default**. It needs a server-side OpenAI API key, the suggestion migration, and a running suggestion worker. The default model is configurable. See the [complete configuration and operating guide](docs/trade-suggestions.md).
 
-Clone QuantRift directly:
+## Get started locally
+
+### Start the application
+
+Clone the repository:
 
 ```sh
 git clone https://github.com/waqasraza123/quantrift.git
 cd quantrift
 ```
 
-### 2. Start the development stack
-
-Docker is the fastest route to PostgreSQL, Redis, FastAPI, and Next.js:
+Start the development stack:
 
 ```sh
 make dev
 ```
 
-In another terminal, apply the schema and seed deterministic defaults:
+In another terminal, apply migrations and seed the defaults:
 
 ```sh
 make migrate
 make seed
 ```
 
-Open:
+Open the homepage at **http://127.0.0.1:3000** and the workspace at **http://127.0.0.1:3000/command-center**. API documentation is available at **http://127.0.0.1:8000/docs**.
 
-```txt
-http://127.0.0.1:3000
-http://127.0.0.1:3000/command-center
-http://127.0.0.1:8000/docs
-http://127.0.0.1:8000/health
-```
+The local stack defaults to developer authentication. For registration, verified email, and session-based accounts, follow the [authentication and deployment instructions](docs/deployment.md).
 
-Run without Docker when preferred:
+If you prefer running services without Docker:
 
 ```sh
 ./scripts/dev-api.sh
 ./scripts/dev-web.sh
 ```
 
-## Neon and production authentication
+See the [development guide](docs/development.md) for database setup, environment configuration, and the existing verification commands.
 
-The local stack defaults to developer mode. For a deployed first-party account flow, configure the API with a migrated Neon database:
+### Enable the AI assessment
 
-```txt
-APP_ENV=production
-DATABASE_URL=postgresql://user:password@pooler-host/database?sslmode=require
-AUTH_MODE=session
-AUTH_PASSWORD_ENABLED=true
-AUTH_PASSWORD_SIGNUP_ENABLED=true
-CORS_ALLOWED_ORIGINS=https://quantrift.vercel.app
+Add your key and enable the feature in the ignored `apps/api/.env` file, or your deployment’s secret manager:
+
+```dotenv
+OPENAI_API_KEY=your-server-side-key
+TRADE_SUGGESTIONS_ENABLED=true
+TRADE_SUGGESTIONS_MODEL=gpt-6.1-sol
+TRADE_SUGGESTIONS_REASONING_EFFORT=medium
 ```
 
-Configure the web runtime:
+Apply the schema and start the dedicated worker from `apps/api`:
 
-```txt
-NEXT_PUBLIC_API_BASE_URL=https://your-api.example
-NEXT_PUBLIC_APP_NAME=QuantRift
-NEXT_PUBLIC_SITE_URL=https://quantrift.vercel.app
-NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/quantrift
-NEXT_PUBLIC_AUTH_MODE=session
-WEB_API_PROXY_BASE_URL=https://your-api.example
-WEB_AUTH_SESSION_COOKIE=trading_intelligence_session
+```sh
+uv run alembic upgrade head
+uv run python -m app.workers.job_queue_worker --queue trade_suggestions --concurrency 2
 ```
 
-Use a Neon pooled connection string for the application and a direct, non-pooler connection string
-for Alembic migrations. Run migrations before enabling traffic. Never put database credentials,
-API keys, or provider secrets in `NEXT_PUBLIC_*` variables.
+For the local Compose stack, the worker service is:
 
-Session tokens are stored as hashes in Postgres and transported to the browser only through secure HTTP-only cookies. New passwords use Argon2id; existing PBKDF2 credentials are upgraded after a successful login.
+```sh
+docker compose --profile workers up -d trade-suggestion-worker
+```
 
-## Configure QuantRift
+Restart the API after changing its environment. Open a setup chart and choose **Analyze with AI**. Keep the API and worker connected to the same database and configuration. Fresh candle data is required; opening a chart does not silently refresh a market-data provider.
 
-- Set the public product name and repository/site URLs in `apps/web/.env.local`.
-- Configure strategy profiles, rule packs, scanner presets, and seeded symbols for your market niche.
-- Enable only the providers, workers, LLM layers, and notifications your deployment needs.
-- Keep broker execution separate. No order or brokerage contract exists in this platform.
+The [AI research guide](docs/trade-suggestions.md) covers limits, permissions, expiry, queue behavior, and failure states.
 
-## Repository layout
+## How it fits together
 
-| Path | Role |
+```mermaid
+flowchart LR
+    Data[Imported or live candles] --> API[FastAPI]
+    API --> DB[(Postgres / Neon)]
+    DB --> Engine[Deterministic analysis]
+    Engine --> Setups[Signals and setup evidence]
+    Setups --> Web[Next.js workspace]
+    Web -->|Analyze with AI| Queue[Suggestion queue]
+    Queue --> Analyst[LangGraph analyst]
+    Analyst --> Review[Risk reviewer and validation]
+    Review --> Saved[Separate saved AI assessment]
+    Saved --> Web
+    Web --> Journal[Paper plans and research journal]
+```
+
+Python owns the API, data contracts, analysis, and agent workflows. Next.js provides the product interface. Postgres holds persisted research and sessions. Redis supports distributed rate limits where configured. An optional Go worker handles market-data ingestion.
+
+| Directory | Contents |
 | --- | --- |
-| `apps/api` | FastAPI, SQLAlchemy/Alembic, auth/RBAC, intelligence modules, workers, and backend docs |
-| `apps/web` | Next.js App Router product, public landing page, auth boundary, cockpit, and Playwright tests |
-| `apps/go/market-worker` | Bounded market-data polling/live ingestion sidecar and health endpoints |
-| `docs` | Development, deployment, architecture, project state, and operating guidance |
+| `apps/web` | Homepage, workspace, charts, account screens, and browser coverage |
+| `apps/api` | FastAPI, auth/RBAC, market intelligence, LangGraph agents, migrations, and workers |
+| `apps/go/market-worker` | Optional polling and streaming market-data worker |
+| `docs` | Development, deployment, architecture, and operating guides |
 
-## Quality checks
+## Deployment and accounts
 
-```sh
-make api-check
-make web-check
-git diff --check
-```
+QuantRift supports first-party session authentication backed by Postgres/Neon, workspace permissions, verified-email registration, password rotation, session revocation, and account activity.
 
-Focused commands:
+For production:
 
-```sh
-cd apps/api && ruff check app alembic && pytest
-cd apps/web && npm run typecheck && npm run lint && npm run build
-cd apps/web && npm run test:e2e
-cd apps/go/market-worker && go test ./...
-```
+- Configure the database, auth mode, email delivery, and the API/web origins.
+- Keep database credentials and provider keys on the server; never use `NEXT_PUBLIC_*` for secrets.
+- Use a direct Neon connection for Alembic migrations and the appropriate pooled connection for application traffic.
+- Run migrations before serving the new application and start only the workers your deployment needs.
 
-Database integration tests require an explicit disposable `TEST_DATABASE_URL`. They refuse production-like database reuse. Some provider and LLM tests require separately configured credentials.
+Use the [deployment guide](docs/deployment.md) and [API README](apps/api/README.md) for the full configuration.
 
-## Safety boundary
+## Research boundaries
 
-QuantRift can ingest market data, persist deterministic intelligence, compose grounded explanations, create paper-only plans, and record observations. It intentionally does not:
+QuantRift provides market context and conditional paper setups for human review. It does not provide a broker, autonomous execution, leverage or account-sizing instructions, or guaranteed outcomes. Data quality checks and agent reviews do not establish prediction accuracy.
 
-- place orders or connect to brokers for execution;
-- auto-trade, copy-trade, or create direct order instructions;
-- treat observed outcomes as account P&L or broker performance;
-- let an LLM mutate source signals or override deterministic classification;
-- store raw provider secrets in source, queued payloads, or API responses;
-- provide regulated financial advice.
-
-## Documentation
-
-- [Development setup](docs/development.md)
-- [Deployment](docs/deployment.md)
-- [API guide](apps/api/README.md)
-- [Web guide](apps/web/README.md)
-- [Authentication](apps/api/docs/auth.md)
-- [Workspace setup](apps/api/docs/workspace-setup.md)
-- [Daily workflows](apps/api/docs/daily-workflows.md)
-- [Equity research](apps/api/docs/equity-research.md)
-- [Go market worker](apps/go/market-worker/README.md)
-- [Project state](docs/project-state.md)
+The deterministic signal, AI assessment, and your journal notes are distinct records. A saved idea can become outdated. Check the data timestamp and the conditions that would invalidate it.
 
 ## Contributing
 
-Keep changes typed, validated, auditable, and covered by focused tests. Preserve deterministic artifacts as the source of truth, route candle data through shared normalization, and keep optional integrations fail-soft. Do not add broker execution or advisory claims under the existing product boundary.
+Follow the repository’s [agent instructions](AGENTS.md), [development guide](docs/development.md), and [project state](docs/project-state.md). Preserve the separation between deterministic analysis, AI proposals, and human decisions.
 
-## License
-
-[MIT](LICENSE) © 2026 Waqas Raza
+Licensed under the [MIT License](LICENSE).

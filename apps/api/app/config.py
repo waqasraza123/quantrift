@@ -1,7 +1,7 @@
 from decimal import Decimal
 from enum import StrEnum
 from functools import lru_cache
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -48,6 +48,18 @@ class Settings(BaseSettings):
     redis_url: SecretStr | None = None
     openai_api_key: SecretStr | None = None
     openai_base_url: str | None = None
+    trade_suggestions_enabled: bool = False
+    trade_suggestions_model: str = Field(default="gpt-6.1-sol", min_length=1, max_length=120)
+    trade_suggestions_reasoning_effort: Literal["low", "medium", "high", "xhigh", "max"] = "medium"
+    trade_suggestions_max_candles: int = Field(default=200, ge=20, le=200)
+    trade_suggestions_min_candles: int = Field(default=20, ge=20, le=200)
+    trade_suggestions_min_quality: Decimal = Field(default=Decimal("0.80"), ge=0, le=1)
+    trade_suggestions_min_reward_risk: Decimal = Field(default=Decimal("2"), ge=2)
+    trade_suggestions_hourly_limit: int = Field(default=10, ge=1, le=100)
+    trade_suggestions_run_timeout_seconds: int = Field(default=180, ge=10, le=600)
+    trade_suggestions_queue_timeout_seconds: int = Field(default=300, ge=10, le=3600)
+    trade_suggestions_model_timeout_seconds: int = Field(default=60, ge=1, le=180)
+    trade_suggestions_max_output_tokens: int = Field(default=8192, ge=1024, le=16384)
     anthropic_api_key: SecretStr | None = None
     llm_explanations_enabled: bool = False
     llm_provider: str = "mock"
@@ -598,6 +610,20 @@ class Settings(BaseSettings):
             msg = "BINANCE_PUBLIC_REST_BASE_URL must start with http:// or https://"
             raise ValueError(msg)
         return normalized_value
+
+    @field_validator("trade_suggestions_model")
+    @classmethod
+    def normalize_trade_suggestions_model(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("TRADE_SUGGESTIONS_MODEL must not be empty")
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_trade_suggestions_window(self) -> Self:
+        if self.trade_suggestions_min_candles > self.trade_suggestions_max_candles:
+            raise ValueError("TRADE_SUGGESTIONS_MIN_CANDLES must not exceed MAX_CANDLES")
+        return self
 
     @field_validator("llm_provider")
     @classmethod

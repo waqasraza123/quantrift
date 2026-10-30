@@ -1,4 +1,3 @@
-import { AvoidConditions } from "@/components/dashboard/avoid-conditions";
 import { BackendStatePanel } from "@/components/dashboard/backend-state-panel";
 import { FollowUpPanel } from "@/components/dashboard/follow-up-panel";
 import { MarketBoard } from "@/components/dashboard/market-board";
@@ -8,85 +7,33 @@ import { TopSummaryRail } from "@/components/dashboard/top-summary-rail";
 import { WatchlistPanel } from "@/components/dashboard/watchlist-panel";
 import { EmptyState } from "@/components/empty-states/empty-state";
 import { AppShell } from "@/components/layout/AppShell";
-import { WorkflowLinks } from "@/components/layout/workflow-links";
-import { Metric } from "@/components/ui/Metric";
+import { ButtonLink } from "@/components/ui/Button";
+import { DisclosurePanel } from "@/components/ui/DisclosurePanel";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { AnimatedListItem, AnimatedSection, motionRevealDensityStyle } from "@/lib/ui/motion";
 import { getDashboardData } from "@/lib/api/dashboard";
+import { navigationHref } from "@/lib/ui/navigation";
 
-type DashboardPageProps = {
-  searchParams: Promise<{
-    workspaceId?: string;
-    signalId?: string;
-  }>;
-};
+type DashboardPageProps = { searchParams: Promise<{ workspaceId?: string; signalId?: string }> };
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = await searchParams;
   const data = await getDashboardData(params);
-
+  const workspaceId = data.workspace?.id;
   return (
-    <AppShell appName={data.appName} workspaceId={data.workspace?.id} workspaceName={data.workspace?.name}>
-      <AnimatedSection as="section" className="space-y-6">
-        <AnimatedListItem as="section" style={motionRevealDensityStyle(0, "comfortable")}>
-          <PageHeader
-            eyebrow="Operator cockpit"
-            title="Daily market intelligence"
-            description="Read-only deterministic analysis across watchlists, signals, context, outcomes, and backend follow-up items."
-            actions={
-              <>
-                <Metric label="Workspace" value={data.workspace?.name || "Not selected"} />
-                <WorkflowLinks
-                  workspaceId={data.workspace?.id}
-                  targets={["commandCenter", "brief", "triage", "scanner", "dataOnboarding", "preferences", "review", "journal"]}
-                />
-              </>
-            }
-          />
-        </AnimatedListItem>
-        {!data.workspace && (
-          <AnimatedListItem as="section" style={motionRevealDensityStyle(1, "comfortable")}>
-            <EmptyState
-              title="No workspace available"
-              message="Seed or create a workspace in the API before workspace-scoped dashboard sections can load."
-            />
-          </AnimatedListItem>
-        )}
-        {data.workspace && (
+    <AppShell appName={data.appName} workspaceId={workspaceId} workspaceName={data.workspace?.name}>
+      <div className="space-y-6">
+        <PageHeader eyebrow="Your watchlists" title="Markets in focus" description="Follow your symbols, check the latest context, and open a chart when something deserves a closer look."
+          actions={<><ButtonLink href={navigationHref("dataOnboarding", workspaceId)} variant="quiet">Manage data</ButtonLink><ButtonLink href={navigationHref("scanner", workspaceId)} variant="primary">Scan watchlist</ButtonLink></>} />
+        {!data.workspace ? <EmptyState title="Add your first market" message="Set up a workspace and choose your symbols to start following their market context." /> : (
           <>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(2, "regular")}>
-              <TopSummaryRail data={data} />
-            </AnimatedListItem>
-            <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
-              <div className="space-y-6">
-                <AnimatedListItem as="section" style={motionRevealDensityStyle(3, "compact")}>
-                  <MarketBoard data={data} />
-                </AnimatedListItem>
-                <AnimatedListItem as="section" style={motionRevealDensityStyle(4, "compact")}>
-                  <SignalFocusPanel data={data} />
-                </AnimatedListItem>
-              </div>
-              <div className="space-y-6">
-                <AnimatedListItem as="section" style={motionRevealDensityStyle(5, "compact")}>
-                  <AvoidConditions data={data} />
-                </AnimatedListItem>
-                <AnimatedListItem as="section" style={motionRevealDensityStyle(6, "compact")}>
-                  <SignalDigestPanel data={data} />
-                </AnimatedListItem>
-                <AnimatedListItem as="section" style={motionRevealDensityStyle(7, "compact")}>
-                  <WatchlistPanel data={data} />
-                </AnimatedListItem>
-                <AnimatedListItem as="section" style={motionRevealDensityStyle(8, "compact")}>
-                  <FollowUpPanel data={data} />
-                </AnimatedListItem>
-              </div>
-            </div>
-            <AnimatedListItem as="section" style={motionRevealDensityStyle(9, "regular")}>
-              <BackendStatePanel data={data} />
-            </AnimatedListItem>
+            <TopSummaryRail data={data} />
+            <MarketBoard data={data} />
+            {params.signalId && <SignalFocusPanel data={data} />}
+            <DisclosurePanel title="Watchlists & recent summaries" description="Manage the markets you follow and revisit recent scan summaries."><WatchlistPanel data={data} /><SignalDigestPanel data={data} /></DisclosurePanel>
+            <DisclosurePanel title="Data & connection details" description="Source availability, pending updates, and diagnostics."><FollowUpPanel data={data} /><BackendStatePanel data={data} /></DisclosurePanel>
           </>
         )}
-      </AnimatedSection>
+      </div>
     </AppShell>
   );
 }

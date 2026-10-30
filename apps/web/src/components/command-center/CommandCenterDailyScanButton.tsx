@@ -67,7 +67,7 @@ export function CommandCenterDailyScanButton({
         type="button"
         onClick={runScan}
       >
-        {pending ? "Scan running" : "Run deterministic daily scan"}
+        {pending ? "Scanning watchlist…" : "Scan watchlist"}
       </button>
       {message && (
         <AnimatedListItem as="div" preset="fade-in" style={motionRevealDensityStyle(1, "compact")}>

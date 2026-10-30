@@ -3,6 +3,7 @@ import { ChartEmptyState } from "@/components/charts/ChartEmptyState";
 import { ChartErrorState } from "@/components/charts/ChartErrorState";
 import { Panel } from "@/components/layout/panel";
 import { Badge } from "@/components/status/badge";
+import { TradeSuggestionPanel } from "@/components/trade-agent/TradeSuggestionPanel";
 import { chartLabel } from "@/lib/charts/labels";
 import type { ChartZone } from "@/lib/charts/types";
 import { formatDateTime } from "@/lib/formatting/dates";
@@ -11,52 +12,58 @@ import type { SetupDetailViewModel } from "@/lib/setup-detail/types";
 
 export function SetupVisualPanel({ model }: { model: SetupDetailViewModel }) {
   const chart = model.setupChart;
+  const signal = model.signal?.signal;
 
   return (
-    <Panel title="Visual setup context" eyebrow="Final-candle chart">
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-2">
-            {chart.badges.map((badge) => (
-              <Badge key={`${badge.label}-${badge.value}`} value={`${badge.label}: ${badge.value}`} tone={badge.tone} />
-            ))}
-          </div>
-          <div className="text-sm text-slate-500">
-            Latest final candle: {formatDateTime(chart.latestFinalCandle?.timestamp)}
-          </div>
-        </div>
-        {chart.status === "ready" ? (
-          <CandleChart
-            slots={chart.slots}
-            overlays={chart.overlays}
-            latestFinalCandle={chart.latestFinalCandle}
-          />
-        ) : (
-          <ChartEmptyState
-            title="Chart context unavailable"
-            message="The setup detail is still available, but final candle chart data could not be loaded for this signal window."
-          />
-        )}
-        <ChartErrorState failures={chart.failures.filter((failure) => !failure.missing)} />
-        {chart.warnings.length > 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
-            <p className="font-semibold">Data quality warnings</p>
-            <ul className="mt-2 space-y-1">
-              {chart.warnings.slice(0, 5).map((warning, index) => (
-                <AnimatedListItem
-                  as="li"
-                  key={`${warning.code}-${warning.message}`}
-                  style={motionRevealDensityStyle(index, "compact")}
-                >
-                  {warning.message}
-                </AnimatedListItem>
+    <div className="space-y-6">
+      <Panel title="Visual setup context" eyebrow="Final-candle chart">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              {chart.badges.map((badge) => (
+                <Badge key={`${badge.label}-${badge.value}`} value={`${badge.label}: ${badge.value}`} tone={badge.tone} />
               ))}
-            </ul>
+            </div>
+            <div className="text-sm text-slate-500">
+              Latest final candle: {formatDateTime(chart.latestFinalCandle?.timestamp)}
+            </div>
           </div>
-        )}
-        <ZoneSummary zones={chart.overlays.zones} />
-      </div>
-    </Panel>
+          {chart.status === "ready" ? (
+            <CandleChart
+              slots={chart.slots}
+              overlays={chart.overlays}
+              latestFinalCandle={chart.latestFinalCandle}
+            />
+          ) : (
+            <ChartEmptyState
+              title="Chart context unavailable"
+              message="The setup detail is still available, but final candle chart data could not be loaded for this signal window."
+            />
+          )}
+          <ChartErrorState failures={chart.failures.filter((failure) => !failure.missing)} />
+          {chart.warnings.length > 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
+              <p className="font-semibold">Data quality warnings</p>
+              <ul className="mt-2 space-y-1">
+                {chart.warnings.slice(0, 5).map((warning, index) => (
+                  <AnimatedListItem
+                    as="li"
+                    key={`${warning.code}-${warning.message}`}
+                    style={motionRevealDensityStyle(index, "compact")}
+                  >
+                    {warning.message}
+                  </AnimatedListItem>
+                ))}
+              </ul>
+            </div>
+          )}
+          <ZoneSummary zones={chart.overlays.zones} />
+        </div>
+      </Panel>
+      {signal && (
+        <TradeSuggestionPanel key={signal.id} signalId={signal.id} workspaceId={signal.workspace_id} />
+      )}
+    </div>
   );
 }
 
