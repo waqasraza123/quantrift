@@ -35,11 +35,11 @@ export function LandingPage() {
 
       <section className="marketing-hero marketing-container" id="main-content">
         <div className="marketing-hero-copy">
-          <p className="marketing-kicker"><span />Your daily trading research workspace</p>
-          <h1>Find your setup.<br />Understand<br className="marketing-desktop-break" /> <em>your risk.</em></h1>
-          <p className="marketing-intro">Scan your watchlist, review the evidence, and see what could invalidate a setup. Keep your charts, optional AI trade ideas, and journal together so you can make your own informed decisions.</p>
+          <p className="marketing-kicker"><span />AI-powered market intelligence</p>
+          <h1><em>AI Agents</em><br />for your trading<br />research.</h1>
+          <p className="marketing-intro">Bring your charts, watchlist, and journal together. When enabled, your AI analyst develops trade ideas and an independent AI risk reviewer challenges the evidence and price levels.</p>
           <div className="marketing-hero-actions"><Link href="/register" className="marketing-button">Create your account<ProductIcon name="arrow" className="h-4 w-4" /></Link><a href="#product-preview" className="marketing-text-link">Try the chart preview<span aria-hidden="true">↘</span></a></div>
-          <p className="marketing-hero-caption"><ProductIcon name="check" className="h-3.5 w-3.5" />Scan your markets <span>·</span> Review your setups <span>·</span> Track your thinking</p>
+          <p className="marketing-hero-caption"><ProductIcon name="check" className="h-3.5 w-3.5" />AI Analyst <span>·</span> AI Risk Reviewer <span>·</span> Your decision</p>
         </div>
         <div id="product-preview" className="marketing-hero-preview"><MarketPreview /><p className="marketing-preview-caption">Explore the preview: switch markets or toggle the chart levels.</p></div>
       </section>

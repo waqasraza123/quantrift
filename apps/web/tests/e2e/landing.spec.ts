@@ -6,7 +6,7 @@ test.describe("QuantRift landing page", () => {
 
     await expect(
       page.getByRole("heading", {
-        name: /Find your setup. Understand your risk./i,
+        name: /AI Agents for your trading research\./i,
       }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: /Create your account/i })).toHaveAttribute(

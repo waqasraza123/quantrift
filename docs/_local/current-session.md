@@ -1,5 +1,16 @@
 # Current Session
 
+## Prominent AI Agents Hero
+
+- Updated the homepage hero to “AI Agents for your trading research.” with “AI Agents” as the
+  first, large army-green line and “AI-powered market intelligence” above it for screenshots.
+- Supporting copy and the hero caption name the AI analyst and independent AI risk reviewer;
+  retained enabled-feature qualification and the white/army-green design.
+- Updated `LandingPage.tsx` and its existing landing heading expectation. Source/diff review only;
+  `git diff --check` passed. No tests, builds, lint, type checks, browser checks, or screenshots.
+- Follow-up user request authorizes committing and pushing the hero update, existing browser
+  expectation, and session notes to `origin/main`.
+
 ## Homepage Copy and Palette Publication
 
 - User requested publishing all changes and outstanding work to `origin/main`. Reviewed all ten
