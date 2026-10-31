@@ -16,6 +16,16 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
+- `/terminal` is the default authenticated chart workspace, with a scoped dark/light terminal shell,
+  Lightweight Charts 5.2.1, real final-candle reads, 15-second visibility-aware refresh, older-window
+  loading, browser-calculated indicators, saved signal overlays/evidence, scanner/setup links, and
+  explicit existing signal AI generation. Panel sizes, favorites, drawings, and private research
+  notes persist locally per user/workspace; they do not yet synchronize to the backend. Production
+  chart Q&A, browser WebSockets, shared research persistence, and drawing-anchor editing remain
+  future work. Existing routes/public branding remain. The terminal avoids legacy shell identity
+  reads and handles 401 once through an origin-protected cookie-expiry route; broader auth-provider
+  consolidation remains. See `apps/web/docs/research-terminal.md`. No tests/builds run in this task.
+
 - Web typography uses bundled Inter Variable via `next/font/local` in the root layout,
   `--font-inter`/`--font-sans` tokens, and inherited tabular numerals. Font and SIL OFL license
   live under `apps/web/app/fonts`; no external font requests are needed at build or runtime.
@@ -44,7 +54,7 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
   no tests, builds, lint, type checks, migrations, browser checks, or live Stripe calls were run.
   Handoff: `docs/billing.md`.
 
-- All web pages use light surfaces, black/charcoal text, and dark army-green (`#303f22`,
+- Existing non-terminal product pages use light surfaces, black/charcoal text, and dark army-green (`#303f22`,
   hover `#24331a`) accents regardless of OS theme. `apps/web/app/globals.css` owns neutral/army
   scales, brand/status tokens, and Tailwind v4 `@theme inline` mappings for existing utilities;
   other Tailwind color families are disabled. Dark variants require an explicit data attribute

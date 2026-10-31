@@ -1,4 +1,5 @@
 export type NavigationTarget =
+  | "terminal"
   | "commandCenter"
   | "onboarding"
   | "dashboard"
@@ -29,6 +30,7 @@ export type NavigationItem = {
 };
 
 export const navigationItems: NavigationItem[] = [
+  { key: "terminal", href: "/terminal", label: "Terminal", section: "Workspace", description: "Interactive charts and AI research" },
   { key: "commandCenter", href: "/command-center", label: "Overview", section: "Workspace", description: "Your next setups and daily review" },
   { key: "onboarding", href: "/onboarding", label: "Onboarding", section: "Command Center", description: "First-run setup and readiness gate" },
   { key: "dashboard", href: "/dashboard", label: "Markets", section: "Workspace", description: "Follow your symbols and watchlists" },
@@ -51,7 +53,7 @@ export const navigationItems: NavigationItem[] = [
 ];
 
 export const primaryNavigationTargets: NavigationTarget[] = [
-  "commandCenter",
+  "terminal",
   "dashboard",
   "triage",
   "scanner",
@@ -59,6 +61,7 @@ export const primaryNavigationTargets: NavigationTarget[] = [
 ];
 
 export const secondaryNavigationTargets: NavigationTarget[] = [
+  "commandCenter",
   "brief", "tradeAgent", "review", "equityResearch", "notifications", "dataOnboarding",
   "quality", "onboarding", "setup", "readiness", "preferences", "account", "billing", "team",
 ];

@@ -1,4 +1,4 @@
-const defaultDestination = "/command-center";
+const defaultDestination = "/terminal";
 const localOrigin = "https://quantrift.invalid";
 const authRoutes = new Set(["/login", "/register", "/signup", "/verify-email", "/mfa"]);
 

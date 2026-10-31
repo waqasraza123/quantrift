@@ -12,7 +12,7 @@ import {
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 
 const icons: Partial<Record<NavigationTarget, ProductIconName>> = {
-  commandCenter: "overview", dashboard: "chart", triage: "setups", scanner: "scanner", journal: "journal",
+  terminal: "chart", commandCenter: "overview", dashboard: "chart", triage: "setups", scanner: "scanner", journal: "journal",
 };
 
 export function Sidebar({ appName, workspaceName, workspaceId }: {
@@ -40,7 +40,7 @@ export function Sidebar({ appName, workspaceName, workspaceId }: {
 
   return (
     <aside className="flex h-full flex-col border-r border-[var(--line)] bg-[var(--surface)] px-4 py-6">
-      <Link href={navigationHref("commandCenter", workspaceId)} className="flex items-center gap-2.5 px-3 text-xl font-semibold tracking-tight text-[var(--strong)]">
+      <Link href={navigationHref("terminal", workspaceId)} className="flex items-center gap-2.5 px-3 text-xl font-semibold tracking-tight text-[var(--strong)]">
         <BrandMark className="h-8 w-8 text-[var(--accent-strong)]" />{appName}
       </Link>
       <div className="mt-8"><WorkspaceSwitcher workspaceId={workspaceId} workspaceName={workspaceName} /></div>

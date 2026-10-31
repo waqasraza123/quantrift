@@ -15,7 +15,7 @@ export function MobileNav({ appName, workspaceName, workspaceId }: {
   return (
     <header className="border-b border-[var(--line)] bg-[var(--surface)] px-4 pt-3">
       <div className="flex min-h-10 items-center justify-between gap-3">
-        <Link href={navigationHref("commandCenter", workspaceId)} className="flex items-center gap-2 font-semibold tracking-tight text-[var(--strong)]"><BrandMark className="h-7 w-7 text-[var(--accent-strong)]" />{appName}</Link>
+        <Link href={navigationHref("terminal", workspaceId)} className="flex items-center gap-2 font-semibold tracking-tight text-[var(--strong)]"><BrandMark className="h-7 w-7 text-[var(--accent-strong)]" />{appName}</Link>
         <AuthStatus />
       </div>
       <div className="mt-1 flex items-center justify-between gap-2">

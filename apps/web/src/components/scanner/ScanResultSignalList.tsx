@@ -37,6 +37,7 @@ export function ScanResultSignalList({ data }: { data: ScannerData }) {
                   <Badge value={dataQuality ? `Data quality ${dataQuality.component_score}` : "Data quality not available"} tone="neutral" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
+                  <Link className="text-[var(--info)]" href={`/terminal?${new URLSearchParams({ workspaceId: signal.workspace_id, symbolId: signal.symbol_id, timeframe: signal.timeframe, signalId: signal.id })}`}>Open chart</Link>
                   <Link className="text-[var(--info)]" href={`/signals/${signal.id}`}>Review result</Link>
                   <Link className="text-[var(--info)]" href={`/signals/${signal.id}#setup-context`}>Setup context</Link>
                 </div>

@@ -3,6 +3,7 @@ import type { ApiResult, JsonPrimitive } from "./types";
 
 type QueryValue = JsonPrimitive | undefined;
 type RequestOptions = {
+  signal?: AbortSignal;
   query?: Record<string, QueryValue>;
   timeoutMs?: number;
   optional?: boolean;
@@ -42,7 +43,7 @@ export async function apiPostForm<T>(
       },
       body,
       cache: "no-store",
-      signal: controller.signal,
+      signal: options.signal ? AbortSignal.any([controller.signal, options.signal]) : controller.signal,
     });
     const payload = await parseResponse(response);
     if (!response.ok) {
@@ -112,7 +113,7 @@ async function apiRequest<T>(
       },
       body: body === undefined ? undefined : JSON.stringify(stripUndefined(body)),
       cache: "no-store",
-      signal: controller.signal,
+      signal: options.signal ? AbortSignal.any([controller.signal, options.signal]) : controller.signal,
     });
     const payload = await parseResponse(response);
     if (!response.ok) {
