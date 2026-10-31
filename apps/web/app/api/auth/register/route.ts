@@ -19,6 +19,8 @@ export async function POST(request: Request): Promise<Response> {
       },
       body,
       cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(20_000),
     });
     const payload = await parseJson(response);
     return Response.json(payload, {

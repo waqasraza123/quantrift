@@ -22,6 +22,8 @@ async function proxyVerificationRequest(request: Request, path: string): Promise
       },
       body: await request.text(),
       cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(20_000),
     });
     return Response.json(await parseJson(response), {
       status: response.status,

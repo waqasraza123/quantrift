@@ -1,3 +1,4 @@
+import { isMfaChallenge, type MfaChallenge } from "@/lib/auth/mfa";
 import { apiGet } from "./client";
 import type { ApiResult, UUID } from "./types";
 
@@ -45,6 +46,7 @@ export type AuthFormResult = {
   message?: string;
   session?: AuthSession;
   verification?: AuthVerificationResult;
+  mfa?: MfaChallenge;
 };
 
 export async function getCurrentIdentity(): Promise<ApiResult<CurrentIdentity>> {
@@ -95,6 +97,8 @@ async function submitAuthForm(path: string, body: Record<string, string>): Promi
       },
       body: JSON.stringify(body),
       cache: "no-store",
+      credentials: "same-origin",
+      signal: AbortSignal.timeout(25_000),
     });
     const payload = (await response.json()) as unknown;
     if (!response.ok) {
@@ -105,6 +109,7 @@ async function submitAuthForm(path: string, body: Record<string, string>): Promi
         message: extractMessage(payload, response.statusText),
       };
     }
+    if (isMfaChallenge(payload)) return { ok: true, mfa: payload };
     if (!isAuthSession(payload)) {
       return { ok: false, message: "Authentication response was invalid" };
     }
@@ -127,6 +132,8 @@ async function submitVerificationForm(
       },
       body: JSON.stringify(body),
       cache: "no-store",
+      credentials: "same-origin",
+      signal: AbortSignal.timeout(25_000),
     });
     const payload = (await response.json()) as unknown;
     if (!response.ok) {

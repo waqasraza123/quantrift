@@ -16,6 +16,18 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
+- Account access now adapts HVACLine’s responsive light/orange login/signup design through shared
+  `AuthLayout`, field components, and scoped CSS; email verification and optional `/mfa` share the
+  same presentation. `/signup` aliases `/register`; local return paths are validated.
+- Optional authenticator verification lives under `auth/mfa`. Existing credentials, Argon2id,
+  workspace registration, and email verification are retained. `AUTH_MFA_REQUIRED=false` defaults
+  off; enrolled accounts remain protected regardless of the flag. Enrollment/replacement uses
+  encrypted, context-bound TOTP secrets, hashed challenges/recovery codes, transactional replay
+  protection, lockout, and factor-version-bound sessions. BFF challenge tokens stay in HttpOnly
+  Strict cookies. Deployment requires dependencies and migration `202610311600_auth_mfa` even
+  with MFA off; activation additionally needs a stable server-only Fernet key. No migration or
+  runtime verification was performed. Handoff: `apps/api/docs/auth.md#authenticator-verification`.
+
 - The web product now centers Overview (`/command-center`), Markets (`/dashboard`), Setups
   (`/triage`), Scanner, and Journal. The homepage is a chart-first, product-focused presentation
   with explicitly illustrative interactive data. Shared headers, compact statistics, responsive

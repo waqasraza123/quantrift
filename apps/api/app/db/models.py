@@ -17,6 +17,7 @@ from app.modules.artifact_graph.models import (
     IntelligenceArtifact,
     IntelligenceArtifactDependency,
 )
+from app.modules.auth.mfa.models import AuthMfaChallenge, AuthMfaFactor, AuthMfaRecoveryCode
 from app.modules.auth.models import (
     AuthActivityEvent,
     AuthApiKey,
@@ -235,6 +236,9 @@ __all__ = [
     "AuthIdentity",
     "AuthPasswordCredential",
     "AuthSession",
+    "AuthMfaFactor",
+    "AuthMfaChallenge",
+    "AuthMfaRecoveryCode",
     "BacktestExperimentCohort",
     "BacktestExperimentRun",
     "Base",

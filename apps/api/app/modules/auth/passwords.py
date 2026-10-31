@@ -15,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import Settings
 from app.core.errors import AppError
 from app.modules.auth.identity import IdentityContext
+from app.modules.auth.mfa.models import AuthMfaFactor
+from app.modules.auth.mfa.schemas import AuthMfaChallengeRead
 from app.modules.auth.models import (
     AuthIdentityStatus,
     AuthPasswordCredential,
@@ -115,11 +117,17 @@ class PasswordAuthService:
             raise
         return RegisteredAccount(verification=verification)
 
-    async def login(self, *, email: str, password: str) -> CreatedSession:
+    async def login(self, *, email: str, password: str) -> CreatedSession | AuthMfaChallengeRead:
+        from app.modules.auth.mfa.service import MfaService
+
         if not self.settings.auth_password_enabled:
             raise AppError(404, "password_auth_disabled", "Password authentication is disabled")
         normalized_email = normalize_email(email)
-        credential = await self.get_credential_by_email(normalized_email)
+        credential = (await self.session.execute(
+            select(AuthPasswordCredential).where(
+                AuthPasswordCredential.email == normalized_email,
+            ).with_for_update()
+        )).scalar_one_or_none()
         if credential is None:
             raise invalid_credentials_error()
         now = datetime.now(UTC)
@@ -145,9 +153,12 @@ class PasswordAuthService:
             raise invalid_credentials_error()
         credential.failed_attempts = 0
         credential.locked_until = None
-        credential.last_login_at = now
         if password_needs_rehash(credential.password_hash):
             credential.password_hash = hash_password(password)
+        challenge = await MfaService(self.session, self.settings).begin(credential)
+        if challenge is not None:
+            return challenge
+        credential.last_login_at = now
         created_session = await self.create_session(user=user, workspace=workspace)
         await self.session.commit()
         return created_session
@@ -177,10 +188,19 @@ class PasswordAuthService:
             user_id=auth_session.user_id,
             workspace_id=auth_session.workspace_id,
         )
-        if credential is None or credential.email_verified_at is None:
+        if credential is None or credential.email_verified_at is None or credential.status != AuthIdentityStatus.ACTIVE.value:
             auth_session.status = AuthSessionStatus.REVOKED.value
             await self.session.commit()
             return None
+        factor = await self.session.get(AuthMfaFactor, credential.id)
+        if self.settings.auth_mfa_required or (factor is not None and factor.enabled_at is not None):
+            if (
+                factor is None or factor.enabled_at is None
+                or auth_session.mfa_verified_at is None or auth_session.mfa_version != factor.version
+            ):
+                auth_session.status = AuthSessionStatus.REVOKED.value
+                await self.session.commit()
+                return None
         auth_session.last_seen_at = now
         await self.session.commit()
         return IdentityContext(
@@ -334,7 +354,9 @@ class PasswordAuthService:
             revoked_count += 1
         return revoked_count
 
-    async def create_session(self, *, user: User, workspace: Workspace) -> CreatedSession:
+    async def create_session(
+        self, *, user: User, workspace: Workspace, mfa_version: int | None = None,
+    ) -> CreatedSession:
         now = datetime.now(UTC)
         expires_at = now + timedelta(minutes=self.settings.auth_session_ttl_minutes)
         token = generate_session_token()
@@ -345,6 +367,8 @@ class PasswordAuthService:
             status=AuthSessionStatus.ACTIVE.value,
             expires_at=expires_at,
             last_seen_at=now,
+            mfa_verified_at=now if mfa_version is not None else None,
+            mfa_version=mfa_version,
         )
         self.session.add(auth_session)
         await self.session.flush()

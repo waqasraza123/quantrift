@@ -1,22 +1,18 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
-import { BrandMark } from "@/components/brand/BrandMark";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 import { getPublicEnv } from "@/config/env";
 import { getCurrentIdentity } from "@/lib/api/auth";
-import { redirect } from "next/navigation";
-import Link from "next/link";
+import { safeAuthDestination } from "@/lib/auth/redirects";
 
-export default async function RegisterPage() {
+export const metadata: Metadata = { title: "Create your account", robots: { index: false, follow: false } };
+
+export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
   if (getPublicEnv().authMode === "session") {
     const identity = await getCurrentIdentity();
-    if (identity.ok && identity.data.authenticated) {
-      redirect("/command-center");
-    }
+    if (identity.ok && identity.data.authenticated) redirect(safeAuthDestination(next));
   }
-  return (
-    <main className="landing-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-[#061416] px-4 py-24 md:py-10">
-      <div className="landing-glow pointer-events-none absolute inset-0" />
-      <Link className="absolute left-5 top-5 z-10 flex items-center gap-2.5 text-sm font-bold transition" href="/"><BrandMark className="h-8 w-8 text-white" /><span className="text-white transition hover:text-[#9cf2e6]">QuantRift</span></Link>
-      <div className="relative z-10 w-full max-w-5xl"><AuthCard mode="register" /></div>
-    </main>
-  );
+  return <AuthLayout><AuthCard mode="register" nextPath={next} /></AuthLayout>;
 }

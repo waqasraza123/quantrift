@@ -203,6 +203,12 @@ class Settings(BaseSettings):
     auth_api_keys_enabled: bool = True
     auth_password_enabled: bool = True
     auth_password_signup_enabled: bool = True
+    auth_mfa_required: bool = False
+    auth_mfa_encryption_key: SecretStr | None = None
+    auth_mfa_issuer: str = Field(default="QuantRift", min_length=1, max_length=80)
+    auth_mfa_challenge_seconds: int = Field(default=600, ge=60, le=600)
+    auth_mfa_failed_attempt_limit: int = Field(default=5, ge=1, le=5)
+    auth_mfa_lockout_seconds: int = Field(default=900, ge=60, le=86400)
     auth_session_ttl_minutes: int = Field(default=1440, ge=15, le=43200)
     auth_password_failed_attempt_limit: int = Field(default=8, ge=1, le=100)
     auth_password_lockout_minutes: int = Field(default=15, ge=1, le=1440)
@@ -1046,6 +1052,28 @@ class Settings(BaseSettings):
             msg = "Demo mode defaults must not be empty"
             raise ValueError(msg)
         return normalized_value
+
+    @field_validator("auth_mfa_issuer")
+    @classmethod
+    def validate_mfa_issuer(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized or any(ord(char) < 32 for char in normalized):
+            raise ValueError("AUTH_MFA_ISSUER must be a nonempty display name")
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_mfa_settings(self) -> Self:
+        if self.auth_mfa_required and secret_is_empty(self.auth_mfa_encryption_key):
+            raise ValueError("AUTH_MFA_ENCRYPTION_KEY is required when AUTH_MFA_REQUIRED=true")
+        encryption_key = self.auth_mfa_encryption_key
+        if encryption_key is not None and not secret_is_empty(encryption_key):
+            from cryptography.fernet import Fernet
+
+            try:
+                Fernet(encryption_key.get_secret_value().encode())
+            except (ValueError, TypeError):
+                raise ValueError("AUTH_MFA_ENCRYPTION_KEY must be a valid Fernet key") from None
+        return self
 
     @model_validator(mode="after")
     def validate_production_settings(self) -> Self:

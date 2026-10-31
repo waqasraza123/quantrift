@@ -52,3 +52,12 @@ navigation, both color schemes, keyboard focus and disclosures, workspace switch
 filters, scan creation/results, journal composition/selection, saved paper plans, and AI chart
 history/expiry. Existing browser expectations for old labels and the six-column board will need
 review against the new product layout.
+
+## Account access
+
+Login, signup, email verification, and optional authenticator verification use the shared
+`AuthLayout` and scoped `auth.module.css`, adapted from HVACLine’s warm orange, two-column
+interface. Keep account flows focused on the current step, preserve local return paths, and
+keep password/session/challenge secrets out of URLs and browser storage. Retain QuantRift’s
+workspace fields and email verification. Authenticator rollout is documented in
+`apps/api/docs/auth.md`; it defaults off until configured.

@@ -38,7 +38,7 @@ def test_alembic_has_single_head() -> None:
     alembic_config.set_main_option("script_location", str(api_root / "alembic"))
     script = ScriptDirectory.from_config(alembic_config)
 
-    assert script.get_heads() == ["202610311200_trade_suggestions"]
+    assert script.get_heads() == ["202610311600_auth_mfa"]
 
 
 @pytest.mark.asyncio
@@ -46,7 +46,7 @@ async def test_migrated_test_database_is_at_head_and_has_critical_tables(
     db_session: AsyncSession,
 ) -> None:
     version_result = await db_session.execute(text("select version_num from alembic_version"))
-    assert version_result.scalar_one() == "202610311200_trade_suggestions"
+    assert version_result.scalar_one() == "202610311600_auth_mfa"
 
     table_result = await db_session.execute(
         text(

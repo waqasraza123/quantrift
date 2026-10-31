@@ -19,6 +19,8 @@ from app.modules.auth.api_keys import ApiKeyService
 from app.modules.auth.dependencies import optional_identity, require_admin
 from app.modules.auth.email import VerificationEmailDeliveryError, VerificationEmailProvider
 from app.modules.auth.identity import IdentityContext, identity_to_read
+from app.modules.auth.mfa.routes import router as mfa_router
+from app.modules.auth.mfa.schemas import AuthMfaChallengeRead
 from app.modules.auth.models import AuthActivityEvent, AuthApiKey, AuthSession
 from app.modules.auth.passwords import PasswordAuthService, hash_session_token
 from app.modules.auth.schemas import (
@@ -134,12 +136,12 @@ async def register(
     )
 
 
-@router.post("/login", response_model=AuthSessionCreated)
+@router.post("/login", response_model=AuthSessionCreated | AuthMfaChallengeRead)
 async def login(
     payload: AuthLoginRequest,
     request: Request,
     session: Annotated[AsyncSession, Depends(database_session)],
-) -> AuthSessionCreated:
+) -> AuthSessionCreated | AuthMfaChallengeRead:
     await enforce_auth_rate_limit(
         request,
         scope="login",
@@ -161,6 +163,8 @@ async def login(
             error_code=error.code,
         )
         raise
+    if isinstance(created_session, AuthMfaChallengeRead):
+        return created_session
     await record_auth_activity(
         request=request,
         session=session,
@@ -656,3 +660,6 @@ async def enforce_auth_rate_limit(
             "auth_rate_limit_exceeded",
             "Too many authentication attempts. Please try again shortly.",
         )
+
+
+router.include_router(mfa_router)

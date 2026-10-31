@@ -30,6 +30,12 @@ Daily briefs, paper plans, outcome reviews, equity research, data management, pr
 
 The homepage includes an interactive preview with clearly labeled illustrative data. Its prices and assessments are examples, not live market quotes.
 
+## Your account
+
+Sign in and create an account through a focused, responsive interface adapted from HVACLine. New accounts verify their email before signing in. Existing accounts and workspaces are preserved. Optional authenticator-app verification adds an enrollment QR code and single-use recovery codes.
+
+Authenticator verification defaults off. This release requires the new auth migration even when it stays off. See the [account setup and rollout guide](apps/api/docs/auth.md#authenticator-verification) for dependencies, encryption-key configuration, and activation.
+
 ## AI research with a second review
 
 An optional LangGraph workflow uses OpenAI to assess the latest stored closed candles:

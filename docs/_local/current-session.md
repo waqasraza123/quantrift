@@ -1,5 +1,28 @@
 # Current Session
 
+## HVACLine Account Access Adaptation
+
+- Copied the login/signup visual system from `/Users/mc/development/hvacline`: warm light/orange
+  layout, story column, white form card, responsive controls, password visibility, and clear errors.
+  Added shared auth components/CSS, matching email-verification screens, and `/signup` alias.
+- Preserved target accounts, password hashing, workspace/RBAC, signup fields, and email verification.
+  Adapted HVACLine authenticator enrollment/verification/recovery to the existing FastAPI sessions.
+- Added `auth/mfa` crypto/models/service/routes/schemas; migration `202610311600_auth_mfa`;
+  nullable MFA session metadata; account lockout/replay protection; encrypted context-bound secrets;
+  recovery-code rotation; safe BFF challenge cookie and `/mfa` UI with locally generated QR.
+- Assumption communicated: MFA defaults off for compatible rollout. Earlier optional scope question
+  received no reply; no new sign-in requirement was enabled. Enrolled accounts remain protected
+  when the global flag is off. No environment files, live accounts, or source HVACLine files changed.
+- Added cryptography plus qrcode.react/server-only dependency and lock entries; used package-lock-only install
+  with scripts disabled. Updated auth docs, README, env example, schema cleanup/head expectations, and durable
+  architecture notes. Owner must install dependencies, migrate before API deployment, and configure
+  a stable server-side Fernet key before enabling MFA. See `apps/api/docs/auth.md`.
+- No tests, builds, lint, type checks, migration runs, preview servers, browser checks, or live service
+  calls. Implementation is unverified; owner validation is documented.
+- Follow-up requested publication of all pending auth work to `origin/main`; included the shared
+  auth design, optional MFA system, migration, dependency lockfile, and documentation. Publication
+  does not apply migrations or enable MFA; deployment remains owner-operated.
+
 ## Main Publication
 
 - Published all pending OpenAI/LangGraph, homepage, workspace, README, and migration changes to

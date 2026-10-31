@@ -1,64 +1,26 @@
-import { getServerApiProxyEnv } from "@/config/serverEnv";
 import { isTrustedMutationRequest, untrustedOriginResponse } from "../origin";
-import { isBackendAuthSession, setAuthSessionCookie } from "../session";
+import { clearAuthSessionCookie, isBackendAuthSession, setAuthSessionCookie } from "../session";
+import { authErrorResponse, authResponseHeaders, requestAuthBackend } from "../backend";
+import { clearMfaCookie, isBackendMfaChallenge, setMfaCookie } from "../mfa/cookie";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: Request): Promise<Response> {
-  if (!isTrustedMutationRequest(request)) {
-    return untrustedOriginResponse();
-  }
-  return authenticate(request, "/auth/login");
-}
-
-async function authenticate(request: Request, path: string): Promise<Response> {
-  const env = getServerApiProxyEnv();
-  const body = await request.text();
+  if (!isTrustedMutationRequest(request)) return untrustedOriginResponse();
   try {
-    const response = await fetch(`${env.apiBaseUrl}${path}`, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": request.headers.get("content-type") || "application/json",
-      },
-      body,
-      cache: "no-store",
-    });
-    const payload = await parseJson(response);
-    if (response.ok && isBackendAuthSession(payload)) {
-      await setAuthSessionCookie(payload.accessToken, payload.expiresAt);
-      return Response.json(
-        {
-          expiresAt: payload.expiresAt,
-          identity: payload.identity,
-        },
-        {
-          status: response.status,
-          headers: { "cache-control": "no-store" },
-        },
-      );
+    const { response, payload } = await requestAuthBackend("login", { method: "POST", body: await request.text() });
+    if (!response.ok) return authErrorResponse(payload, response.status);
+    if (isBackendMfaChallenge(payload)) {
+      await clearAuthSessionCookie();
+      await setMfaCookie(payload);
+      return Response.json({ mfaRequired: true, nextAction: payload.nextAction, expiresAt: payload.expiresAt }, { headers: authResponseHeaders });
     }
-    return Response.json(payload, {
-      status: response.status,
-      headers: { "cache-control": "no-store" },
-    });
+    if (!isBackendAuthSession(payload)) return authErrorResponse(null, 502);
+    await setAuthSessionCookie(payload.accessToken, payload.expiresAt);
+    await clearMfaCookie();
+    return Response.json({ expiresAt: payload.expiresAt, identity: payload.identity }, { headers: authResponseHeaders });
   } catch {
-    return Response.json(
-      { error: { code: "auth_backend_unavailable", message: "Unable to reach auth API" } },
-      { status: 502 },
-    );
-  }
-}
-
-async function parseJson(response: Response): Promise<unknown> {
-  const text = await response.text();
-  if (!text) {
-    return null;
-  }
-  try {
-    return JSON.parse(text) as unknown;
-  } catch {
-    return { message: text };
+    return authErrorResponse(null, 502);
   }
 }

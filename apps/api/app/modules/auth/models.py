@@ -209,6 +209,8 @@ class AuthSession(Base):
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    mfa_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    mfa_version: Mapped[int | None] = mapped_column(Integer)
     created_at = created_at_column()
     updated_at = updated_at_column()
 

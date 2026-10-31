@@ -1,32 +1,18 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
-import { BrandMark } from "@/components/brand/BrandMark";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 import { getPublicEnv } from "@/config/env";
 import { getCurrentIdentity } from "@/lib/api/auth";
-import { redirect } from "next/navigation";
-import Link from "next/link";
+import { safeAuthDestination } from "@/lib/auth/redirects";
 
-type LoginPageProps = {
-  searchParams: Promise<{ next?: string }>;
-};
+export const metadata: Metadata = { title: "Sign in", robots: { index: false, follow: false } };
 
-export default async function LoginPage({ searchParams }: LoginPageProps) {
-  await redirectAuthenticatedSession();
-  const params = await searchParams;
-  return (
-    <main className="landing-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-[#061416] px-4 py-24 md:py-10">
-      <div className="landing-glow pointer-events-none absolute inset-0" />
-      <Link className="absolute left-5 top-5 z-10 flex items-center gap-2.5 text-sm font-bold transition" href="/"><BrandMark className="h-8 w-8 text-white" /><span className="text-white transition hover:text-[#9cf2e6]">QuantRift</span></Link>
-      <div className="relative z-10 w-full max-w-5xl"><AuthCard mode="login" nextPath={params.next} /></div>
-    </main>
-  );
-}
-
-async function redirectAuthenticatedSession(): Promise<void> {
-  if (getPublicEnv().authMode !== "session") {
-    return;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
+  if (getPublicEnv().authMode === "session") {
+    const identity = await getCurrentIdentity();
+    if (identity.ok && identity.data.authenticated) redirect(safeAuthDestination(next));
   }
-  const identity = await getCurrentIdentity();
-  if (identity.ok && identity.data.authenticated) {
-    redirect("/command-center");
-  }
+  return <AuthLayout><AuthCard mode="login" nextPath={next} /></AuthLayout>;
 }

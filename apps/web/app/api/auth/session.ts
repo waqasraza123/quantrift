@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cookies } from "next/headers";
 import { getServerApiProxyEnv } from "@/config/serverEnv";
 
@@ -61,8 +63,12 @@ export function isBackendAuthSession(value: unknown): value is BackendAuthSessio
   const record = value as Record<string, unknown>;
   return (
     typeof record.accessToken === "string" &&
+    /^[A-Za-z0-9_-]{32,1024}$/.test(record.accessToken) &&
+    record.tokenType === "bearer" &&
     typeof record.expiresAt === "string" &&
+    Date.parse(record.expiresAt) > Date.now() &&
     typeof record.identity === "object" &&
-    record.identity !== null
+    record.identity !== null &&
+    "authenticated" in record.identity && record.identity.authenticated === true
   );
 }
