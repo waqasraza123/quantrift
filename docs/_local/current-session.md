@@ -1,5 +1,17 @@
 # Current Session
 
+## Concise Bold Hero Replacement
+
+- Replaced all hero marketing copy with the requested headline “Production-grade AI Agents for
+  precise trading.” and “Easily customizable to your trading needs.” Removed the prior kicker,
+  description, and role caption; retained account/preview actions and illustrative chart.
+- Applied bold sans-serif heading and army-green emphasis to “AI Agents” and “precise trading.”
+  Updated responsive heading/subtitle sizes and removed unused hero-copy styles.
+- Updated `LandingPage.tsx`, `marketing.css`, and the existing landing heading expectation.
+  Verification: `git diff --check` passed; no tests, builds, lint, type checks, browser checks,
+  or screenshots. Follow-up user request authorizes committing and pushing these changes and
+  session notes to `origin/main`.
+
 ## Prominent AI Agents Hero
 
 - Updated the homepage hero to “AI Agents for your trading research.” with “AI Agents” as the

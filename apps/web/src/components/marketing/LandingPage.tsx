@@ -35,11 +35,9 @@ export function LandingPage() {
 
       <section className="marketing-hero marketing-container" id="main-content">
         <div className="marketing-hero-copy">
-          <p className="marketing-kicker"><span />AI-powered market intelligence</p>
-          <h1><em>AI Agents</em><br />for your trading<br />research.</h1>
-          <p className="marketing-intro">Bring your charts, watchlist, and journal together. When enabled, your AI analyst develops trade ideas and an independent AI risk reviewer challenges the evidence and price levels.</p>
+          <h1>Production-grade<br /><span>AI Agents</span> for<br /><span>precise trading.</span></h1>
+          <p className="marketing-intro">Easily customizable to your trading needs.</p>
           <div className="marketing-hero-actions"><Link href="/register" className="marketing-button">Create your account<ProductIcon name="arrow" className="h-4 w-4" /></Link><a href="#product-preview" className="marketing-text-link">Try the chart preview<span aria-hidden="true">↘</span></a></div>
-          <p className="marketing-hero-caption"><ProductIcon name="check" className="h-3.5 w-3.5" />AI Analyst <span>·</span> AI Risk Reviewer <span>·</span> Your decision</p>
         </div>
         <div id="product-preview" className="marketing-hero-preview"><MarketPreview /><p className="marketing-preview-caption">Explore the preview: switch markets or toggle the chart levels.</p></div>
       </section>
