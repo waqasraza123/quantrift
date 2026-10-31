@@ -63,7 +63,7 @@ export function SymbolsStep({ initialData, selectedSymbolIds, mutation, onComple
             Additional existing symbol codes
             <input className="mt-1 w-full rounded-md border border-[var(--line)] bg-[var(--panel)] px-3 py-2" placeholder="BTCUSDT, ETHUSDT" value={symbolCodes} onChange={(event) => setSymbolCodes(event.target.value)} />
           </label>
-          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
+          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
             Save symbols
           </button>
         </form>

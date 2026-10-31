@@ -120,7 +120,7 @@ export function RunScanNowPanel({ data }: { data: ScannerData }) {
               type="button"
               disabled={!selectedConfig || pendingAction !== null}
               onClick={runSelectedConfig}
-              className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {pendingAction === "config" ? "Running scan" : "Run selected scan"}
             </button>

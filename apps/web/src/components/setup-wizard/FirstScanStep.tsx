@@ -41,7 +41,7 @@ export function FirstScanStep({ initialData, selectedScanConfigId, mutation, onC
               </select>
             </label>
           )}
-          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
+          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
             {runScan ? "Run first scan" : "Finish without scan"}
           </button>
         </form>

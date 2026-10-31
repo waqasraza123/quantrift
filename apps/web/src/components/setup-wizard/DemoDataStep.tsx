@@ -42,7 +42,7 @@ export function DemoDataStep({ selectedSymbolIds, selectedTimeframes, selectedSo
             Candle count
             <input className="mt-1 w-full rounded-md border border-[var(--line)] bg-[var(--panel)] px-3 py-2" min={40} max={2000} type="number" value={candleCount} onChange={(event) => setCandleCount(Number(event.target.value))} />
           </label>
-          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
+          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
             {enabled ? "Seed demo candles" : "Skip demo data"}
           </button>
         </form>

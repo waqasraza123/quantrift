@@ -45,7 +45,7 @@ export function PreferenceProfileStep({ selectedSymbolIds, selectedTimeframes, m
             <label className="flex items-center gap-2"><input checked={requireTimeframeAgreement} type="checkbox" onChange={(event) => setRequireTimeframeAgreement(event.target.checked)} /> Require timeframe agreement</label>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
+            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
               Create profile
             </button>
             <button className="rounded-md border border-[var(--line)] px-4 py-2 text-sm font-semibold" type="button" onClick={() => onSkip("preference_profile")}>

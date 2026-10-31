@@ -128,7 +128,7 @@ export function ScanConfigForm({ data }: { data: ScannerData }) {
           <label className="flex items-center gap-2"><input type="checkbox" checked={includeActionPlan} onChange={(event) => setIncludeActionPlan(event.target.checked)} /> Include action plan record</label>
         </div>
         <div className="lg:col-span-2 xl:col-span-4">
-          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
+          <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
             {pending ? "Creating config" : "Create scan config"}
           </button>
         </div>

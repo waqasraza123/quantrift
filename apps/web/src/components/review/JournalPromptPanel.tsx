@@ -28,7 +28,7 @@ export function JournalPromptPanel({ items, workspaceId }: { items: OutcomeRevie
               <p className="mt-1 text-sm text-slate-500">Add a note about what was observed and what needs follow-up review.</p>
             </div>
             <Link
-              className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white"
+              className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)]"
               href={journalHref(workspaceId, item)}
             >
               Create note

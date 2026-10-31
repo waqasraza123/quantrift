@@ -126,7 +126,7 @@ export function WatchlistManager({ data }: WatchlistManagerProps) {
               />
             </label>
             <button
-              className="mt-4 w-full rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-4 w-full rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
               disabled={pendingAction === "create-watchlist"}
               type="submit"
             >
@@ -163,7 +163,7 @@ export function WatchlistManager({ data }: WatchlistManagerProps) {
               Include partial live candle
             </label>
             <button
-              className="mt-4 w-full rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-4 w-full rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
               disabled={pendingAction === "add-item" || activeWatchlists.length === 0 || data.symbols.length === 0}
               type="submit"
             >

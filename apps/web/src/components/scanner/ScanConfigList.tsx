@@ -78,7 +78,7 @@ export function ScanConfigList({ data }: { data: ScannerData }) {
       eyebrow="Schedules and manual runs"
       action={
         <button
-          className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
           disabled={pendingAction === "run-due" || data.dueScanConfigs.length === 0}
           type="button"
           onClick={runDue}

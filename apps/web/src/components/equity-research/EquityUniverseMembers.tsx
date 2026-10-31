@@ -88,7 +88,7 @@ export function EquityUniverseMembers({ data }: { data: EquityResearchData }) {
           Exchange
           <input className="mt-1 w-full rounded-md border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-sm" value={exchange} onChange={(event) => setExchange(event.target.value)} />
         </label>
-        <button className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 md:col-span-4" disabled={!data.selectedUniverse || !symbolId || pending === "add"} type="submit">
+        <button className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60 md:col-span-4" disabled={!data.selectedUniverse || !symbolId || pending === "add"} type="submit">
           {pending === "add" ? "Adding" : "Add symbol"}
         </button>
       </form>

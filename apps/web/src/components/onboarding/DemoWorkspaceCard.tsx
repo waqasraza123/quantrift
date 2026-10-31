@@ -26,7 +26,7 @@ export function DemoWorkspaceCard({
       </div>
       <button
         type="button"
-        className={cn("mt-4 w-full rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60", motionCardClass)}
+        className={cn("mt-4 w-full rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60", motionCardClass)}
         disabled={!status.demo_mode.available || pending}
         onClick={onAction}
       >

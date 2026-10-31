@@ -32,7 +32,7 @@ export function ReadinessRunButton({ workspaceId }: { workspaceId?: UUID | null 
   return (
     <div className="space-y-2">
       <button
-        className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
         disabled={pending}
         type="button"
         onClick={runChecklist}

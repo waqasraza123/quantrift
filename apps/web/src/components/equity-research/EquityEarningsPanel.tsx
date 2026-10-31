@@ -64,7 +64,7 @@ export function EquityEarningsPanel({ data }: { data: EquityResearchData }) {
         <button className="rounded-md border border-[var(--line)] px-3 py-2 text-sm font-semibold text-[var(--strong)] disabled:opacity-60" disabled={pending || !symbolId} type="button" onClick={() => runEnrichment("fundamentals")}>
           Fetch fundamentals
         </button>
-        <button className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={pending || !symbolId} type="button" onClick={() => runEnrichment("earnings")}>
+        <button className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={pending || !symbolId} type="button" onClick={() => runEnrichment("earnings")}>
           Fetch earnings
         </button>
       </div>

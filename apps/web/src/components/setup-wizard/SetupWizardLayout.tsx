@@ -193,7 +193,7 @@ export function SetupWizardLayout({ initialData }: SetupWizardLayoutProps) {
             <button className="rounded-md border border-[var(--line)] px-4 py-2 text-sm font-semibold" disabled={mutation.status === "pending"} type="button" onClick={startWizard}>
               {run ? "Start new run" : "Start setup"}
             </button>
-            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="button" onClick={createDemo}>
+            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="button" onClick={createDemo}>
               Demo workspace
             </button>
             {run && (

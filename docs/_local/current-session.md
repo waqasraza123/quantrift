@@ -1,5 +1,20 @@
 # Current Session
 
+## Selected Black, White, and Acid Yellow Palette
+
+- User rejected the lavender/amber palette and explicitly selected option 9: black, white,
+  and acid yellow. Updated brand tokens to `#080808`, `#ffffff`, and `#f4ff3a`; neutralized
+  surfaces, borders, shadows, and light product colors. Updated favicon and browser theme color.
+- Homepage, auth/verification/MFA, chart preview, loading screen, brand marks, and shared status
+  styles inherit the palette. Added `--on-accent` and applied it to shared and direct workspace
+  primary controls for readable labels across themes. Layouts and application behavior preserved.
+- Updated product/auth guidance and durable palette memory. No tests, builds, lint, type checks,
+  preview servers, browser checks, or deployments run, preserving the existing handoff.
+- Verification: `git diff --check` passed. Source review found no earlier palette references in
+  active brand styles/docs and no accent-filled controls retaining fixed white labels.
+- Publishing to `origin/main` under the user's preceding check-and-push request; the previous
+  published palette commit is `f0283d4`.
+
 ## Complete Brand Palette Replacement
 
 - Replaced teal/mint/cyan brand colors with midnight blue `#101322`, lavender `#c4b5fd`,

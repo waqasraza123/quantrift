@@ -33,7 +33,7 @@ export function SetupSummary({ run }: { run: WorkspaceSetupRun | null }) {
         <SummaryAction
           href={run.workspace_id ? `/command-center?workspaceId=${run.workspace_id}` : "/command-center"}
           index={0}
-          className="rounded-md bg-[var(--accent)] text-white"
+          className="rounded-md bg-[var(--accent)] text-[var(--on-accent)]"
         >
           Command Center
         </SummaryAction>

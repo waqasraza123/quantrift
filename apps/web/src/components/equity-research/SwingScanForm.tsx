@@ -161,7 +161,7 @@ export function SwingScanForm({ data }: { data: EquityResearchData }) {
             />
           </div>
           <button
-            className="mt-5 w-full rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-5 w-full rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!data.workspace || !data.selectedUniverse || pending}
             type="submit"
           >

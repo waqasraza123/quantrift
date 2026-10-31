@@ -69,7 +69,7 @@ export function EquityUniverseFileImportPanel({ data }: { data: EquityResearchDa
         <p className="text-xs text-slate-500">
           Accepted columns: ticker or symbol, name, exchange, sector, industry, currency, country, asset_type. Credential-shaped columns are redacted.
         </p>
-        <button className="w-fit rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
+        <button className="w-fit rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
           {pending ? "Importing" : "Import research universe"}
         </button>
       </form>

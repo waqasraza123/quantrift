@@ -41,7 +41,7 @@ export function OnboardingStepCard({
           {step.action_type && step.state !== "complete" && (
             <button
               type="button"
-              className={cn("rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60", motionCardClass)}
+              className={cn("rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60", motionCardClass)}
               disabled={pending || disabled}
               onClick={() => onAction(step.action_type as OnboardingActionType)}
             >

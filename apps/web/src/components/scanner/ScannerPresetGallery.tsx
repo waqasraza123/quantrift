@@ -171,7 +171,7 @@ export function ScannerPresetGallery({ data }: ScannerPresetGalleryProps) {
                       ))}
                     </div>
                     <button
-                      className="mt-4 rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                      className="mt-4 rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={!data.workspace}
                       type="button"
                       onClick={() => openPreset(preset)}
@@ -316,7 +316,7 @@ export function ScannerPresetGallery({ data }: ScannerPresetGalleryProps) {
                 Cancel
               </button>
               <button
-                className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={pendingAction === "apply"}
                 type="submit"
               >

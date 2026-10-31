@@ -47,7 +47,7 @@ export function OutcomeReviewFilters({ data }: { data: OutcomeReviewData }) {
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white" type="submit">
+        <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)]" type="submit">
           Apply filters
         </button>
         <a className="rounded-md border border-[var(--line)] px-4 py-2 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800" href={selectedWorkspaceId ? `/review/outcomes?workspaceId=${selectedWorkspaceId}` : "/review/outcomes"}>

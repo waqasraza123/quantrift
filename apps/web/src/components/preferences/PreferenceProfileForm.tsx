@@ -215,7 +215,7 @@ export function PreferenceProfileForm({ data }: { data: PreferenceProfilesPageDa
         />
 
         <button
-          className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60"
           disabled={pending || !data.workspace}
           type="submit"
         >

@@ -77,7 +77,7 @@ export function EquityUniverseImportPanel({ data }: { data: EquityResearchData }
           <textarea className="mt-1 min-h-32 w-full rounded-md border border-[var(--line)] bg-[var(--panel)] px-3 py-2 font-mono text-xs" value={text} onChange={(event) => setText(event.target.value)} />
         </label>
         <div className="flex flex-wrap gap-2">
-          <button className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
+          <button className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
             {pending ? "Importing" : "Import rows"}
           </button>
           <button className="rounded-md border border-[var(--line)] px-3 py-2 text-sm font-semibold text-[var(--strong)] disabled:opacity-60" disabled={pending || !data.workspace} type="button" onClick={importMock}>

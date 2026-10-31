@@ -70,7 +70,7 @@ export function DataSourceStep({ initialData, selectedSourceId, mutation, onComp
             </>
           )}
           <div className="md:col-span-2">
-            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
+            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
               Save data source
             </button>
           </div>

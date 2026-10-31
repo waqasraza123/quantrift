@@ -87,7 +87,7 @@ export function CredentialStep({ initialData, mutation, onComplete, onSkip }: Se
             </>
           )}
           <div className="md:col-span-2">
-            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
+            <button className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-60" disabled={mutation.status === "pending"} type="submit">
               {mode === "none" ? "Skip credential" : "Save credential reference"}
             </button>
           </div>

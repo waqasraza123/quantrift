@@ -55,11 +55,11 @@ export function OutcomeReviewCard({ item, workspaceId }: { item: OutcomeReviewQu
             Signal detail
           </Link>
           {item.journalEntry ? (
-            <Link className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white" href={`/journal/${item.journalEntry.id}`}>
+            <Link className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)]" href={`/journal/${item.journalEntry.id}`}>
               Review note
             </Link>
           ) : (
-            <Link className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white" href={journalHref(workspaceId, item)}>
+            <Link className="rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)]" href={journalHref(workspaceId, item)}>
               Create note
             </Link>
           )}

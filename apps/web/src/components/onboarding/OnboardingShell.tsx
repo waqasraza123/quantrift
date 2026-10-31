@@ -151,7 +151,7 @@ export function OnboardingShell({ initialData }: { initialData: OnboardingPageDa
                   </Link>
                   <Link
                     className={cn(
-                      "rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white",
+                      "rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)]",
                       motionCardClass,
                     )}
                     href={withWorkspace("/command-center", workspaceId)}

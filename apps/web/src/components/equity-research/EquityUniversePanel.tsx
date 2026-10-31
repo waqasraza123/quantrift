@@ -61,7 +61,7 @@ export function EquityUniversePanel({ data }: { data: EquityResearchData }) {
             Description
             <input className="mt-1 w-full rounded-md border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-sm" value={description} maxLength={1000} onChange={(event) => setDescription(event.target.value)} />
           </label>
-          <button className="mt-4 w-full rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
+          <button className="mt-4 w-full rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-60" disabled={pending || !data.workspace} type="submit">
             {pending ? "Creating" : "Create universe"}
           </button>
         </form>

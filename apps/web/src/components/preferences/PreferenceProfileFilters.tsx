@@ -37,7 +37,7 @@ export function PreferenceProfileFilters({ data }: { data: PreferenceProfilesPag
         </label>
         <div className="flex items-end gap-2">
           <button
-            className="h-10 rounded-md bg-[var(--accent)] px-4 text-sm font-semibold text-white"
+            className="h-10 rounded-md bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--on-accent)]"
             type="submit"
           >
             Apply

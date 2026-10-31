@@ -115,7 +115,7 @@ export function SetupJournalPanel({
             <button
               type="submit"
               disabled={!canSubmit}
-              className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Save journal note
             </button>
