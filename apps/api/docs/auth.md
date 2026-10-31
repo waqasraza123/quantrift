@@ -105,9 +105,9 @@ role, workspace, permissions, credential ownership, or another user's profile.
 
 The login, signup, and authenticator experience is adapted from the local HVACLine repository.
 QuantRift keeps its existing workspace registration fields, Argon2id/legacy password compatibility,
-and required email verification. `/signup` aliases `/register`. Auth pages share the warm,
-two-column HVACLine design; responsive layouts, password visibility, inline errors, delivery
-recovery, and safe local return paths are included.
+and required email verification. `/signup` aliases `/register`. Auth pages retain HVACLine's
+two-column layout with QuantRift's shared deep-teal, mint, and cyan palette; responsive layouts,
+password visibility, inline errors, delivery recovery, and safe local return paths are included.
 
 `AUTH_MFA_REQUIRED=false` preserves password-only login for accounts without an enrolled factor.
 Set it to `true` to require an authenticator after verified email and password. Already-enrolled

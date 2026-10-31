@@ -16,9 +16,10 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
-- Account access now adapts HVACLine’s responsive light/orange login/signup design through shared
-  `AuthLayout`, field components, and scoped CSS; email verification and optional `/mfa` share the
-  same presentation. `/signup` aliases `/register`; local return paths are validated.
+- Public and account pages share a bold deep-teal, mint, and cyan palette through `--brand-*`
+  tokens in `apps/web/app/globals.css`; product pages retain adaptive light/dark colors with
+  stronger teal accents. Shared `AuthLayout`, fields, and scoped CSS cover login/signup, email
+  verification, and optional `/mfa`. `/signup` aliases `/register`; local return paths are validated.
 - Optional authenticator verification lives under `auth/mfa`. Existing credentials, Argon2id,
   workspace registration, and email verification are retained. `AUTH_MFA_REQUIRED=false` defaults
   off; enrolled accounts remain protected regardless of the flag. Enrollment/replacement uses

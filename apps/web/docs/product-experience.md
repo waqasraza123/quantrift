@@ -19,7 +19,8 @@ are instance-specific so desktop and mobile markup can coexist.
 
 ## Presentation
 
-- Use a restrained green accent, neutral page backgrounds, solid surfaces, and a clear heading.
+- Use the shared `--brand-*` palette: deep teal surfaces, bright mint actions, cyan highlights,
+  and high-contrast text. Product pages retain adaptive light/dark themes with stronger teal accents.
 - Prefer one primary page action, a few useful summary counts, and readable lists.
 - Keep setup rows responsive without a wide multi-column board or mandatory horizontal scrolling.
 - Put configuration, audit trails, and secondary diagnostics in native disclosure sections.
@@ -33,9 +34,10 @@ are instance-specific so desktop and mobile markup can coexist.
 - Disclosure sections open for explicit deep-link state, such as `/journal?compose=1#new-note`,
   selected scan history, or missing scanner configuration.
 
-The public homepage uses its own light editorial palette and a code-native interactive sample
-chart. Sample data must remain labeled illustrative. No live prices, returns, customers,
-testimonials, or predictive-accuracy claims may be invented.
+The public homepage and auth screens share the dark brand palette regardless of system theme.
+The homepage uses a code-native interactive sample chart. Sample data must remain labeled
+illustrative. No live prices, returns, customers, testimonials, or predictive-accuracy claims may
+be invented.
 
 ## Reusable UI
 
@@ -56,8 +58,11 @@ review against the new product layout.
 ## Account access
 
 Login, signup, email verification, and optional authenticator verification use the shared
-`AuthLayout` and scoped `auth.module.css`, adapted from HVACLine’s warm orange, two-column
-interface. Keep account flows focused on the current step, preserve local return paths, and
-keep password/session/challenge secrets out of URLs and browser storage. Retain QuantRift’s
+`AuthLayout` and scoped `auth.module.css`, retaining the two-column layout adapted from HVACLine
+with the shared QuantRift brand colors. Keep account flows focused on the current step, preserve
+local return paths, and keep password/session/challenge secrets out of URLs and browser storage. Retain QuantRift’s
 workspace fields and email verification. Authenticator rollout is documented in
 `apps/api/docs/auth.md`; it defaults off until configured.
+
+Keep authenticator QR codes black on white for scanning. Error, notice, and recovery-code panels
+use the shared semantic colors; primary actions use dark text on mint backgrounds.

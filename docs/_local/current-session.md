@@ -1,5 +1,19 @@
 # Current Session
 
+## Bold Shared Website Palette
+
+- Replaced orange auth styling and the muted homepage palette with shared `--brand-*` tokens in
+  `apps/web/app/globals.css`: deep teal backgrounds, bright mint actions, cyan highlights, and
+  high-contrast text. Homepage/auth use a consistent dark palette; product pages retain adaptive
+  light/dark themes with stronger teal accents.
+- Updated `marketing.css`, auth CSS, sample chart colors, shared primary button dark text, brand
+  mark, favicon, and browser theme color. Login/signup, email verification, MFA enrollment/recovery,
+  validation messages, and focus states share the palette. QR codes remain black on white.
+- Updated product/auth documentation and durable project state. No auth logic or layout changed.
+- No tests, builds, lint, type checks, preview servers, or browser verification were run, per user
+  instruction. Owner review: homepage, login/register, verification/MFA, and both product themes.
+- User requested publication of the completed palette changes and documentation to `origin/main`.
+
 ## MFA Deployment Type Guard Fix
 
 - Updated `apps/web/src/lib/auth/mfa.ts` so `isRecord` preserves the input type and explicitly

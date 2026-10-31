@@ -66,13 +66,13 @@ export function MarketPreview() {
               {[80, 160, 240, 320, 400].map((x) => <line key={x} x1={x} x2={x} y1="10" y2="200" stroke="currentColor" className="preview-gridline" />)}
               {showLevels && market.decision === "BUY" && (
                 <g>
-                  <rect x="0" y="104" width="490" height="18" fill="#5ad3ad" fillOpacity=".10" />
-                  <line x1="0" x2="490" y1="104" y2="104" stroke="#71d6b6" strokeDasharray="5 4" />
-                  <line x1="0" x2="490" y1="161" y2="161" stroke="#e2a594" strokeDasharray="5 4" />
-                  <line x1="0" x2="490" y1="29" y2="29" stroke="#71d6b6" strokeDasharray="5 4" />
-                  <text x="9" y="97" fill="#9be8d0" fontSize="9">ENTRY ZONE</text>
-                  <text x="9" y="153" fill="#e2a594" fontSize="9">STOP</text>
-                  <text x="9" y="23" fill="#9be8d0" fontSize="9">TARGET</text>
+                  <rect x="0" y="104" width="490" height="18" fill="var(--brand-accent)" fillOpacity=".10" />
+                  <line x1="0" x2="490" y1="104" y2="104" stroke="var(--brand-accent)" strokeDasharray="5 4" />
+                  <line x1="0" x2="490" y1="161" y2="161" stroke="var(--brand-danger)" strokeDasharray="5 4" />
+                  <line x1="0" x2="490" y1="29" y2="29" stroke="var(--brand-secondary)" strokeDasharray="5 4" />
+                  <text x="9" y="97" fill="var(--brand-accent)" fontSize="9">ENTRY ZONE</text>
+                  <text x="9" y="153" fill="var(--brand-danger)" fontSize="9">STOP</text>
+                  <text x="9" y="23" fill="var(--brand-secondary)" fontSize="9">TARGET</text>
                 </g>
               )}
               {market.closes.map((close, index) => {
@@ -81,7 +81,7 @@ export function MarketPreview() {
                 const x = index * 15 + 18;
                 const yOpen = 225 - open * 2;
                 const yClose = 225 - close * 2;
-                return <g key={index} stroke={rising ? "#6bd5b0" : "#d59789"} fill={rising ? "#6bd5b0" : "#d59789"}><line x1={x} x2={x} y1={Math.min(yOpen, yClose) - 7} y2={Math.max(yOpen, yClose) + 6} /><rect x={x - 3.5} y={Math.min(yOpen, yClose)} width="7" height={Math.max(2, Math.abs(yClose - yOpen))} strokeWidth="0" /></g>;
+                return <g key={index} stroke={rising ? "var(--brand-accent)" : "var(--brand-danger)"} fill={rising ? "var(--brand-accent)" : "var(--brand-danger)"}><line x1={x} x2={x} y1={Math.min(yOpen, yClose) - 7} y2={Math.max(yOpen, yClose) + 6} /><rect x={x - 3.5} y={Math.min(yOpen, yClose)} width="7" height={Math.max(2, Math.abs(yClose - yOpen))} strokeWidth="0" /></g>;
               })}
             </svg>
             <div className="preview-chart-footer"><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span></div>
