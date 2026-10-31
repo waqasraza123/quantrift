@@ -19,8 +19,9 @@ are instance-specific so desktop and mobile markup can coexist.
 
 ## Presentation
 
-- Use the shared `--brand-*` palette: deep teal surfaces, bright mint actions, cyan highlights,
-  and high-contrast text. Product pages retain adaptive light/dark themes with stronger teal accents.
+- Use the shared `--brand-*` palette: midnight-blue surfaces, lavender actions, amber highlights,
+  and soft white text. Product pages retain adaptive light/dark themes with violet accents and
+  pale lavender light surfaces. Shared status badges and dots use the semantic theme tokens.
 - Prefer one primary page action, a few useful summary counts, and readable lists.
 - Keep setup rows responsive without a wide multi-column board or mandatory horizontal scrolling.
 - Put configuration, audit trails, and secondary diagnostics in native disclosure sections.
@@ -65,4 +66,4 @@ workspace fields and email verification. Authenticator rollout is documented in
 `apps/api/docs/auth.md`; it defaults off until configured.
 
 Keep authenticator QR codes black on white for scanning. Error, notice, and recovery-code panels
-use the shared semantic colors; primary actions use dark text on mint backgrounds.
+use the shared semantic colors; primary actions use dark plum text on lavender backgrounds.

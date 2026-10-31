@@ -1,5 +1,35 @@
 # Current Session
 
+## Complete Brand Palette Replacement
+
+- Replaced teal/mint/cyan brand colors with midnight blue `#101322`, lavender `#c4b5fd`,
+  amber `#f7c66a`, and soft white. Light product surfaces now use pale lavender and violet accents.
+- Homepage, auth/verification/MFA, chart preview, brand mark, and shared controls inherit the
+  new tokens. Updated favicon, browser theme color, loading screen, marketing shadows, and shared
+  status badges/dots; retained existing layouts and behavior.
+- Updated product/auth guidance and durable palette notes. Existing local diagnosis notes preserved.
+- Verification: `git diff --check` passed; source review found no old brand hex colors or
+  teal/mint/cyan references in the homepage/auth styles, brand components, or shared status styles.
+- No tests, builds, lint, type checks, preview servers, browser checks, or deployments run,
+  preserving the existing verification handoff.
+- User requested committing and pushing the palette replacement and documentation to `origin/main`.
+
+## Live Palette Deployment Diagnosis
+
+- Follow-up source/history review confirms `05807c4` intentionally keeps green-family colors:
+  homepage background `#061a20`, mint primary accent `#49f5bd`, cyan secondary `#66dbff`.
+  `marketing.css` uses these shared tokens for the homepage background, buttons, and headings.
+  Green accents alone therefore do not establish that an old deployment is being served.
+- User reports old green homepage/orange auth after publication of `05807c4`.
+- GitHub commit status reports the web Vercel deployment succeeded:
+  `https://vercel.com/waqas-projects-ee13b447/ai-trading-agent/Ea6a5tyondiYUtg2jr8WKzF1TiSa`.
+- Direct HTTP reads of `https://quantrift.vercel.app/`, `/login`, and `/register` show the new
+  shared brand tokens and dark teal/mint styles in their served CSS. No orange auth CSS found in
+  current source. Earlier Vercel branch/preview links redirect unauthenticated requests to Vercel
+  login, so their page styles could not be inspected.
+- Asked for the exact browser URL to identify the differing environment. No tests, builds, lint,
+  type checks, deployments, or application changes were made during this diagnosis.
+
 ## Bold Shared Website Palette
 
 - Replaced orange auth styling and the muted homepage palette with shared `--brand-*` tokens in

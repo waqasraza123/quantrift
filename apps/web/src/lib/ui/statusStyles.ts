@@ -1,19 +1,19 @@
 export type StatusTone = "neutral" | "good" | "warning" | "danger" | "info";
 
 export const statusToneClassName: Record<StatusTone, string> = {
-  neutral: "border-slate-300/70 bg-slate-100/80 text-slate-700 dark:border-slate-600/70 dark:bg-slate-800/70 dark:text-slate-200",
-  good: "border-teal-200/80 bg-teal-50/90 text-teal-800 dark:border-teal-700/70 dark:bg-teal-950/70 dark:text-teal-100",
-  warning: "border-amber-200/80 bg-amber-50/90 text-amber-800 dark:border-amber-700/70 dark:bg-amber-950/70 dark:text-amber-100",
-  danger: "border-rose-200/80 bg-rose-50/90 text-rose-800 dark:border-rose-800/70 dark:bg-rose-950/70 dark:text-rose-100",
-  info: "border-blue-200/80 bg-blue-50/90 text-blue-800 dark:border-blue-800/70 dark:bg-blue-950/70 dark:text-blue-100",
+  neutral: "border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-muted)]",
+  good: "border-[var(--success)] bg-[var(--success-soft)] text-[var(--success)]",
+  warning: "border-[var(--warning)] bg-[var(--warning-soft)] text-[var(--warning)]",
+  danger: "border-[var(--danger)] bg-[var(--danger-soft)] text-[var(--danger)]",
+  info: "border-[var(--info)] bg-[var(--info-soft)] text-[var(--info)]",
 };
 
 export const statusDotClassName: Record<StatusTone, string> = {
-  neutral: "bg-slate-400",
-  good: "bg-teal-500",
-  warning: "bg-amber-500",
-  danger: "bg-rose-500",
-  info: "bg-blue-500",
+  neutral: "bg-[var(--text-muted)]",
+  good: "bg-[var(--success)]",
+  warning: "bg-[var(--warning)]",
+  danger: "bg-[var(--danger)]",
+  info: "bg-[var(--info)]",
 };
 
 export function toneForBias(value: string | null | undefined): StatusTone {

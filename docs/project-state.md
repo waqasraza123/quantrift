@@ -16,9 +16,10 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
-- Public and account pages share a bold deep-teal, mint, and cyan palette through `--brand-*`
+- Public and account pages share a midnight-blue, lavender, and amber palette through `--brand-*`
   tokens in `apps/web/app/globals.css`; product pages retain adaptive light/dark colors with
-  stronger teal accents. Shared `AuthLayout`, fields, and scoped CSS cover login/signup, email
+  violet accents and pale lavender light surfaces. Shared status badges/dots use semantic tokens.
+  Shared `AuthLayout`, fields, and scoped CSS cover login/signup, email
   verification, and optional `/mfa`. `/signup` aliases `/register`; local return paths are validated.
 - Optional authenticator verification lives under `auth/mfa`. Existing credentials, Argon2id,
   workspace registration, and email verification are retained. `AUTH_MFA_REQUIRED=false` defaults

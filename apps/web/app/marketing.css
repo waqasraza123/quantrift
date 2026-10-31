@@ -37,7 +37,7 @@
 .marketing-hero-caption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; font-size: 10px; color: var(--brand-muted); }
 .marketing-hero-caption > svg { color: var(--brand-accent); }
 .marketing-preview-caption { margin: 17px 0 0; text-align: center; font-size: 10px; color: var(--brand-muted); }
-.market-preview { overflow: hidden; border: 1px solid var(--brand-border); border-radius: 13px; background: var(--brand-surface); color: var(--brand-foreground); box-shadow: 0 30px 64px -26px rgb(0 10 14 / 42%), 0 3px 8px rgb(0 10 14 / 16%); }
+.market-preview { overflow: hidden; border: 1px solid var(--brand-border); border-radius: 13px; background: var(--brand-surface); color: var(--brand-foreground); box-shadow: var(--brand-shadow); }
 .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 51px; padding: 0 19px; border-bottom: 1px solid var(--brand-border); }
 .preview-workspace { display: flex; align-items: center; gap: 9px; font-size: 10px; font-weight: 550; color: var(--brand-muted); }
 .preview-avatar { display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--brand-border); border-radius: 5px; color: var(--brand-accent); font-size: 11px; }
@@ -117,7 +117,7 @@
 .marketing-journal-preview { padding: 24px; border: 1px solid var(--brand-border); border-radius: 12px; background: var(--brand-surface-muted); }
 .marketing-journal-top { display: flex; gap: 10px; align-items: center; font-size: 11px; font-weight: 550; color: var(--brand-muted); }
 .marketing-journal-tag { margin-left: auto; padding: 4px 7px; border: 1px solid var(--brand-border); border-radius: 4px; color: var(--brand-muted); font-size: 8px; font-weight: 400; }
-.marketing-journal-entry { margin-top: 22px; padding: 29px; border: 1px solid var(--brand-border); border-radius: 8px; background: var(--brand-surface); box-shadow: 0 6px 16px rgb(0 10 14 / 12%); }
+.marketing-journal-entry { margin-top: 22px; padding: 29px; border: 1px solid var(--brand-border); border-radius: 8px; background: var(--brand-surface); box-shadow: var(--brand-shadow); }
 .marketing-journal-entry .marketing-eyebrow { margin-bottom: 15px; font-size: 9px; }
 .marketing-journal-entry h3 { margin: 0; font-size: 23px; font-family: Georgia, serif; font-weight: 400; letter-spacing: -.04em; }
 .marketing-journal-entry > p { margin: 17px 0 25px; color: var(--brand-muted); font-size: 12px; line-height: 1.95; }
