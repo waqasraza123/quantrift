@@ -58,6 +58,16 @@ filters, scan creation/results, journal composition/selection, saved paper plans
 history/expiry. Existing browser expectations for old labels and the six-column board will need
 review against the new product layout.
 
+## Pricing and teams
+
+Public pricing at `/pricing` and on the homepage reads the API-owned catalog. Keep plan prices,
+AI allowances, shared Team seats, unavailable checkout, and cancellation timing clear. Preserve
+selected plans through registration, verification, and MFA without starting checkout automatically.
+`/billing` and `/team` use the active session workspace; only the owner can manage payments.
+Workspace switching updates the server session before navigation. Invitation tokens stay in URL
+fragments/session storage and must not enter analytics, logs, or application copy. Setup and
+owner-operated validation are documented in `docs/billing.md`.
+
 ## Account access
 
 Login, signup, email verification, and optional authenticator verification use the shared

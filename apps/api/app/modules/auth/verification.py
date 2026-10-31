@@ -15,6 +15,7 @@ from app.modules.auth.email import (
     VerificationEmailDeliveryError,
     VerificationEmailProvider,
 )
+from app.modules.auth.continuation import safe_continuation
 from app.modules.auth.models import AuthEmailVerificationToken, AuthPasswordCredential
 from app.modules.users.models import User
 
@@ -34,6 +35,7 @@ class IssuedEmailVerification:
 class EmailVerificationResult:
     status: str
     email: str
+    continuation_path: str | None = None
 
 
 class EmailVerificationService:
@@ -48,6 +50,7 @@ class EmailVerificationService:
         recipient_name: str,
         enforce_cooldown: bool,
         commit: bool,
+        continuation_path: str | None = None,
     ) -> IssuedEmailVerification:
         now = datetime.now(UTC)
         if credential.email_verified_at is not None:
@@ -73,6 +76,7 @@ class EmailVerificationService:
             token_hash=hash_email_verification_token(raw_token),
             delivery_status="pending",
             expires_at=expires_at,
+            continuation_path=safe_continuation(continuation_path or (latest.continuation_path if latest else None)),
         )
         self.session.add(token)
         await self.session.flush()
@@ -116,7 +120,7 @@ class EmailVerificationService:
         if credential is None:
             raise invalid_verification_token_error()
         if credential.email_verified_at is not None:
-            return EmailVerificationResult(status="already_verified", email=credential.email)
+            return EmailVerificationResult(status="already_verified", email=credential.email, continuation_path=token.continuation_path)
         now = datetime.now(UTC)
         if token.invalidated_at is not None or token.consumed_at is not None:
             raise invalid_verification_token_error()
@@ -130,7 +134,7 @@ class EmailVerificationService:
         token.consumed_at = now
         await self.invalidate_active_tokens(credential.id, now, exclude_token_id=token.id)
         await self.session.commit()
-        return EmailVerificationResult(status="verified", email=credential.email)
+        return EmailVerificationResult(status="verified", email=credential.email, continuation_path=token.continuation_path)
 
     async def mark_delivery(self, token_id: UUID, delivered: bool) -> None:
         token = await self.session.get(AuthEmailVerificationToken, token_id)

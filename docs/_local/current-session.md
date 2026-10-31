@@ -1,5 +1,53 @@
 # Current Session
 
+## Billing Implementation Publication
+
+- User requested pushing the pending code to `main`, including Stripe portal setup repair and
+  its billing/membership dependencies, pricing/account screens, migration, usage accounting,
+  worker configuration, prepared coverage, and handoff docs.
+- Remote `main` matched local HEAD `5c99f78` before publication; no merge/rebase was needed.
+- User reiterated no tests or builds. Publication uses source/diff review only; no tests, builds,
+  lint, type checks, migrations, browser checks, or live Stripe calls were run.
+- Stripe setup still needs owner-run retry, all five environment IDs, and sandbox flow validation
+  as documented below and in `docs/billing.md`.
+
+## Stripe Portal Duplicate Interval Fix
+
+- Fixed setup's duplicate monthly-price portal catalog using management-only, Pro-subscriber
+  (Team target), and Team-subscriber (Pro target) configurations. Retained the shared product,
+  existing lookup keys/prices, upgrade proration, and same-product period-end downgrade settings.
+- Gateway selects the portal from the current Stripe subscription price, falling back to
+  management for unknown/multiple subscriptions. Readiness now requires all three portal IDs.
+- Added `STRIPE_PORTAL_PRO_CONFIGURATION_ID` / `STRIPE_PORTAL_TEAM_CONFIGURATION_ID` settings
+  and env examples. Setup reuses prices, paginates configurations, creates/reconciles managed
+  catalog-v2 configurations, and reports original Stripe errors without API error translation.
+- Updated billing runbook/durable state and prepared portal catalog/routing regression coverage.
+- Verification: source review and `git diff --check` only. Earlier no-tests/builds/lint/typechecks/
+  migrations/browser/live-Stripe instruction preserved. No commit/push requested.
+- Next: rerun `.venv/bin/python -m app.modules.billing.cli setup` from `apps/api`, save all five
+  returned IDs in API/worker environments, restart, and validate sandbox upgrades/downgrades.
+  Confirm portal switching when the current price is absent from its target configuration.
+
+## Stripe Pricing, Credits, and Team Memberships
+
+- Implemented the agreed Free/Pro/Team catalog, homepage pricing and `/pricing`, workspace `/billing`,
+  `/team`, `/invite`, session switching, and selected-plan continuation through verification/MFA.
+- Added modular billing/membership services, models/routes, Stripe 16.1.0 SDK integration,
+  checkout idempotency, signed queued reconciliation, credit reservations across AI generation,
+  Team invitations/seat checks, per-workspace authorization/ORM scoping, and account-wide sessions.
+- Added migration `202611010900_workspace_billing`, billing worker/Compose service, catalog setup,
+  activation/recovery commands, env examples, API/web docs, and prepared backend/browser coverage.
+- Source review added Stripe 16 serialization/price checks and mode-bound records, deferred credit
+  settlement for parent transactions, verified-credential invitation matching, and pricing SEO.
+- Billing defaults off. Requires owner-managed migration, Stripe sandbox catalog/webhook setup,
+  server credentials and price/portal IDs, session auth, and billing worker before activation.
+  Existing workspaces get 30 days Pro from one persisted cutoff. See `docs/billing.md`.
+- User superseded the earlier test authorization: no tests, builds, lint, type checks, migrations,
+  preview servers, or browser checks were run. SDK installed locally before that instruction.
+  A temporary PostgreSQL cluster was initialized during preparation; no server/test/migration ran.
+- No live Stripe products/prices, subscriptions, payments, webhook configuration, or deployment
+  were created. No commit or push requested. Source review is not runtime verification.
+
 ## Concise Bold Hero Replacement
 
 - Replaced all hero marketing copy with the requested headline “Production-grade AI Agents for

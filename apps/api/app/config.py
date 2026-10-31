@@ -46,6 +46,15 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
     database_url: SecretStr | None = None
     redis_url: SecretStr | None = None
+    billing_enabled: bool = False
+    stripe_secret_key: SecretStr | None = None
+    stripe_webhook_secret: SecretStr | None = None
+    stripe_pro_price_id: str | None = None
+    stripe_team_price_id: str | None = None
+    stripe_portal_configuration_id: str | None = None
+    stripe_portal_pro_configuration_id: str | None = None
+    stripe_portal_team_configuration_id: str | None = None
+    stripe_live_mode: bool = False
     openai_api_key: SecretStr | None = None
     openai_base_url: str | None = None
     trade_suggestions_enabled: bool = False
@@ -1060,6 +1069,16 @@ class Settings(BaseSettings):
         if not normalized or any(ord(char) < 32 for char in normalized):
             raise ValueError("AUTH_MFA_ISSUER must be a nonempty display name")
         return normalized
+
+    @model_validator(mode="after")
+    def validate_billing_settings(self) -> Self:
+        if self.billing_enabled and self.auth_mode not in {"session", "mixed"}:
+            raise ValueError("Billing requires first-party session authentication")
+        if self.billing_enabled and self.auth_public_web_base_url.startswith("http:") and self.app_env in {
+            AppEnvironment.STAGING, AppEnvironment.PRODUCTION,
+        }:
+            raise ValueError("Billing return URLs require HTTPS outside local development")
+        return self
 
     @model_validator(mode="after")
     def validate_mfa_settings(self) -> Self:

@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import Settings
+from app.modules.billing.jobs import handle_billing_job
 from app.modules.equity_data.jobs import handle_equity_data_operation_job
 from app.modules.job_queue.dispatcher import JobQueueDispatcher
 from app.modules.job_queue.models import JobQueueJobType
@@ -102,6 +103,7 @@ class JobQueueWorkerRuntime:
                     JobQueueJobType.TRADE_AGENT_SUGGEST.value,
                     handle_trade_suggestion_job,
                 )
+                dispatcher.register_handler(JobQueueJobType.BILLING_RECONCILE.value, handle_billing_job)
                 await dispatcher.dispatch_job(job_id, self.worker_id)
 
         await asyncio.gather(*(run_one(job_id) for job_id in job_ids))

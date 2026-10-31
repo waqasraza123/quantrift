@@ -165,6 +165,25 @@ services:
       postgres:
         condition: service_healthy
 
+  billing-worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    profiles:
+      - workers
+    env_file:
+      - path: apps/api/.env.example
+      - path: apps/api/.env
+        required: false
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql://trading:trading@postgres:5432/trading_intelligence
+      REDIS_URL: redis://redis:6379/0
+    command: ["python", "-m", "app.workers.job_queue_worker", "--queue", "billing", "--concurrency", "2"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   go-market-worker:
     build:
       context: .

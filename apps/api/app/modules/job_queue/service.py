@@ -47,6 +47,11 @@ class JobQueueSeedResult:
 def default_job_queue_definitions() -> list[DefaultJobQueueDefinition]:
     return [
         DefaultJobQueueDefinition(
+            "billing_reconcile", "Stripe billing reconciliation",
+            "Synchronizes signed Stripe subscription events with workspace access.",
+            "billing", JobQueueJobType.BILLING_RECONCILE, timeout_seconds=60,
+        ),
+        DefaultJobQueueDefinition(
             "trade_agent_suggest", "AI trade suggestion",
             "Runs an explicitly requested paper setup through analyst and risk-review agents.",
             "trade_suggestions", JobQueueJobType.TRADE_AGENT_SUGGEST,

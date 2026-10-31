@@ -150,6 +150,7 @@ class AuthEmailVerificationToken(Base):
     )
 
     id = uuid_primary_key()
+    continuation_path: Mapped[str | None] = mapped_column(String(2048))
     credential_id: Mapped[UUID] = mapped_column(
         PostgresUUID(as_uuid=True),
         ForeignKey("auth_password_credentials.id", ondelete="CASCADE"),

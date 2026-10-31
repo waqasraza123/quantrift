@@ -129,6 +129,7 @@ class AuthApiKeyRead(ApiReadSchema):
 
 
 class AuthRegisterRequest(ApiSchema):
+    continuation_path: str | None = Field(default=None, max_length=2048)
     workspace_name: str = Field(min_length=1, max_length=120)
     name: str = Field(min_length=1, max_length=160)
     email: str = Field(min_length=3, max_length=320)
@@ -156,6 +157,7 @@ class AuthRegistrationRead(ApiSchema):
 
 
 class AuthEmailVerificationRead(ApiSchema):
+    continuation_path: str | None = None
     status: AuthEmailVerificationStatusRead
     email: str | None = None
     message: str

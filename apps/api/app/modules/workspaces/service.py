@@ -1,12 +1,13 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import AppError
 from app.modules.auth.identity import IdentityContext
 from app.modules.users.models import User
+from app.modules.memberships.models import WorkspaceMembership
 from app.modules.workspaces.models import Workspace
 from app.modules.workspaces.repository import WorkspaceRepository
 from app.modules.workspaces.schemas import (
@@ -23,10 +24,12 @@ class WorkspaceService:
         self.session = session
         self.repository = WorkspaceRepository(session)
 
-    async def create_workspace(self, payload: WorkspaceCreate) -> Workspace:
+    async def create_workspace(self, payload: WorkspaceCreate, identity: IdentityContext | None = None) -> Workspace:
         workspace = Workspace(**payload.model_dump(mode="python"))
         try:
             created_workspace = await self.repository.create(workspace)
+            if identity is not None and identity.user is not None:
+                self.session.add(WorkspaceMembership(workspace_id=created_workspace.id, user_id=identity.user.id, role="owner"))
             await self.session.commit()
         except IntegrityError as error:
             await self.session.rollback()
@@ -37,14 +40,26 @@ class WorkspaceService:
             ) from error
         return created_workspace
 
-    async def list_workspaces(self, limit: int, offset: int) -> list[Workspace]:
+    async def list_workspaces(self, limit: int, offset: int,
+                              identity: IdentityContext | None = None) -> list[Workspace]:
+        if identity is not None and identity.user is not None:
+            statement = select(Workspace).where(or_(Workspace.id == identity.user.workspace_id, Workspace.id.in_(
+                select(WorkspaceMembership.workspace_id).where(
+                    WorkspaceMembership.user_id == identity.user.id,
+                    WorkspaceMembership.removed_at.is_(None),
+                )
+            ))).order_by(Workspace.created_at, Workspace.id).limit(limit).offset(offset)
+            return list((await self.session.scalars(statement)).all())
+        if identity is not None and identity.workspace_id is not None:
+            workspace = await self.repository.get_by_id(identity.workspace_id)
+            return [workspace] if workspace else []
         return await self.repository.list(limit=limit, offset=offset)
 
     async def get_default_context(
         self,
         identity: IdentityContext | None,
     ) -> WorkspaceDefaultContextRead:
-        workspaces = await self.repository.list(limit=100, offset=0)
+        workspaces = await self.list_workspaces(limit=100, offset=0, identity=identity)
         workspace = identity.workspace if identity is not None and identity.workspace else None
         if workspace is None:
             workspace = workspaces[0] if workspaces else None
@@ -67,7 +82,7 @@ class WorkspaceService:
         return WorkspaceDefaultContextRead(
             status="ready",
             workspace=WorkspaceRead.model_validate(workspace),
-            user=WorkspaceDefaultUserRead(id=user.id, role=user.role, name=user.name)
+            user=WorkspaceDefaultUserRead(id=user.id, role=("admin" if identity.membership_role == "owner" else identity.membership_role or user.role) if identity else user.role, name=user.name)
             if user is not None
             else None,
             available_workspaces=[WorkspaceRead.model_validate(item) for item in workspaces],

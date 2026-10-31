@@ -1,4 +1,6 @@
 from app.db.base import Base
+from app.modules.billing.models import BillingAccount, BillingCheckout, BillingEvent, BillingRollout, BillingUsage
+from app.modules.memberships.models import WorkspaceMembership, WorkspaceInvitation
 from app.modules.action_plans.models import (
     ReasoningActionItem,
     ReasoningActionPlan,
@@ -221,6 +223,8 @@ from app.modules.workspaces.models import Workspace
 metadata = Base.metadata
 
 __all__ = [
+    "BillingAccount", "BillingCheckout", "BillingEvent", "BillingRollout", "BillingUsage",
+    "WorkspaceMembership", "WorkspaceInvitation",
     "AdvancedFeatureSnapshot",
     "AiIntelligenceClaim",
     "AiIntelligenceInsight",

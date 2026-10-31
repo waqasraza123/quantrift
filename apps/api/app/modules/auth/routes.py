@@ -87,6 +87,7 @@ async def register(
             settings=request.app.state.settings,
         ).register(
             workspace_name=payload.workspace_name,
+            continuation_path=payload.continuation_path,
             name=payload.name,
             email=payload.email,
             password=payload.password,
@@ -431,6 +432,8 @@ async def create_api_key(
     session: Annotated[AsyncSession, Depends(database_session)],
     identity: Annotated[IdentityContext | None, Depends(optional_identity)] = None,
 ) -> AuthApiKeyCreated:
+    if identity is not None and identity.workspace_id is not None:
+        payload.workspace_id = identity.workspace_id
     service = ApiKeyService(session=session, settings=request.app.state.settings)
     api_key, raw_key = await service.create(
         name=payload.name,
@@ -473,7 +476,10 @@ async def list_api_keys(
     request: Request,
     session: Annotated[AsyncSession, Depends(database_session)],
     workspace_id: Annotated[UUID | None, Query(alias="workspaceId")] = None,
+    identity: Annotated[IdentityContext | None, Depends(optional_identity)] = None,
 ) -> list[AuthApiKeyRead]:
+    if identity is not None and identity.workspace_id is not None:
+        workspace_id = identity.workspace_id
     api_keys = await ApiKeyService(session=session, settings=request.app.state.settings).list(
         workspace_id=workspace_id
     )
@@ -491,6 +497,10 @@ async def revoke_api_key(
     session: Annotated[AsyncSession, Depends(database_session)],
     identity: Annotated[IdentityContext | None, Depends(optional_identity)] = None,
 ) -> AuthApiKeyRead:
+    if identity is not None and identity.workspace_id is not None:
+        existing = await session.get(AuthApiKey, key_id)
+        if existing is None or existing.workspace_id != identity.workspace_id:
+            raise AppError(404, "api_key_not_found", "API key was not found in this workspace")
     service = ApiKeyService(session=session, settings=request.app.state.settings)
     api_key = await service.revoke(key_id)
     await record_auth_activity(
@@ -625,6 +635,7 @@ def verification_result_to_read(result: EmailVerificationResult) -> AuthEmailVer
         status=result.status,
         email=result.email,
         message=message,
+        continuation_path=result.continuation_path,
     )
 
 

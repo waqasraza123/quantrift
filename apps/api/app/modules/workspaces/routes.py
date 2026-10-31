@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.errors import AppError
 from app.core.pagination import PaginationParams
 from app.dependencies import database_session
 from app.modules.auth.dependencies import optional_identity
@@ -36,8 +37,9 @@ def get_workspace_service(
 async def create_workspace(
     payload: WorkspaceCreate,
     service: Annotated[WorkspaceService, Depends(get_workspace_service)],
+    identity: Annotated[IdentityContext | None, Depends(optional_identity)] = None,
 ) -> WorkspaceRead:
-    workspace = await service.create_workspace(payload)
+    workspace = await service.create_workspace(payload, identity)
     return WorkspaceRead.model_validate(workspace)
 
 
@@ -46,11 +48,13 @@ async def list_workspaces(
     service: Annotated[WorkspaceService, Depends(get_workspace_service)],
     limit: Annotated[int, Query(ge=1, le=500)] = 100,
     offset: Annotated[int, Query(ge=0)] = 0,
+    identity: Annotated[IdentityContext | None, Depends(optional_identity)] = None,
 ) -> list[WorkspaceRead]:
     pagination = PaginationParams(limit=limit, offset=offset)
     workspaces = await service.list_workspaces(
         limit=pagination.limit,
         offset=pagination.offset,
+        identity=identity,
     )
     return [WorkspaceRead.model_validate(workspace) for workspace in workspaces]
 
@@ -67,7 +71,10 @@ async def get_default_workspace_context(
 async def get_workspace(
     workspace_id: UUID,
     service: Annotated[WorkspaceService, Depends(get_workspace_service)],
+    identity: Annotated[IdentityContext | None, Depends(optional_identity)] = None,
 ) -> WorkspaceRead:
+    if identity is not None and not identity.can_access_workspace(workspace_id):
+        raise AppError(403, "workspace_access_denied", "Workspace access denied")
     workspace = await service.get_workspace(workspace_id)
     return WorkspaceRead.model_validate(workspace)
 

@@ -10,6 +10,9 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/api/",
         "/account",
+        "/billing",
+        "/team",
+        "/invite",
         "/brief",
         "/command-center",
         "/dashboard",

@@ -14,6 +14,8 @@ export type NavigationTarget =
   | "notifications"
   | "journal"
   | "review"
+  | "billing"
+  | "team"
   | "account"
   | "preferences";
 
@@ -42,6 +44,8 @@ export const navigationItems: NavigationItem[] = [
   { key: "review", href: "/review/outcomes", label: "Review Outcomes", shortLabel: "Outcomes", section: "Journal", description: "Observed outcome review queue" },
   { key: "setup", href: "/setup", label: "Setup", section: "Preferences", description: "Workspace setup wizard" },
   { key: "readiness", href: "/readiness", label: "Workspace health", section: "Preferences", description: "Check workspace and data readiness" },
+  { key: "billing", href: "/billing", label: "Plan & billing", section: "Preferences", description: "Subscription and shared AI allowance" },
+  { key: "team", href: "/team", label: "Team", section: "Preferences", description: "Members and workspace invitations" },
   { key: "account", href: "/account", label: "Account", section: "Preferences", description: "Identity and session management" },
   { key: "preferences", href: "/preferences/strategy", label: "Preferences", section: "Preferences", description: "Review filter profiles" },
 ];
@@ -56,7 +60,7 @@ export const primaryNavigationTargets: NavigationTarget[] = [
 
 export const secondaryNavigationTargets: NavigationTarget[] = [
   "brief", "tradeAgent", "review", "equityResearch", "notifications", "dataOnboarding",
-  "quality", "onboarding", "setup", "readiness", "preferences", "account",
+  "quality", "onboarding", "setup", "readiness", "preferences", "account", "billing", "team",
 ];
 
 export const navigationSections = Array.from(new Set(navigationItems.map((item) => item.section)));

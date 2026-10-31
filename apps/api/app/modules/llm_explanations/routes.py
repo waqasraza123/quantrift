@@ -5,12 +5,13 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import database_session
+from app.modules.billing.access import authorize_ai_artifact
 from app.modules.llm_explanations.schemas import LlmExplanationRead
 from app.modules.llm_explanations.service import LlmExplanationService
 from app.modules.permissions.dependencies import require_permission
 from app.modules.permissions.registry import Permission
 
-router = APIRouter(tags=["llm-explanations"])
+router = APIRouter(tags=["llm-explanations"], dependencies=[Depends(authorize_ai_artifact)])
 
 
 def get_llm_explanation_service(

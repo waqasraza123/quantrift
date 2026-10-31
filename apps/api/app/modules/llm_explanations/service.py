@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings, get_settings
+from app.modules.billing.usage import generation_credit
 from app.core.errors import AppError
 from app.modules.analysis.models import AnalysisAuditLog
 from app.modules.analysis.repository import AnalysisRepository
@@ -126,67 +127,72 @@ class LlmExplanationService:
                 await self.session.commit()
             return LlmExplanationRead.model_validate(persisted)
 
-        provider_result: LlmProviderResult | None = None
-        try:
-            resolved_provider = provider or build_provider(self.settings)
-            provider_result = await resolved_provider.generate_explanation(
-                LlmExplanationInput(
-                    prompt=prompt,
-                    input_json=input_payload.model_dump(mode="json"),
+        async with generation_credit(
+            self.session, self.settings, signal.workspace_id, uuid4(), "explanation",
+        ) as credit:
+            provider_result: LlmProviderResult | None = None
+            try:
+                resolved_provider = provider or build_provider(self.settings)
+                provider_result = await resolved_provider.generate_explanation(
+                    LlmExplanationInput(
+                        prompt=prompt,
+                        input_json=input_payload.model_dump(mode="json"),
+                    )
                 )
-            )
-            validation = self.validate_output(
-                input_payload=input_payload,
-                output_text=provider_result.output_text,
-                fallback_text=fallback_text,
-            )
-            error_message = None
-        except ProviderNotConfiguredError as exc:
-            validation = self._build_provider_failure_validation(fallback_text)
-            error_message = "provider_not_configured"
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_explanation_fallback_used",
-                "LLM explanation provider was not configured, using deterministic fallback",
-                {"signalId": str(signal.id), "reason": error_message},
-            )
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_explanation_failed",
-                "LLM explanation provider was not configured",
-                {"signalId": str(signal.id), "error": type(exc).__name__},
-            )
-        except LlmProviderError as exc:
-            validation = self._build_provider_failure_validation(fallback_text)
-            error_message = "provider_error"
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_explanation_fallback_used",
-                "LLM explanation provider failed, using deterministic fallback",
-                {"signalId": str(signal.id), "reason": error_message},
-            )
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_explanation_failed",
-                "LLM explanation provider failed",
-                {"signalId": str(signal.id), "error": type(exc).__name__},
-            )
+                validation = self.validate_output(
+                    input_payload=input_payload,
+                    output_text=provider_result.output_text,
+                    fallback_text=fallback_text,
+                )
+                error_message = None
+            except ProviderNotConfiguredError as exc:
+                validation = self._build_provider_failure_validation(fallback_text)
+                error_message = "provider_not_configured"
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_explanation_fallback_used",
+                    "LLM explanation provider was not configured, using deterministic fallback",
+                    {"signalId": str(signal.id), "reason": error_message},
+                )
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_explanation_failed",
+                    "LLM explanation provider was not configured",
+                    {"signalId": str(signal.id), "error": type(exc).__name__},
+                )
+            except LlmProviderError as exc:
+                validation = self._build_provider_failure_validation(fallback_text)
+                error_message = "provider_error"
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_explanation_fallback_used",
+                    "LLM explanation provider failed, using deterministic fallback",
+                    {"signalId": str(signal.id), "reason": error_message},
+                )
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_explanation_failed",
+                    "LLM explanation provider failed",
+                    {"signalId": str(signal.id), "error": type(exc).__name__},
+                )
 
-        persisted = await self.persist_result(
-            signal=signal,
-            input_payload=input_payload,
-            validation=validation,
-            tokens_input=provider_result.tokens_input if provider_result is not None else None,
-            tokens_output=provider_result.tokens_output if provider_result is not None else None,
-            estimated_cost=(
-                provider_result.estimated_cost if provider_result is not None else None
-            ),
-            error_message=error_message,
-        )
-        await self.emit_validation_audit(signal, validation)
-        if commit:
-            await self.session.commit()
-        return LlmExplanationRead.model_validate(persisted)
+            persisted = await self.persist_result(
+                signal=signal,
+                input_payload=input_payload,
+                validation=validation,
+                tokens_input=provider_result.tokens_input if provider_result is not None else None,
+                tokens_output=provider_result.tokens_output if provider_result is not None else None,
+                estimated_cost=(
+                    provider_result.estimated_cost if provider_result is not None else None
+                ),
+                error_message=error_message,
+            )
+            await self.emit_validation_audit(signal, validation)
+            if commit:
+                await self.session.commit()
+            credit.success = validation.safety_status == LlmExplanationSafetyStatus.PASSED
+            credit.defer_until_commit = not commit
+            return LlmExplanationRead.model_validate(persisted)
 
     async def get_for_signal(self, signal_id: UUID) -> LlmExplanationRead:
         signal = await self.load_signal(signal_id)

@@ -1,4 +1,5 @@
 import { getServerApiProxyEnv } from "@/config/serverEnv";
+import { getPublicEnv } from "@/config/env";
 import { cookies } from "next/headers";
 import { isTrustedMutationRequest, untrustedOriginResponse } from "../../auth/origin";
 
@@ -47,6 +48,7 @@ async function proxyRequest(request: Request, context: RouteContext): Promise<Re
       headers: await buildForwardHeaders(request.headers),
       body: body.byteLength > 0 ? body : undefined,
       cache: "no-store",
+      signal: AbortSignal.timeout(65_000),
     });
     return new Response(await response.arrayBuffer(), {
       status: response.status,
@@ -85,10 +87,6 @@ async function buildForwardHeaders(incomingHeaders: Headers): Promise<Headers> {
     }
   });
 
-  if (env.adminApiKey) {
-    headers.set(env.apiKeyHeaderName, env.adminApiKey);
-  }
-
   if (!headers.has("authorization")) {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get(env.authSessionCookieName)?.value;
@@ -97,6 +95,9 @@ async function buildForwardHeaders(incomingHeaders: Headers): Promise<Headers> {
     }
   }
 
+  if (!headers.has("authorization") && getPublicEnv().authMode === "dev" && env.adminApiKey) {
+    headers.set(env.apiKeyHeaderName, env.adminApiKey);
+  }
   return headers;
 }
 

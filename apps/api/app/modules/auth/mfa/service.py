@@ -263,7 +263,6 @@ class MfaService:
     async def revoke_sessions(self, credential: AuthPasswordCredential) -> None:
         await self.session.execute(update(AuthSession).where(
             AuthSession.user_id == credential.user_id,
-            AuthSession.workspace_id == credential.workspace_id,
             AuthSession.status == AuthSessionStatus.ACTIVE.value,
         ).values(status=AuthSessionStatus.REVOKED.value))
 

@@ -3,6 +3,8 @@ import { defaultAuthSessionCookieName } from "@/config/serverEnv";
 
 const publicPaths = new Set([
   "/",
+  "/pricing",
+  "/invite",
   "/login",
   "/register",
   "/verify-email",

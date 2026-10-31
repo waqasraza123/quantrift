@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings, get_settings
+from app.modules.billing.usage import generation_credit
 from app.core.errors import AppError
 from app.core.time import utc_now
 from app.modules.ai_intelligence.grounding import check_ai_intelligence_grounding
@@ -104,36 +105,40 @@ class AiIntelligenceService:
             timeout_seconds=self.settings.llm_provider_timeout_seconds,
             metadata={"promptVersion": PROMPT_VERSION, "analysisType": "ai_intelligence"},
         )
-        try:
-            adapter = self.adapter_registry.resolve(provider_key, model_name)
-            response = await adapter.generate_structured(request)
-            await self.parse_and_persist(run, response, snapshot)
-            await self.add_audit_log(
-                snapshot.analysis_run_id,
-                "ai_intelligence_completed",
-                "AI intelligence analysis completed",
-                {"aiIntelligenceRunId": str(run.id), "signalId": str(signal_id)},
-            )
-        except LlmProviderNotConfiguredError:
-            await self.persist_fallback(
-                run=run,
-                parsed=fallback_provider_not_configured(snapshot.artifact_refs),
-                status=AiIntelligenceRunStatus.PROVIDER_NOT_CONFIGURED,
-                safety_status=AiIntelligenceSafetyStatus.FALLBACK_USED,
-                grounding_status=AiIntelligenceGroundingStatus.NOT_CHECKED,
-                error_message="provider_not_configured",
-            )
-        except LlmAdapterError:
-            await self.persist_fallback(
-                run=run,
-                parsed=fallback_provider_error(snapshot.artifact_refs),
-                status=AiIntelligenceRunStatus.FALLBACK_USED,
-                safety_status=AiIntelligenceSafetyStatus.FALLBACK_USED,
-                grounding_status=AiIntelligenceGroundingStatus.NOT_CHECKED,
-                error_message="provider_error",
-            )
-        await self.session.commit()
-        return await self.response_for_run(run)
+        async with generation_credit(
+            self.session, self.settings, snapshot.workspace_id, run.id, "intelligence",
+        ) as credit:
+            try:
+                adapter = self.adapter_registry.resolve(provider_key, model_name)
+                response = await adapter.generate_structured(request)
+                await self.parse_and_persist(run, response, snapshot)
+                await self.add_audit_log(
+                    snapshot.analysis_run_id,
+                    "ai_intelligence_completed",
+                    "AI intelligence analysis completed",
+                    {"aiIntelligenceRunId": str(run.id), "signalId": str(signal_id)},
+                )
+            except LlmProviderNotConfiguredError:
+                await self.persist_fallback(
+                    run=run,
+                    parsed=fallback_provider_not_configured(snapshot.artifact_refs),
+                    status=AiIntelligenceRunStatus.PROVIDER_NOT_CONFIGURED,
+                    safety_status=AiIntelligenceSafetyStatus.FALLBACK_USED,
+                    grounding_status=AiIntelligenceGroundingStatus.NOT_CHECKED,
+                    error_message="provider_not_configured",
+                )
+            except LlmAdapterError:
+                await self.persist_fallback(
+                    run=run,
+                    parsed=fallback_provider_error(snapshot.artifact_refs),
+                    status=AiIntelligenceRunStatus.FALLBACK_USED,
+                    safety_status=AiIntelligenceSafetyStatus.FALLBACK_USED,
+                    grounding_status=AiIntelligenceGroundingStatus.NOT_CHECKED,
+                    error_message="provider_error",
+                )
+            await self.session.commit()
+            credit.success = run.status == AiIntelligenceRunStatus.COMPLETED.value
+            return await self.response_for_run(run)
 
     async def get_run(self, run_id: UUID) -> AiIntelligenceResponse:
         run = await self.repository.get_run(run_id)

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import database_session
+from app.modules.billing.access import authorize_ai_artifact
 from app.modules.permissions.dependencies import require_permission
 from app.modules.permissions.registry import Permission
 from app.modules.reasoning.schemas import (
@@ -14,7 +15,7 @@ from app.modules.reasoning.schemas import (
 )
 from app.modules.reasoning.service import ScenarioReasoningService
 
-router = APIRouter(tags=["reasoning"])
+router = APIRouter(tags=["reasoning"], dependencies=[Depends(authorize_ai_artifact)])
 
 
 def get_scenario_reasoning_service(

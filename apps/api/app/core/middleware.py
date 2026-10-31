@@ -144,7 +144,7 @@ class OperationsMiddleware(BaseHTTPMiddleware):
         prefix = self.settings.api_prefix
         if prefix and path.startswith(prefix):
             path = path[len(prefix) :] or "/"
-        return path == "/health" or path.startswith("/health/")
+        return path in {"/health", "/billing/webhook", "/billing/plans"} or path.startswith("/health/")
 
     def client_host(self, request: Request) -> str | None:
         if request.client is None:

@@ -30,6 +30,7 @@ class IdentityContext:
     api_key: AuthApiKey | None = None
     scopes: list[str] = field(default_factory=list)
     admin: bool = False
+    membership_role: str | None = None
 
     @property
     def workspace_id(self) -> UUID | None:
@@ -47,10 +48,11 @@ class IdentityContext:
             return frozenset(Permission)
         if self.user is None:
             return scoped_permissions(self.scopes)
-        return permissions_for_role(self.user.role)
+        role = self.membership_role or self.user.role
+        return permissions_for_role("admin" if role == "owner" else role)
 
     def can_access_workspace(self, workspace_id: UUID | None) -> bool:
-        if workspace_id is None or self.admin:
+        if workspace_id is None or (self.admin and self.user is None and self.workspace_id is None):
             return True
         current_workspace_id = self.workspace_id
         return current_workspace_id is not None and current_workspace_id == workspace_id
@@ -165,10 +167,11 @@ def identity_to_read(identity: IdentityContext | None) -> CurrentIdentityRead:
     if identity.user is not None:
         user = AuthUserRead(
             id=identity.user.id,
-            workspace_id=identity.user.workspace_id,
+            workspace_id=identity.workspace_id or identity.user.workspace_id,
             email=identity.user.email,
             name=identity.user.name,
-            role=UserRole(identity.user.role),
+            role=UserRole("admin" if identity.membership_role == "owner"
+                          else identity.membership_role or identity.user.role),
         )
     workspace = None
     if identity.workspace is not None:
@@ -205,3 +208,17 @@ def parse_uuid(value: str | None) -> UUID | None:
         return UUID(value.strip())
     except ValueError as error:
         raise AppError(401, "invalid_user_context", "User context is invalid") from error
+
+
+async def build_user_identity(
+    session: AsyncSession, settings: Settings, user: User, workspace: Workspace,
+    source: IdentitySource,
+) -> IdentityContext:
+    from app.modules.memberships.service import MembershipService
+
+    role = user.role
+    if settings.billing_enabled or user.workspace_id != workspace.id:
+        member = await MembershipService(session, settings).require_member(user.id, workspace.id)
+        role = member.role
+    return IdentityContext(source=source, user=user, workspace=workspace,
+                           membership_role=role, admin=role in {"owner", "admin"})

@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.core.errors import AppError
-from app.modules.auth.identity import IdentityContext
+from app.modules.auth.identity import IdentityContext, build_user_identity
 from app.modules.auth.mfa.models import AuthMfaFactor
 from app.modules.auth.mfa.schemas import AuthMfaChallengeRead
 from app.modules.auth.models import (
@@ -26,6 +26,8 @@ from app.modules.auth.models import (
 from app.modules.auth.schemas import IdentitySource
 from app.modules.auth.verification import EmailVerificationService, IssuedEmailVerification
 from app.modules.users.models import User, UserRole
+from app.modules.memberships.models import WorkspaceMembership
+from app.modules.billing.state import activate_billing
 from app.modules.workspaces.models import Workspace
 
 PASSWORD_HASH_ALGORITHM = "pbkdf2_sha256"
@@ -64,11 +66,14 @@ class PasswordAuthService:
         name: str,
         email: str,
         password: str,
+        continuation_path: str | None = None,
     ) -> RegisteredAccount:
         if not self.settings.auth_password_enabled:
             raise AppError(404, "password_auth_disabled", "Password authentication is disabled")
         if not self.settings.auth_password_signup_enabled:
             raise AppError(403, "signup_disabled", "Sign-up is disabled")
+        if self.settings.billing_enabled:
+            await activate_billing(self.session)
         normalized_email = normalize_email(email)
         normalized_name = normalize_required_text(name, "name")
         normalized_workspace_name = normalize_required_text(workspace_name, "workspace_name")
@@ -99,6 +104,7 @@ class PasswordAuthService:
             self.session.add(user)
             await self.session.flush()
             self.session.add(credential)
+            self.session.add(WorkspaceMembership(workspace_id=workspace_id, user_id=user_id, role="owner"))
             await self.session.flush()
             verification = await EmailVerificationService(
                 self.session,
@@ -108,6 +114,7 @@ class PasswordAuthService:
                 recipient_name=user.name,
                 enforce_cooldown=False,
                 commit=False,
+                continuation_path=continuation_path,
             )
             await self.session.commit()
         except IntegrityError as error:
@@ -182,11 +189,19 @@ class PasswordAuthService:
             return None
         user = await self.session.get(User, auth_session.user_id)
         workspace = await self.session.get(Workspace, auth_session.workspace_id)
-        if user is None or workspace is None or user.workspace_id != workspace.id:
+        if user is None or workspace is None:
             return None
+        try:
+            identity = await build_user_identity(self.session, self.settings, user, workspace, IdentitySource.SESSION)
+        except AppError:
+            workspace = await self.session.get(Workspace, user.workspace_id)
+            if workspace is None:
+                return None
+            auth_session.workspace_id = workspace.id
+            identity = await build_user_identity(self.session, self.settings, user, workspace, IdentitySource.SESSION)
         credential = await self.get_credential_by_user(
             user_id=auth_session.user_id,
-            workspace_id=auth_session.workspace_id,
+            workspace_id=user.workspace_id,
         )
         if credential is None or credential.email_verified_at is None or credential.status != AuthIdentityStatus.ACTIVE.value:
             auth_session.status = AuthSessionStatus.REVOKED.value
@@ -203,12 +218,7 @@ class PasswordAuthService:
                 return None
         auth_session.last_seen_at = now
         await self.session.commit()
-        return IdentityContext(
-            source=IdentitySource.SESSION,
-            user=user,
-            workspace=workspace,
-            admin=user.role == UserRole.ADMIN.value,
-        )
+        return identity
 
     async def revoke_session(self, token: str) -> None:
         token_hash = hash_session_token(token)
@@ -283,7 +293,6 @@ class PasswordAuthService:
             select(AuthSession)
             .where(
                 AuthSession.user_id == user_id,
-                AuthSession.workspace_id == workspace_id,
             )
             .order_by(AuthSession.created_at.desc())
             .limit(limit)
@@ -302,7 +311,6 @@ class PasswordAuthService:
             select(AuthSession).where(
                 AuthSession.id == session_id,
                 AuthSession.user_id == user_id,
-                AuthSession.workspace_id == workspace_id,
             )
         )
         auth_session = result.scalar_one_or_none()
@@ -342,7 +350,6 @@ class PasswordAuthService:
         result = await self.session.execute(
             select(AuthSession).where(
                 AuthSession.user_id == user_id,
-                AuthSession.workspace_id == workspace_id,
                 AuthSession.status == AuthSessionStatus.ACTIVE.value,
             )
         )
@@ -375,11 +382,8 @@ class PasswordAuthService:
         return CreatedSession(
             token=token,
             expires_at=expires_at,
-            identity=IdentityContext(
-                source=IdentitySource.SESSION,
-                user=user,
-                workspace=workspace,
-                admin=user.role == UserRole.ADMIN.value,
+            identity=await build_user_identity(
+                self.session, self.settings, user, workspace, IdentitySource.SESSION,
             ),
         )
 
@@ -426,7 +430,6 @@ class PasswordAuthService:
         result = await self.session.execute(
             select(AuthSession).where(
                 AuthSession.user_id == user_id,
-                AuthSession.workspace_id == workspace_id,
                 AuthSession.status == AuthSessionStatus.ACTIVE.value,
                 AuthSession.expires_at <= now,
             )

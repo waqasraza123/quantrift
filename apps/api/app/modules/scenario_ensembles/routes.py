@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import database_session
+from app.modules.billing.access import authorize_ai_artifact
 from app.modules.permissions.dependencies import require_permission
 from app.modules.permissions.registry import Permission
 from app.modules.scenario_ensembles.schemas import (
@@ -16,7 +17,7 @@ from app.modules.scenario_ensembles.schemas import (
 )
 from app.modules.scenario_ensembles.service import ScenarioEnsembleService
 
-router = APIRouter(tags=["scenario-ensembles"])
+router = APIRouter(tags=["scenario-ensembles"], dependencies=[Depends(authorize_ai_artifact)])
 
 
 def get_scenario_ensemble_service(

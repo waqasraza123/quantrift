@@ -2,7 +2,7 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import Settings, get_settings
@@ -18,6 +18,9 @@ from app.modules.artifact_graph.routes import router as artifact_graph_router
 from app.modules.audit_timeline.routes import router as audit_timeline_router
 from app.modules.auth.email import create_verification_email_provider
 from app.modules.auth.routes import router as auth_router
+from app.modules.billing.routes import router as billing_router
+from app.modules.memberships.routes import router as memberships_router
+from app.modules.memberships.scope import workspace_scope
 from app.modules.backfill_plans.routes import router as backfill_plans_router
 from app.modules.backtest_experiments.routes import router as backtest_experiments_router
 from app.modules.candle_gap_recovery.routes import router as candle_gap_recovery_router
@@ -116,6 +119,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         "app_startup",
         extra={"app_env": settings.app_env.value, "service": settings.service_name},
     )
+    if settings.billing_enabled:
+        from app.db.session import get_async_session_factory
+        from app.modules.billing.state import activate_billing
+
+        factory = get_async_session_factory()
+        if factory is None:
+            raise RuntimeError("DATABASE_URL is required when billing is enabled")
+        async with factory() as session:
+            await activate_billing(session)
+            await session.commit()
     yield
     app.state.logger.info(
         "app_shutdown",
@@ -130,6 +143,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title=resolved_settings.service_title,
         version=resolved_settings.service_version,
         lifespan=lifespan,
+        dependencies=[Depends(workspace_scope)],
     )
     app.state.settings = resolved_settings
     app.state.logger = logging.getLogger(resolved_settings.service_name)
@@ -153,6 +167,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         health_router,
         observability_router,
         auth_router,
+        billing_router,
+        memberships_router,
         workspaces_router,
         workspace_overview_router,
         workspace_actions_router,

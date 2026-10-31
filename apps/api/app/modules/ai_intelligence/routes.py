@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import database_session
+from app.modules.billing.access import authorize_ai_artifact
 from app.modules.ai_intelligence.schemas import (
     AiIntelligenceRequest,
     AiIntelligenceResponse,
@@ -14,7 +15,7 @@ from app.modules.ai_intelligence.service import AiIntelligenceService
 from app.modules.permissions.dependencies import require_permission
 from app.modules.permissions.registry import Permission
 
-router = APIRouter(prefix="/ai-intelligence", tags=["ai-intelligence"])
+router = APIRouter(prefix="/ai-intelligence", tags=["ai-intelligence"], dependencies=[Depends(authorize_ai_artifact)])
 
 
 def get_ai_intelligence_service(

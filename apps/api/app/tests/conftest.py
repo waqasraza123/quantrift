@@ -36,6 +36,13 @@ from app.modules.workspaces.models import Workspace
 
 TEST_DATABASE_SKIP_REASON = "DB integration tests require TEST_DATABASE_URL"
 APP_TABLES = (
+    "billing_usage",
+    "billing_events",
+    "billing_checkouts",
+    "billing_accounts",
+    "billing_rollouts",
+    "workspace_invitations",
+    "workspace_memberships",
     "trade_suggestion_runs",
     "equity_data_operations",
     "equity_data_import_errors",

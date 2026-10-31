@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import Settings, secret_is_empty
 from app.core.errors import AppError
 from app.core.time import utc_now
+from app.modules.billing.usage import reserve_credit, finish_credit, require_reservation
 from app.modules.job_queue.models import JobQueueItem, JobQueueJobType
 from app.modules.job_queue.schemas import JobQueueJobCreate
 from app.modules.job_queue.service import JobQueueService
@@ -101,8 +102,11 @@ class SuggestionService:
             signal.workspace_id, utc_now() - timedelta(hours=1)
         ) >= self.settings.trade_suggestions_hourly_limit:
             raise AppError(429, "trade_suggestions_rate_limited", "Hourly AI suggestion limit reached.")
+        run_id = uuid4()
+        if blocked is None:
+            await reserve_credit(self.session, self.settings, signal.workspace_id, run_id, "setup_review")
         run = TradeSuggestionRun(
-            id=uuid4(), workspace_id=signal.workspace_id, signal_id=signal.id,
+            id=run_id, workspace_id=signal.workspace_id, signal_id=signal.id,
             request_id=payload.request_id, status="blocked" if blocked else "queued",
             stage="blocked" if blocked else "queued", fingerprint=fingerprint,
             model=self.settings.trade_suggestions_model, prompt_version=PROMPT_VERSION,
@@ -149,6 +153,7 @@ class SuggestionService:
                     job.id, run.error_code, run.error_message, commit=False,
                 )
             await self.session.flush()
+            await finish_credit(self.session, self.settings, run.id, success=False)
 
     async def read(self, run: TradeSuggestionRun) -> SuggestionRead:
         await self.reconcile(run)
@@ -185,6 +190,7 @@ class SuggestionService:
                 run.error_message = "The previous worker was interrupted. Request a new run."
                 run.completed_at = utc_now()
             await self.session.commit()
+            await finish_credit(self.session, self.settings, run.id, success=run.status == "completed")
             return run
         run.status, run.stage, run.started_at = "running", "context", utc_now()
         await self.session.commit()
@@ -192,6 +198,7 @@ class SuggestionService:
         agents = None
         cancelled = False
         try:
+            await require_reservation(self.session, self.settings, run.workspace_id, run.id)
             if not self.availability().enabled:
                 raise AppError(503, "trade_suggestions_unavailable", "AI suggestions are unavailable.")
             if run.created_at + timedelta(
@@ -255,7 +262,12 @@ class SuggestionService:
                 "latency_ms": round((time.perf_counter() - started) * 1000),
             }
             run.completed_at = utc_now()
-            await self.session.commit()
+            completed = False
+            try:
+                await self.session.commit()
+                completed = run.status == "completed"
+            finally:
+                await finish_credit(self.session, self.settings, run.id, success=completed)
         if cancelled:
             raise asyncio.CancelledError
         return run

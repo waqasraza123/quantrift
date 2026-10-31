@@ -153,6 +153,17 @@ For production:
 
 Use the [deployment guide](docs/deployment.md) and [API README](apps/api/README.md) for the full configuration.
 
+## Pricing and subscriptions
+
+QuantRift includes Free, Pro ($29 USD/month, 100 AI credits), and Team ($79 USD/month,
+500 shared credits and five members). Core research tools and saved results remain on Free.
+Team supports invitations and switching between shared and personal workspaces.
+
+Stripe subscriptions are opt-in and default off. The implementation includes hosted checkout,
+customer billing management, signed webhook reconciliation, and enforced AI usage accounting.
+Existing workspaces receive a one-time 30-day Pro transition when billing is activated.
+See the [billing setup and validation handoff](docs/billing.md) before enabling payments.
+
 ## Research boundaries
 
 QuantRift provides market context and conditional paper setups for human review. It does not provide a broker, autonomous execution, leverage or account-sizing instructions, or guaranteed outcomes. Data quality checks and agent reviews do not establish prediction accuracy.

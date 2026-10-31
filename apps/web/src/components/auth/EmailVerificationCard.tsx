@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { ProductIcon } from "@/components/ui/ProductIcon";
 import { resendVerificationEmail, verifyEmailToken } from "@/lib/api/auth";
+import { authModeHref } from "@/lib/auth/redirects";
 import { AuthField } from "./AuthField";
 import styles from "./auth.module.css";
 
@@ -15,6 +16,7 @@ export function EmailVerificationCard({ token }: { token?: string }) {
   const [view, setView] = useState<VerificationView>(token ? "verifying" : "invalid");
   const [message, setMessage] = useState(token ? "Confirming your email address…" : "This verification link is missing its token.");
   const [email, setEmail] = useState("");
+  const [continuationPath, setContinuationPath] = useState<string | undefined>();
   const [resending, setResending] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
 
@@ -29,6 +31,7 @@ export function EmailVerificationCard({ token }: { token?: string }) {
       if (result.ok && result.verification) {
         setView(result.verification.status === "already_verified" ? "already_verified" : "verified");
         setMessage(result.verification.message);
+        setContinuationPath(result.verification.continuationPath || undefined);
       } else {
         setView(result.code === "verification_token_expired" ? "expired" : result.code === "invalid_verification_token" ? "invalid" : "error");
         setMessage(result.message || "We couldn’t verify this email address. Try requesting a new link.");
@@ -55,7 +58,7 @@ export function EmailVerificationCard({ token }: { token?: string }) {
       <span className={styles.cardIcon}>{view === "verifying" ? <span className={styles.spinner} /> : <ProductIcon name={successful ? "check" : "shield"} />}</span>
       <h2 id="verification-title">{title}</h2>
       <p className={styles.intro} role="status">{message}</p>
-      {successful ? <Link href="/login" className={styles.submit}>Continue to sign in <ProductIcon name="arrow" /></Link> : view !== "verifying" && (
+      {successful ? <Link href={authModeHref("login", continuationPath)} className={styles.submit}>Continue to sign in <ProductIcon name="arrow" /></Link> : view !== "verifying" && (
         <form className={styles.form} onSubmit={(event) => void resend(event)} aria-busy={resending}>
           <AuthField label="Account email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" maxLength={320} required disabled={resending} />
           <button className={styles.submit} type="submit" disabled={resending}>{resending ? "Sending…" : "Send a new link"}</button>

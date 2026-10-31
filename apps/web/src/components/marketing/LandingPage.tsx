@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { PricingSection } from "@/components/billing/PricingSection";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProductIcon, type ProductIconName } from "@/components/ui/ProductIcon";
 import { getProductConfig } from "@/config/product";
@@ -28,7 +30,7 @@ export function LandingPage() {
       <header className="marketing-nav">
         <div className="marketing-container marketing-nav-inner">
           <Link href="/" className="marketing-brand" aria-label={`${product.name} home`}><BrandMark className="h-8 w-8" />{product.name}</Link>
-          <nav aria-label="Homepage navigation" className="marketing-links"><a href="#features">Top features</a><a href="#ai-research">AI trade ideas</a><a href="#questions">Questions</a></nav>
+          <nav aria-label="Homepage navigation" className="marketing-links"><a href="#features">Top features</a><Link href="/pricing">Pricing</Link><a href="#ai-research">AI trade ideas</a><a href="#questions">Questions</a></nav>
           <div className="marketing-nav-actions"><Link href="/login" className="marketing-signin">Sign in</Link><Link href="/register" className="marketing-button marketing-button-small">Get started<ProductIcon name="arrow" className="h-3.5 w-3.5" /></Link></div>
         </div>
       </header>
@@ -65,6 +67,8 @@ export function LandingPage() {
         <div className="marketing-journal-preview"><div className="marketing-journal-top"><ProductIcon name="journal" className="h-5 w-5" /><span>Research journal</span><span className="marketing-journal-tag">Sample note</span></div><div className="marketing-journal-entry"><span className="marketing-eyebrow">BTC / USD · 1h</span><h3>A good reason to wait.</h3><p>The setup looked promising, but the next candle did not confirm support. Kept the idea on watch and recorded what would change my view.</p><div><span>Observation saved</span><ProductIcon name="check" className="h-4 w-4" /></div></div><div className="marketing-journal-lines"><span /><span /><span /></div></div>
         <div><p className="marketing-eyebrow">Your journal & outcome review</p><h2>Record your reasoning.<br />Learn from each setup.</h2><p className="marketing-body-copy">Save why you considered a setup, what made you wait, and how it developed. Review your notes, paper plans, and observed outcomes together before your next research session.</p><Link href="/register" className="marketing-text-link">Start your research journal<ProductIcon name="arrow" className="h-4 w-4" /></Link></div>
       </section>
+
+      <Suspense fallback={<section className="marketing-section marketing-container" id="pricing"><p role="status">Loading plans…</p></section>}><PricingSection /></Suspense>
 
       <section className="marketing-section marketing-container marketing-faq" id="questions"><div><p className="marketing-eyebrow">Your questions answered</p><h2>Get to know<br />your workspace.</h2><a href="#features" className="marketing-text-link">Explore the features ↑</a></div><div>{questions.map((item) => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</div></section>
 

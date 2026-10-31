@@ -44,7 +44,7 @@ export function AuthCard({ mode, nextPath }: { mode: "login" | "register"; nextP
     if (Object.keys(errors).length) return;
     setBusy(true);
     const result = signup
-      ? await registerWithPassword({ name: name.trim(), workspaceName: workspaceName.trim(), email: email.trim(), password })
+      ? await registerWithPassword({ continuationPath: safeAuthDestination(nextPath), name: name.trim(), workspaceName: workspaceName.trim(), email: email.trim(), password })
       : await loginWithPassword(email.trim(), password);
     if (!result.ok) {
       setBusy(false);

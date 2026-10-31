@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.billing.usage import release_uncommitted_credits
 from app.modules.job_queue.models import JobQueueItem
 from app.modules.job_queue.service import JobQueueService
 
@@ -33,6 +34,12 @@ class JobQueueDispatcher:
         self.handlers[job_type] = handler
 
     async def dispatch_job(self, job_id: UUID, worker_id: str) -> JobQueueItem:
+        try:
+            return await self.dispatch_leased_job(job_id, worker_id)
+        finally:
+            await release_uncommitted_credits(self.session)
+
+    async def dispatch_leased_job(self, job_id: UUID, worker_id: str) -> JobQueueItem:
         job = await self.service.start_job(job_id, worker_id=worker_id, commit=False)
         handler = self.handlers.get(job.job_type)
         if handler is None:

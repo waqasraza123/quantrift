@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { switchWorkspace } from "@/lib/api/billing";
+import { getPublicEnv } from "@/config/env";
 import { listWorkspaces } from "@/lib/api/market";
 import type { Workspace } from "@/lib/api/types";
 import { readSelectedWorkspaceId, resolveSelectedWorkspace, workspaceScopedHref, writeSelectedWorkspaceId } from "@/lib/workspace/selectedWorkspace";
@@ -15,6 +17,8 @@ export function WorkspaceSelector({ workspaceId, workspaceName }: {
   const selectId = useId();
   const [workspaces, setWorkspaces] = useState<Workspace[]>(workspaceId && workspaceName ? [{ id: workspaceId, name: workspaceName, created_at: "", updated_at: "" }] : []);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [switching, setSwitching] = useState(false);
   useEffect(() => {
     let active = true;
     void listWorkspaces().then((result) => {
@@ -28,7 +32,14 @@ export function WorkspaceSelector({ workspaceId, workspaceName }: {
   const storedId = typeof window === "undefined" ? null : readSelectedWorkspaceId();
   const selected = useMemo(() => resolveSelectedWorkspace(workspaces, workspaceId || searchParams.get("workspaceId"), storedId), [workspaces, workspaceId, searchParams, storedId]);
 
-  function selectWorkspace(nextWorkspaceId: string) {
+  async function selectWorkspace(nextWorkspaceId: string) {
+    if (switching) return;
+    setSwitching(true);
+    setError("");
+    if (getPublicEnv().authMode === "session") {
+      const result = await switchWorkspace(nextWorkspaceId);
+      if (!result.ok) { setError(result.error.message); setSwitching(false); return; }
+    }
     writeSelectedWorkspaceId(nextWorkspaceId || null);
     const params = new URLSearchParams(searchParams.toString());
     if (nextWorkspaceId) params.set("workspaceId", nextWorkspaceId);
@@ -41,10 +52,11 @@ export function WorkspaceSelector({ workspaceId, workspaceName }: {
   return (
     <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2.5">
       <label htmlFor={selectId} className="block text-[9px] font-medium uppercase tracking-[0.12em] text-[var(--muted)]">Workspace</label>
-      <select id={selectId} value={selected?.id || ""} onChange={(event) => selectWorkspace(event.target.value)} disabled={loading && !workspaces.length} className="mt-1.5 block min-h-7 w-full min-w-0 bg-transparent text-xs font-semibold text-[var(--strong)]">
+      <select id={selectId} value={selected?.id || ""} onChange={(event) => void selectWorkspace(event.target.value)} disabled={switching || (loading && !workspaces.length)} className="mt-1.5 block min-h-7 w-full min-w-0 bg-transparent text-xs font-semibold text-[var(--strong)]">
         {!workspaces.length && <option value="">Loading workspace…</option>}
         {workspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
       </select>
+      {error && <p role="alert" className="mt-2 text-xs text-[var(--danger)]">{error}</p>}
     </div>
   );
 }

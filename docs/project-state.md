@@ -16,6 +16,24 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
+- Optional Stripe workspace subscriptions are implemented under `billing`, with public `/pricing`,
+  `/billing`, `/team`, and `/invite` screens. Free retains core research; Pro is $29 USD/month with
+  100 AI credits, Team $79 with 500 shared credits and five seats. Billing defaults off. A persisted
+  activation cutoff grants older workspaces a one-time 30-day Pro transition; new workspaces are Free.
+  Server-owned catalog, hosted checkout/portal, signed durable webhook receipts, a `billing` queue,
+  reconciliation, and atomic generation reservations control paid access. Paired reviews consume
+  one credit, ensembles one per generated constituent; saved reads/cached results remain free.
+  Stripe retains one shared product; three portal configurations provide management and one target
+  price per subscriber plan, preserving scheduled downgrades without duplicate monthly intervals.
+  Setup prints two price IDs and three portal IDs; all are required. Sandbox flow validation remains.
+- Workspace memberships retain home credentials and add shared access with owner/admin/analyst/user
+  roles. Session switching validates membership; ORM research queries and API keys stay scoped.
+  Password/session/MFA recovery is account-wide. Seven-day hashed invitations reserve Team seats;
+  non-owners are suspended after a downgrade without deleting data. Migration:
+  `202611010900_workspace_billing`. Stripe catalog/account setup and validation are owner-operated;
+  no tests, builds, lint, type checks, migrations, browser checks, or live Stripe calls were run.
+  Handoff: `docs/billing.md`.
+
 - Public and account pages share white backgrounds, black/charcoal text, and army-green
   (`#4b5320`) accents through `--brand-*` tokens in `apps/web/app/globals.css`, regardless of
   system theme. Product pages retain adaptive light/dark colors with white light surfaces and

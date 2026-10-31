@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { pricingCatalog } from "../fixtures/billingFixtures.mjs";
 
 const port = Number(process.env.E2E_MOCK_API_PORT || 4010);
 const demoWorkspaceId = "11111111-1111-4111-8111-111111111111";
@@ -62,6 +63,10 @@ async function handleRequest(request, response) {
     const body = await readJsonBody(request);
     scenario = typeof body.scenario === "string" ? body.scenario : "ready-overview";
     sendJson(response, 200, { scenario });
+    return;
+  }
+  if (request.method === "GET" && url.pathname === "/billing/plans") {
+    sendJson(response, 200, pricingCatalog);
     return;
   }
   if (request.method === "GET" && url.pathname === "/health") {

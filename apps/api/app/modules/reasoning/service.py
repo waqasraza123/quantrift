@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings, get_settings
+from app.modules.billing.usage import generation_credit
 from app.core.errors import AppError
 from app.modules.analysis.models import AnalysisAuditLog
 from app.modules.analysis.repository import AnalysisRepository
@@ -168,54 +169,58 @@ class ScenarioReasoningService:
                 "reasoningType": ReasoningType.NEXT_SCENARIOS.value,
             },
         )
-        try:
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_reasoning_provider_started",
-                "LLM scenario reasoning provider call started",
-                {"signalId": str(signal.id), "provider": provider_key, "model": model_name},
-            )
-            adapter = self.adapter_registry.resolve(provider_key, model_name)
-            adapter_response = await adapter.generate_structured(adapter_request)
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_reasoning_provider_completed",
-                "LLM scenario reasoning provider call completed",
-                {"signalId": str(signal.id), "provider": provider_key, "model": model_name},
-            )
-            await self.parse_and_persist_scenarios(run, adapter_response, input_snapshot)
-        except LlmProviderNotConfiguredError as exc:
-            await self.persist_fallback(
-                run=run,
-                parsed=fallback_provider_not_configured(),
-                status=ReasoningRunStatus.PROVIDER_NOT_CONFIGURED,
-                safety_status=ReasoningSafetyStatus.FALLBACK_USED,
-                grounding_status=ReasoningGroundingStatus.NOT_CHECKED,
-                error_message="provider_not_configured",
-            )
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_reasoning_failed",
-                "LLM scenario reasoning provider was not configured",
-                {"signalId": str(signal.id), "error": type(exc).__name__},
-            )
-        except LlmAdapterError as exc:
-            await self.persist_fallback(
-                run=run,
-                parsed=fallback_provider_error(),
-                status=ReasoningRunStatus.FALLBACK_USED,
-                safety_status=ReasoningSafetyStatus.FAILED,
-                grounding_status=ReasoningGroundingStatus.NOT_CHECKED,
-                error_message="provider_error",
-            )
-            await self.add_audit_log(
-                signal.analysis_run_id,
-                "llm_reasoning_failed",
-                "LLM scenario reasoning provider failed",
-                {"signalId": str(signal.id), "error": type(exc).__name__},
-            )
-        await self.session.commit()
-        return await self.response_for_run(run)
+        async with generation_credit(
+            self.session, self.settings, signal.workspace_id, run.id, "reasoning",
+        ) as credit:
+            try:
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_reasoning_provider_started",
+                    "LLM scenario reasoning provider call started",
+                    {"signalId": str(signal.id), "provider": provider_key, "model": model_name},
+                )
+                adapter = self.adapter_registry.resolve(provider_key, model_name)
+                adapter_response = await adapter.generate_structured(adapter_request)
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_reasoning_provider_completed",
+                    "LLM scenario reasoning provider call completed",
+                    {"signalId": str(signal.id), "provider": provider_key, "model": model_name},
+                )
+                await self.parse_and_persist_scenarios(run, adapter_response, input_snapshot)
+            except LlmProviderNotConfiguredError as exc:
+                await self.persist_fallback(
+                    run=run,
+                    parsed=fallback_provider_not_configured(),
+                    status=ReasoningRunStatus.PROVIDER_NOT_CONFIGURED,
+                    safety_status=ReasoningSafetyStatus.FALLBACK_USED,
+                    grounding_status=ReasoningGroundingStatus.NOT_CHECKED,
+                    error_message="provider_not_configured",
+                )
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_reasoning_failed",
+                    "LLM scenario reasoning provider was not configured",
+                    {"signalId": str(signal.id), "error": type(exc).__name__},
+                )
+            except LlmAdapterError as exc:
+                await self.persist_fallback(
+                    run=run,
+                    parsed=fallback_provider_error(),
+                    status=ReasoningRunStatus.FALLBACK_USED,
+                    safety_status=ReasoningSafetyStatus.FAILED,
+                    grounding_status=ReasoningGroundingStatus.NOT_CHECKED,
+                    error_message="provider_error",
+                )
+                await self.add_audit_log(
+                    signal.analysis_run_id,
+                    "llm_reasoning_failed",
+                    "LLM scenario reasoning provider failed",
+                    {"signalId": str(signal.id), "error": type(exc).__name__},
+                )
+            await self.session.commit()
+            credit.success = run.status == ReasoningRunStatus.COMPLETED.value
+            return await self.response_for_run(run)
 
     async def get_reasoning_run(self, reasoning_run_id: UUID) -> ScenarioReasoningResponse:
         run = await self.reasoning_repository.get_run(reasoning_run_id)

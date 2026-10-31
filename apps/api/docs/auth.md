@@ -197,3 +197,19 @@ The current identity resolves to a user, workspace, provider subject, API key, s
 ## Safety Boundary
 
 This auth layer only protects market-intelligence APIs. It does not add broker execution, copy trading, auto-trading, external signal delivery, or financial-advice behavior.
+
+
+## Workspace memberships and billing
+
+Migration `202611010900_workspace_billing` adds explicit workspace memberships and ownership.
+The credential's original workspace remains the home workspace; joining Team does not duplicate
+credentials or move data. `POST /auth/workspace` selects a validated membership for the current
+session, while password changes, session revocation, and MFA recovery remain account-wide.
+Membership roles determine permissions in the active workspace. Workspace administrators cannot
+access other tenants or create global API keys. ORM research reads and explicit workspace request
+contexts are scoped to the active authenticated workspace.
+
+Registration accepts a validated local `continuationPath`, persisted with verification tokens and
+returned after verification, so a pricing selection or invitation can survive email and MFA flows.
+Billing ownership, Team seat suspension, and Stripe activation are described in
+[`docs/billing.md`](../../../docs/billing.md). Billing remains off by default.

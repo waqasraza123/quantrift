@@ -33,6 +33,7 @@ export type AuthSession = {
 };
 
 export type AuthVerificationResult = {
+  continuationPath?: string | null;
   status: "verification_pending" | "verified" | "already_verified" | "sent" | "accepted";
   email?: string;
   expiresAt?: string;
@@ -59,12 +60,14 @@ export async function loginWithPassword(email: string, password: string): Promis
 
 export async function registerWithPassword(payload: {
   workspaceName: string;
+  continuationPath?: string;
   name: string;
   email: string;
   password: string;
 }): Promise<AuthFormResult> {
   return submitVerificationForm("/api/auth/register", {
     workspace_name: payload.workspaceName,
+    continuation_path: payload.continuationPath || "/command-center",
     name: payload.name,
     email: payload.email,
     password: payload.password,
@@ -167,7 +170,7 @@ function isAuthVerificationResult(value: unknown): value is AuthVerificationResu
   if (!isRecord(value)) {
     return false;
   }
-  return typeof value.status === "string" && typeof value.message === "string";
+  return typeof value.status === "string" && typeof value.message === "string" && (value.continuationPath === undefined || value.continuationPath === null || typeof value.continuationPath === "string");
 }
 
 function extractCode(payload: unknown): string | undefined {
