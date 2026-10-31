@@ -3,7 +3,7 @@
   --marketing-muted: var(--brand-muted);
   --marketing-line: var(--brand-border);
   min-height: 100dvh;
-  color-scheme: dark;
+  color-scheme: light;
   overflow: clip;
   background: var(--brand-background);
   color: var(--marketing-ink);
@@ -85,13 +85,13 @@
 .marketing-eyebrow { display: block; margin: 0 0 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .13em; color: var(--brand-secondary); }
 .marketing-page h2 { margin: 0; font-size: clamp(30px, 3.3vw, 44px); font-weight: 500; line-height: 1.16; letter-spacing: -.05em; }
 .marketing-section-heading > p { max-width: 350px; justify-self: end; margin: 0; color: var(--marketing-muted); font-size: 14px; line-height: 1.9; }
-.marketing-workflow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 54px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--marketing-line); }
-.marketing-workflow li { padding: 27px 25px 0 0; }
-.marketing-workflow li + li { padding-left: 25px; border-left: 1px solid var(--marketing-line); }
+.marketing-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 0; margin: 54px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--marketing-line); }
+.marketing-features li { padding: 27px 25px 0; border-left: 1px solid var(--marketing-line); }
+.marketing-features li:nth-child(3n + 1) { padding-left: 0; border-left: 0; }
 .marketing-step-top { display: flex; align-items: center; justify-content: space-between; color: var(--brand-accent); }
 .marketing-step-top > span { font-family: ui-monospace, monospace; color: var(--brand-muted); font-size: 11px; }
-.marketing-workflow h3 { margin: 27px 0 12px; font-size: 16px; font-weight: 550; letter-spacing: -.03em; }
-.marketing-workflow li > p { margin: 0; color: var(--marketing-muted); font-size: 12px; line-height: 1.9; }
+.marketing-features h3 { margin: 27px 0 12px; font-size: 16px; font-weight: 550; letter-spacing: -.03em; }
+.marketing-features li > p { margin: 0; color: var(--marketing-muted); font-size: 12px; line-height: 1.9; }
 .marketing-research { background: var(--brand-surface-muted); border-block: 1px solid var(--brand-border); }
 .marketing-research-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; padding-block: 96px; }
 .marketing-research-copy > p:not(.marketing-eyebrow) { max-width: 420px; margin-top: 24px; font-size: 14px; line-height: 1.95; color: var(--brand-muted); }
@@ -172,8 +172,9 @@
   .marketing-section { padding-block: 66px; }
   .marketing-section-heading { grid-template-columns: 1fr; gap: 24px; }
   .marketing-section-heading > p { justify-self: start; max-width: 440px; }
-  .marketing-workflow { grid-template-columns: repeat(2, 1fr); row-gap: 30px; margin-top: 35px; }
-  .marketing-workflow li:nth-child(3) { border-left: 0; padding-left: 0; }
+  .marketing-features { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 35px; }
+  .marketing-features li:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .marketing-features li:nth-child(even) { border-left: 1px solid var(--marketing-line); padding-left: 25px; }
   .marketing-research-inner, .marketing-notebook, .marketing-faq { grid-template-columns: 1fr; gap: 44px; }
   .marketing-research-inner { padding-block: 66px; }
   .marketing-agent-stack { max-width: 600px; }

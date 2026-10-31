@@ -19,8 +19,9 @@ are instance-specific so desktop and mobile markup can coexist.
 
 ## Presentation
 
-- Use the shared `--brand-*` palette: black surfaces, white text, and acid-yellow actions and
-  highlights. Product pages retain adaptive light/dark themes with neutral light surfaces.
+- Use the shared `--brand-*` palette: white backgrounds, black/charcoal text, and army-green
+  (`#4b5320`) actions and highlights, with white labels on green buttons. Product pages retain
+  adaptive light/dark themes with white light surfaces and theme-appropriate olive accents.
   Shared status badges and dots use the semantic theme tokens. Accent-filled controls pair
   their background with `--on-accent` so labels remain readable in both themes.
 - Prefer one primary page action, a few useful summary counts, and readable lists.
@@ -36,7 +37,7 @@ are instance-specific so desktop and mobile markup can coexist.
 - Disclosure sections open for explicit deep-link state, such as `/journal?compose=1#new-note`,
   selected scan history, or missing scanner configuration.
 
-The public homepage and auth screens share the dark brand palette regardless of system theme.
+The public homepage and auth screens share the light brand palette regardless of system theme.
 The homepage uses a code-native interactive sample chart. Sample data must remain labeled
 illustrative. No live prices, returns, customers, testimonials, or predictive-accuracy claims may
 be invented.
@@ -67,4 +68,4 @@ workspace fields and email verification. Authenticator rollout is documented in
 `apps/api/docs/auth.md`; it defaults off until configured.
 
 Keep authenticator QR codes black on white for scanning. Error, notice, and recovery-code panels
-use the shared semantic colors; primary actions use black text on acid-yellow backgrounds.
+use the shared semantic colors; primary actions use white text on army-green backgrounds.

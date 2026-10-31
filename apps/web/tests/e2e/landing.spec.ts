@@ -6,16 +6,16 @@ test.describe("QuantRift landing page", () => {
 
     await expect(
       page.getByRole("heading", {
-        name: /Find the signal. Review the evidence./i,
+        name: /Find your setup. Understand your risk./i,
       }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: /Start researching/i })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: /Create your account/i })).toHaveAttribute(
       "href",
       "/register",
     );
-    await expect(page.getByRole("link", { name: /Explore the demo/i })).toHaveAttribute("href", "/demo");
-    await expect(page.getByText(/No broker execution/i).first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: /One clear view of the market/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Try the chart preview/i })).toHaveAttribute("href", "#product-preview");
+    await expect(page.getByText("Market research and conditional paper setups. Not financial advice.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Find what matters. Review it in one place./i })).toBeVisible();
     await expect(page).toHaveTitle(/QuantRift/i);
   });
 
@@ -25,6 +25,6 @@ test.describe("QuantRift landing page", () => {
 
     await expect(page.getByRole("link", { name: "Sign in" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Get started" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /Start researching/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Create your account/i })).toBeVisible();
   });
 });

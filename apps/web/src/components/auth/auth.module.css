@@ -9,7 +9,7 @@
   --auth-control: var(--brand-control);
   --auth-glow: var(--brand-ring);
   min-height: 100dvh;
-  color-scheme: dark;
+  color-scheme: light;
   color: var(--auth-ink);
   background: var(--brand-background);
   font-family: var(--font-sans);
@@ -33,7 +33,7 @@
 .story h1 > span { color: var(--auth-accent-ink); }
 .story > p:not(.eyebrow) { max-width: 360px; margin: 1.5rem 0 2rem; font-size: .95rem; color: var(--auth-muted); line-height: 1.8; }
 .productMark { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.8rem; }
-.productMark > span { width: 56px; height: 56px; display: grid; place-items: center; color: var(--brand-on-accent); background: var(--auth-accent); border-radius: 17px; transform: rotate(-7deg); }
+.productMark > span { --brand-secondary: var(--brand-on-accent); width: 56px; height: 56px; display: grid; place-items: center; color: var(--brand-on-accent); background: var(--auth-accent); border-radius: 17px; transform: rotate(-7deg); }
 .productMark svg { transform: rotate(7deg); }
 .productMark > div { font-size: 1rem; font-weight: 700; letter-spacing: -.025em; }
 .productMark small { display: block; margin-top: .4rem; color: var(--auth-muted); font-size: .7rem; font-weight: 400; letter-spacing: 0; }

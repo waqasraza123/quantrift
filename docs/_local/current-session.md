@@ -1,5 +1,37 @@
 # Current Session
 
+## Homepage Copy and Palette Publication
+
+- User requested publishing all changes and outstanding work to `origin/main`. Reviewed all ten
+  modified files; no untracked source files or additional local commits were pending.
+- Publication includes trader-focused homepage copy, six top features, white/army-green styling,
+  account-screen styles, favicon/metadata, existing browser expectations, and project memory.
+- Confirmed remote `main` matches local HEAD `c662e9e` before committing. `git diff --check`
+  passed; no tests, builds, lint, type checks, browser checks, migrations, or manual deployments.
+
+## White and Army Green Palette
+
+- Replaced the dark/yellow public palette with white backgrounds, black/charcoal text, and
+  army-green `#4b5320` accents. Buttons use white labels; muted surfaces, borders, status colors,
+  shadows, favicon, and browser theme color now suit the light background.
+- Homepage, auth/verification/MFA, chart preview, and loading screen inherit the light palette
+  regardless of system preference. Preserved adaptive product themes with separate dark tokens
+  and readable olive accents. Earlier homepage copy changes remain intact.
+- Updated `globals.css`, `marketing.css`, auth CSS, layout metadata, favicon, product guidance,
+  and durable memory. Source/diff and palette contrast review only; no tests, builds, lint,
+  type checks, preview servers, browser checks, deployments, commit, or push.
+
+## Trader-Focused Homepage Copy
+
+- Rewrote the homepage hero, AI section, journal, FAQ, and calls to action around the trader's
+  tasks and decisions; removed backend setup instructions from public copy.
+- Replaced the four workflow steps with six top features: watchlists/scanning, chart context,
+  setup evidence, optional AI ideas, independent AI risk review, and journal/outcome review.
+- Updated `LandingPage.tsx`, the responsive feature grid in `marketing.css`, and existing landing
+  browser expectations. Preserved illustrative preview labels and conditional paper setup scope.
+- Verification: source/diff review only; no tests, builds, lint, type checks, preview servers,
+  browser checks, or deployments. No commit or push requested for this task.
+
 ## Selected Black, White, and Acid Yellow Palette
 
 - User rejected the lavender/amber palette and explicitly selected option 9: black, white,
