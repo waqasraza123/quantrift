@@ -1,5 +1,14 @@
 # Current Session
 
+## MFA Deployment Type Guard Fix
+
+- Updated `apps/web/src/lib/auth/mfa.ts` so `isRecord` preserves the input type and explicitly
+  intersects it with `Record<string, unknown>`. This lets chained guards validate extra MFA fields
+  after narrowing to session/status/challenge types, including `mfaVerified` and `recoveryCodes`.
+- Runtime validation is unchanged. No tests, builds, lint, or type checks were run, per user
+  instruction. Owner verification: `cd apps/web && npm run build`.
+- User requested committing and pushing the fix and session notes to `origin/main`.
+
 ## HVACLine Account Access Adaptation
 
 - Copied the login/signup visual system from `/Users/mc/development/hvacline`: warm light/orange

@@ -7,7 +7,7 @@ export type MfaChallenge = {
 export type MfaStatus = Pick<MfaChallenge, "nextAction" | "expiresAt">;
 export type MfaSetup = { secret: string; otpauthUri: string; issuer: string };
 
-export function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord<T>(value: T): value is T & Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
