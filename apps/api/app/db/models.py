@@ -192,6 +192,7 @@ from app.modules.state_machines.models import (
     StateMachineDefinition,
     StateTransitionValidation,
 )
+from app.modules.starter_content.models import WorkspaceStarterContent
 from app.modules.strategy_profiles.models import StrategyProfile
 from app.modules.symbols.models import Symbol
 from app.modules.timeframe_aggregation.models import (
@@ -407,6 +408,7 @@ __all__ = [
     "WebhookOutboxEvent",
     "WebhookSubscription",
     "Workspace",
+    "WorkspaceStarterContent",
     "WorkspaceSetupRun",
     "WorkspaceSetupStepResult",
     "metadata",

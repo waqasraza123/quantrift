@@ -491,6 +491,7 @@ class Settings(BaseSettings):
     job_queue_redis_url: SecretStr | None = None
     backfill_plan_version: str = "v1"
     product_readiness_version: str = "v1"
+    starter_content_enabled: bool = True
     demo_mode_enabled: bool = False
     demo_mode_default_workspace_name: str = "Demo Workspace"
     demo_mode_default_symbols: str = "BTCUSDT,ETHUSDT,EURUSD"

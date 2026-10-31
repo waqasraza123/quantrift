@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   createChart,
+  createTextWatermark,
   CandlestickSeries,
   BarSeries,
   LineSeries,
@@ -106,6 +107,23 @@ export const TerminalChart = forwardRef<
       },
     });
     chart.current = instance;
+    if (props.sampleData)
+      createTextWatermark(instance.panes()[0], {
+        horzAlign: "center",
+        vertAlign: "center",
+        lines: [
+          {
+            text: "SAMPLE DATA",
+            color: dark ? "#a4b8c52b" : "#52647530",
+            fontSize: 30,
+          },
+          {
+            text: "Synthetic market history",
+            color: dark ? "#a4b8c550" : "#52647560",
+            fontSize: 12,
+          },
+        ],
+      });
     const priceFormat = {
       type: "price" as const,
       precision: props.precision,
@@ -370,7 +388,13 @@ export const TerminalChart = forwardRef<
       primitive.current = null;
       firstPoint.current = null;
     };
-  }, [props.theme, props.chartType, props.indicators, props.precision]);
+  }, [
+    props.theme,
+    props.chartType,
+    props.indicators,
+    props.precision,
+    props.sampleData,
+  ]);
 
   useEffect(() => {
     updateData.current?.();

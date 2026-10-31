@@ -93,6 +93,7 @@ from app.modules.signal_digests.routes import router as signal_digests_router
 from app.modules.signal_priority.routes import router as signal_priority_router
 from app.modules.signals.routes import router as signals_router
 from app.modules.state_machines.routes import router as state_machines_router
+from app.modules.starter_content.routes import router as starter_content_router
 from app.modules.strategy_profiles.routes import router as strategy_profiles_router
 from app.modules.symbols.routes import router as symbols_router
 from app.modules.synthetic_fixtures.routes import router as synthetic_fixtures_router
@@ -170,6 +171,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         billing_router,
         memberships_router,
         workspaces_router,
+        starter_content_router,
         workspace_overview_router,
         workspace_actions_router,
         onboarding_router,

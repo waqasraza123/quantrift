@@ -1,28 +1,26 @@
 # Current Session
 
-## 2026-11-01 — Trading terminal UI overhaul
+## 2026-11-01 — Default starter research
 
-- User requested the full terminal plan, then explicitly prioritized the TradingView-inspired UI.
-- User prohibited tests and builds. No tests, builds, browser checks, migrations, or deployment ran.
-- Added `/terminal` as the default authenticated destination; existing research routes remain.
-- Scoped dark/light terminal styling, compact toolbars, resizable/collapsible panels, responsive
-  drawers, accessible dialogs/shortcuts, symbol search, watchlists, and market details.
-- Integrated Lightweight Charts 5.2.1 with candles/bars/line/area, volume and indicator panes,
-  historical loading, crosshair, drawings, screenshots, and persisted backend setup overlays.
-- Reused real candle APIs, analysis runs, signals, evidence, watchlists, and explicit grounded AI.
-- Browser-scoped preferences/drawings/favorites/private notes are local only. No fake market data.
-- Added request cancellation, deduplicated terminal queries, origin-protected session expiry,
-  and native URL-state updates that avoid repeating server bootstrap reads on chart selection.
-- New modules: `apps/web/app/terminal`, `src/components/terminal`, `src/lib/terminal`.
-- Modified navigation/auth destination, scanner/setup chart links, API cancellation, dependencies.
-- Added focused test specs but did not execute them.
-- Static verification passed: web TypeScript, targeted ESLint (zero warnings), terminal Prettier
-  check, and `git diff --check`.
-- Details and limitations: `apps/web/docs/research-terminal.md`.
-- Next: UI/browser validation when authorized, persistent streaming service, backend indicator
-  series, range-grounded Q&A, synchronized private layouts/research and explicit sharing,
-  drawing-anchor editing, broader auth bootstrap consolidation.
-- Suggested commit: `feat(web): add chart-first QuantRift research terminal`.
-- Publication: user requested publishing the UI-first changes to `origin/main`.
-- Commit message: `feat(web): add chart-first QuantRift research terminal`.
-- No tests, builds, or additional runtime validation run during publication.
+- User requested useful demo defaults for all accounts, editable later. Optional scope question
+  received no answer; implemented across research pages, preserving existing populated workspaces
+  and leaving identity, billing, credentials, and secrets untouched.
+- Added default-enabled `starter_content` API/model and bounded resumable template preparation.
+- New and existing empty workspaces initialize on their next product visit, with workspace-write
+  permission required; read-only members use the owner's prepared examples.
+- Template: BTC/ETH candles for seven timeframes, deterministic hourly signals/context/outcomes,
+  historical vectors/read models, watchlist, paused scan, preferences, journal, daily brief.
+- Added shared first-visit progress gate, clear sample notice, screenshot watermark, default
+  browser research example/favorites, remembered source selection, and sample polling suppression.
+- Initialization skips existing market data; completion/opt-out persists and preserves later edits.
+- New migration: `202611011600_starter_content`, parent `202611010900_workspace_billing`.
+  Applied to the configured Neon database on 2026-11-01; Alembic current confirmed head.
+  No sample records were generated and no manual deployment was performed.
+- User's no-tests/no-builds constraint remains active. Tests were added but not executed.
+- Static checks: frontend TypeScript/targeted ESLint passed; new backend Ruff/mypy passed.
+- Files: `apps/api/app/modules/starter_content`, new migration/test, model/router/config registry;
+  shared onboarding gate/styles; terminal data/analyst/chart integration; `docs/starter-content.md`.
+- Next: API/frontend rollout can use the migrated schema; runtime/browser validation only when allowed.
+- Publication: user requested applying migrations, then pushing the starter-content changes to main.
+- Migration upgrade and revision verification succeeded; no tests/builds run during publication.
+- Publishing commit: `feat: add editable starter research for empty workspaces`.

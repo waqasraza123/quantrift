@@ -10,6 +10,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { StarterContentGate } from "@/components/onboarding/StarterContentGate";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { switchWorkspace } from "@/lib/api/billing";
 import { getPublicEnv } from "@/config/env";
@@ -103,24 +104,26 @@ function Workspace({ workspaces, symbols, userId, initialError }: Props) {
   ) || "1h") as Timeframe;
   const scope = `${userId}:${workspace?.id || "none"}`;
   return (
-    <WorkspaceContent
-      key={scope}
-      workspace={workspace}
-      selectedSymbol={selectedSymbol}
-      timeframe={timeframe}
-      workspaces={workspaces}
-      symbols={symbols}
-      scope={scope}
-      initialError={initialError}
-      navigate={(changes) => {
-        const next = new URLSearchParams(params.toString());
-        Object.entries(changes).forEach(([key, value]) => {
-          if (value) next.set(key, value);
-          else next.delete(key);
-        });
-        window.history.pushState(null, "", `/terminal?${next}`);
-      }}
-    />
+    <StarterContentGate workspaceId={workspace?.id} terminal>
+      <WorkspaceContent
+        key={scope}
+        workspace={workspace}
+        selectedSymbol={selectedSymbol}
+        timeframe={timeframe}
+        workspaces={workspaces}
+        symbols={symbols}
+        scope={scope}
+        initialError={initialError}
+        navigate={(changes) => {
+          const next = new URLSearchParams(params.toString());
+          Object.entries(changes).forEach(([key, value]) => {
+            if (value) next.set(key, value);
+            else next.delete(key);
+          });
+          window.history.pushState(null, "", `/terminal?${next}`);
+        }}
+      />
+    </StarterContentGate>
   );
 }
 
@@ -536,6 +539,7 @@ function WorkspaceContent(props: Parameters<typeof useTerminalWorkspace>[0]) {
                 drawings={drawings}
                 tool={tool}
                 zones={zones}
+                sampleData={source?.provider === "quantrift_sample"}
                 precision={Math.min(10, selectedSymbol?.price_precision ?? 2)}
                 signalTime={evidence.data?.analysisRun?.end_time || undefined}
                 onDraw={(drawing) => {
@@ -688,7 +692,11 @@ function WorkspaceContent(props: Parameters<typeof useTerminalWorkspace>[0]) {
           </span>
           <span className="qt-status-separator">|</span>
           <span>
-            {state.params.get("endTime") ? "Historical view" : "15s refresh"}
+            {source?.provider === "quantrift_sample"
+              ? "Sample history"
+              : state.params.get("endTime")
+                ? "Historical view"
+                : "15s refresh"}
           </span>
         </div>
         <div>

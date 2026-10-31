@@ -1,3 +1,4 @@
+import { StarterContentGate } from "@/components/onboarding/StarterContentGate";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getPublicEnv } from "@/config/env";
@@ -33,7 +34,7 @@ export async function AppShell({ appName, children, workspaceName, workspaceId }
       </div>
       <div className="min-h-screen lg:pl-60">
         <Topbar apiBaseUrl={env.apiBaseUrl} workspaceId={workspaceId} workspaceName={workspaceName} />
-        <PageContainer>{children}</PageContainer>
+        <PageContainer><StarterContentGate workspaceId={workspaceId}>{children}</StarterContentGate></PageContainer>
       </div>
     </div>
   );

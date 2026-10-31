@@ -16,6 +16,17 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
+- Empty authenticated workspaces now prepare labeled, editable starter research by default via
+  `starter_content` and `STARTER_CONTENT_ENABLED=true`. Existing market data is preserved. The
+  source-isolated template includes BTC/ETH candles for seven timeframes, deterministic hourly
+  analysis/evidence/outcomes, a paused sample scanner, watchlist/preferences, journal, brief, and
+  read models. A durable workspace lease/checkpoint prevents concurrent/repeated seeding; opt-out
+  persists. Product shells show progress/sample notices; chart exports retain a sample watermark.
+  No sample identities, credentials, billing, fake AI output, or paid generation are created.
+  Migration `202611011600_starter_content` was applied to the configured Neon database on
+  2026-11-01; `alembic current` confirmed this revision as head.
+  Details: `docs/starter-content.md`. No tests/builds run for this change.
+
 - `/terminal` is the default authenticated chart workspace, with a scoped dark/light terminal shell,
   Lightweight Charts 5.2.1, real final-candle reads, 15-second visibility-aware refresh, older-window
   loading, browser-calculated indicators, saved signal overlays/evidence, scanner/setup links, and
@@ -33,8 +44,8 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 - Database runtime traffic uses `DATABASE_URL` (Neon pooled); Alembic prefers `DIRECT_URL`
   (same branch/database, direct endpoint), falling back to `DATABASE_URL` when unset or blank.
   Integration migrations override both with the disposable `TEST_DATABASE_URL`.
-  The configured Neon database was upgraded on 2026-10-31; `alembic current` confirmed
-  `202611010900_workspace_billing (head)`. Tests and billing flow validation remain owner-run.
+  The configured Neon database was upgraded on 2026-11-01; `alembic current` confirmed
+  `202611011600_starter_content (head)`. Tests and billing flow validation remain owner-run.
 
 - Optional Stripe workspace subscriptions are implemented under `billing`, with public `/pricing`,
   `/billing`, `/team`, and `/invite` screens. Free retains core research; Pro is $29 USD/month with

@@ -75,6 +75,7 @@ export type TerminalChartProps = {
   zones: ChartZone[];
   signalTime?: string;
   precision: number;
+  sampleData?: boolean;
   onDraw: (drawing: Drawing) => void;
   onEvidence: (id: string) => void;
   onRange: (start: number, end: number) => void;

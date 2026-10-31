@@ -61,6 +61,8 @@ export function useTerminalWorkspace({
   const [preferences, setPreferences] =
     useState<WorkspacePreferences>(defaultPreferences);
   const [hydrated, setHydrated] = useState(false);
+  const [preferredSourceId, setPreferredSourceId] = useState("");
+  const sampleWatchlistInitialized = useRef(false);
   const [search, setSearch] = useState("");
   const [marketSearch, setMarketSearch] = useState("");
   const [dialog, setDialog] = useState<
@@ -93,6 +95,7 @@ export function useTerminalWorkspace({
 
   useEffect(() => {
     try {
+      setPreferredSourceId(localStorage.getItem(`${storageKey}:source`) || "");
       const stored = localStorage.getItem(storageKey);
       const restored = stored
         ? parsePreferences(JSON.parse(stored))
@@ -176,7 +179,68 @@ export function useTerminalWorkspace({
   });
   const sources = useMemo(() => sourceQuery.data || [], [sourceQuery.data]);
   const source =
-    sources.find((item) => item.id === params.get("sourceId")) || sources[0];
+    sources.find((item) => item.id === params.get("sourceId")) ||
+    sources.find((item) => item.id === preferredSourceId) ||
+    sources.find(
+      (item) =>
+        item.provider === "quantrift_sample" && item.status === "active",
+    ) ||
+    sources[0];
+  useEffect(() => {
+    const explicit = params.get("sourceId");
+    if (explicit && source?.id === explicit) {
+      try {
+        localStorage.setItem(`${storageKey}:source`, explicit);
+        setPreferredSourceId(explicit);
+      } catch {
+        return;
+      }
+    }
+  }, [params, source?.id, storageKey]);
+  useEffect(() => {
+    if (!hydrated || source?.provider !== "quantrift_sample") return;
+    const marker = `${storageKey}:sample-personalized`;
+    try {
+      if (localStorage.getItem(marker)) return;
+      if (!localStorage.getItem(`${storageKey}:research`)) {
+        const examples: ResearchNote[] = [
+          {
+            id: "starter-research-v1",
+            title: "Sample: chart research",
+            created: new Date().toISOString(),
+            note: "Sample research on synthetic market history. Compare the candles with the calculated indicators, inspect the saved signal evidence, and review its observed outcome. Replace this note with your own observations.",
+            href: `/terminal?${new URLSearchParams({ workspaceId: workspace?.id || "", symbolId: selectedSymbol?.id || "", sourceId: source.id, timeframe })}`,
+          },
+        ];
+        localStorage.setItem(
+          `${storageKey}:research`,
+          JSON.stringify(examples),
+        );
+        setNotes(examples);
+      }
+      setPreferences((previous) =>
+        previous.favorites.length
+          ? previous
+          : {
+              ...previous,
+              favorites: symbols
+                .filter((item) => ["BTCUSDT", "ETHUSDT"].includes(item.symbol))
+                .map((item) => item.id),
+            },
+      );
+      localStorage.setItem(marker, "1");
+    } catch {
+      return;
+    }
+  }, [
+    hydrated,
+    source,
+    storageKey,
+    workspace?.id,
+    selectedSymbol?.id,
+    timeframe,
+    symbols,
+  ]);
   const contextKey = `${selectedSymbol?.id}:${source?.id || "default"}:${timeframe}`;
   const drawings = preferences.drawings[contextKey] || emptyDrawings;
   useEffect(() => {
@@ -212,7 +276,10 @@ export function useTerminalWorkspace({
           : undefined,
         signal,
       ),
-    refetchInterval: params.get("endTime") ? false : 15000,
+    refetchInterval:
+      params.get("endTime") || source?.provider === "quantrift_sample"
+        ? false
+        : 15000,
     refetchIntervalInBackground: false,
   });
   const anchor = useRef<{ key: string; timestamp: string | undefined }>({
@@ -324,6 +391,19 @@ export function useTerminalWorkspace({
     enabled: !!workspace,
     queryFn: async () => unwrap(await listWatchlists(workspace!.id)),
   });
+  useEffect(() => {
+    const sample = watchlists.data?.find(
+      (item) => item.metadata_json.sample === true,
+    );
+    if (
+      source?.provider === "quantrift_sample" &&
+      sample &&
+      !sampleWatchlistInitialized.current
+    ) {
+      sampleWatchlistInitialized.current = true;
+      setWatchlistId(sample.id);
+    }
+  }, [source?.provider, watchlists.data]);
   const watchlistItems = useQuery({
     queryKey: ["terminal-watchlist-items", workspace?.id, watchlistId],
     enabled: !!watchlistId,

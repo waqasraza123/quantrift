@@ -130,6 +130,20 @@ export function AnalystPanel({
             signals and AI interpretations stay separate.
           </p>
         </div>
+        {classification && (
+          <section className="qt-context-card" style={{ marginBottom: 14 }}>
+            <span className="qt-eyebrow">DETERMINISTIC SETUP</span>
+            <strong>
+              {classification.signal.bias} ·{" "}
+              {classification.signal.pattern_type || "Market context"}
+            </strong>
+            <p>{classification.signal.summary}</p>
+            <button className="qt-text-button" onClick={onInspect}>
+              Review {classification.evidence.length} evidence items{" "}
+              <Icon name="arrow" size={13} />
+            </button>
+          </section>
+        )}
         <button
           className="qt-analyze-button"
           disabled={!signal || generate.isPending}
