@@ -5,12 +5,13 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { getPublicEnv } from "@/config/env";
 import { getCurrentIdentity } from "@/lib/api/auth";
 import { safeAuthDestination } from "@/lib/auth/redirects";
+import { getAuthSessionToken } from "../api/auth/session";
 
 export const metadata: Metadata = { title: "Sign in", robots: { index: false, follow: false } };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
-  if (getPublicEnv().authMode === "session") {
+  if (getPublicEnv().authMode === "session" && await getAuthSessionToken()) {
     const identity = await getCurrentIdentity();
     if (identity.ok && identity.data.authenticated) redirect(safeAuthDestination(next));
   }

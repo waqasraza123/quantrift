@@ -49,13 +49,13 @@
 .preview-main { min-width: 0; padding: 18px; }
 .preview-chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
 .preview-chart-heading p { margin: 0; color: var(--brand-foreground); font-size: 11px; font-weight: 600; }
-.preview-chart-heading p > span { margin-left: 12px; color: var(--brand-muted); font-family: ui-monospace, monospace; font-size: 10px; font-weight: 400; }
+.preview-chart-heading p > span { margin-left: 12px; color: var(--brand-muted); font-size: 10px; font-weight: 400; }
 .preview-closed { display: flex; align-items: center; gap: 4px; color: var(--brand-muted); font-size: 7px; white-space: nowrap; }
 .preview-closed > span { width: 4px; height: 4px; border-radius: 50%; background: var(--brand-accent); }
 .preview-chart { margin-top: 16px; }
 .preview-chart svg { display: block; width: 100%; height: auto; }
 .preview-gridline { opacity: .12; }
-.preview-chart-footer { display: flex; justify-content: space-between; color: var(--brand-muted); font-family: ui-monospace, monospace; font-size: 7px; }
+.preview-chart-footer { display: flex; justify-content: space-between; color: var(--brand-muted); font-size: 7px; }
 .preview-assessment { margin-top: 19px; padding: 14px; border: 1px solid var(--brand-border); border-radius: 7px; background: var(--brand-accent-soft); }
 .preview-assessment-title { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
 .preview-assessment-title > span { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 550; color: var(--brand-muted); }
@@ -64,7 +64,7 @@
 .preview-assessment > p { margin: 9px 0 13px; color: var(--brand-muted); font-size: 9px; line-height: 1.85; }
 .preview-levels { display: grid; grid-template-columns: 1.4fr .8fr .8fr; gap: 9px; padding-bottom: 12px; }
 .preview-levels small { display: block; margin-bottom: 5px; color: var(--brand-muted); font-size: 7px; }
-.preview-levels span { font-family: ui-monospace, monospace; font-size: 8px; color: var(--brand-foreground); }
+.preview-levels span { font-size: 8px; color: var(--brand-foreground); }
 .preview-review { display: flex; align-items: start; gap: 8px; padding-top: 11px; border-top: 1px solid var(--brand-border); color: var(--brand-muted); }
 .preview-review > svg { flex-shrink: 0; margin-top: 2px; }
 .preview-review p { margin: 0; color: var(--brand-muted); font-size: 8px; line-height: 1.85; }
@@ -85,7 +85,7 @@
 .marketing-features li { padding: 27px 25px 0; border-left: 1px solid var(--marketing-line); }
 .marketing-features li:nth-child(3n + 1) { padding-left: 0; border-left: 0; }
 .marketing-step-top { display: flex; align-items: center; justify-content: space-between; color: var(--brand-accent); }
-.marketing-step-top > span { font-family: ui-monospace, monospace; color: var(--brand-muted); font-size: 11px; }
+.marketing-step-top > span { color: var(--brand-muted); font-size: 11px; }
 .marketing-features h3 { margin: 27px 0 12px; font-size: 16px; font-weight: 550; letter-spacing: -.03em; }
 .marketing-features li > p { margin: 0; color: var(--marketing-muted); font-size: 12px; line-height: 1.9; }
 .marketing-research { background: var(--brand-surface-muted); border-block: 1px solid var(--brand-border); }
@@ -97,12 +97,12 @@
 .marketing-agent { padding: 27px; border: 1px solid var(--brand-border); border-radius: 11px; background: var(--brand-surface); }
 .marketing-agent-heading { display: flex; align-items: center; gap: 13px; }
 .marketing-agent-icon { display: grid; place-items: center; width: 42px; height: 42px; background: var(--brand-secondary-soft); border: 1px solid var(--brand-border); border-radius: 9px; color: var(--brand-secondary); }
-.marketing-agent-heading p { margin: 0 0 6px; font-family: ui-monospace, monospace; font-size: 9px; text-transform: uppercase; letter-spacing: .07em; color: var(--brand-muted); }
+.marketing-agent-heading p { margin: 0 0 6px; font-size: 9px; text-transform: uppercase; letter-spacing: .07em; color: var(--brand-muted); }
 .marketing-agent h3 { margin: 0; font-size: 18px; font-weight: 550; letter-spacing: -.04em; }
 .marketing-agent-tag { margin-left: auto; padding: 5px 8px; border: 1px solid var(--brand-border); border-radius: 4px; font-size: 8px; color: var(--brand-muted); }
 .marketing-agent > p { margin: 18px 0 0; max-width: 390px; color: var(--brand-muted); font-size: 12px; line-height: 1.85; }
 .marketing-agent-pills { display: flex; gap: 7px; margin-top: 19px; }
-.marketing-agent-pills span { padding: 6px 14px; border: 1px solid var(--brand-border); border-radius: 5px; background: var(--brand-accent-soft); color: var(--brand-accent); font-family: ui-monospace, monospace; font-size: 10px; }
+.marketing-agent-pills span { padding: 6px 14px; border: 1px solid var(--brand-border); border-radius: 5px; background: var(--brand-accent-soft); color: var(--brand-accent); font-size: 10px; }
 .marketing-agent-pills span:nth-child(2) { border-color: var(--brand-danger); background: var(--brand-danger-soft); color: var(--brand-danger); }
 .marketing-agent-pills span:nth-child(3) { border-color: var(--brand-warning); background: var(--brand-warning-soft); color: var(--brand-warning); }
 .marketing-agent-connector { display: flex; align-items: center; justify-content: center; gap: 13px; padding-block: 15px; color: var(--brand-muted); font-size: 9px; }
@@ -115,7 +115,7 @@
 .marketing-journal-tag { margin-left: auto; padding: 4px 7px; border: 1px solid var(--brand-border); border-radius: 4px; color: var(--brand-muted); font-size: 8px; font-weight: 400; }
 .marketing-journal-entry { margin-top: 22px; padding: 29px; border: 1px solid var(--brand-border); border-radius: 8px; background: var(--brand-surface); box-shadow: var(--brand-shadow); }
 .marketing-journal-entry .marketing-eyebrow { margin-bottom: 15px; font-size: 9px; }
-.marketing-journal-entry h3 { margin: 0; font-size: 23px; font-family: Georgia, serif; font-weight: 400; letter-spacing: -.04em; }
+.marketing-journal-entry h3 { margin: 0; font-size: 23px; font-weight: 400; letter-spacing: -.04em; }
 .marketing-journal-entry > p { margin: 17px 0 25px; color: var(--brand-muted); font-size: 12px; line-height: 1.95; }
 .marketing-journal-entry > div { display: flex; justify-content: space-between; padding-top: 17px; border-top: 1px solid var(--brand-border); color: var(--brand-accent); font-size: 9px; }
 .marketing-journal-lines { display: grid; gap: 12px; margin: 22px 16px 5px; }

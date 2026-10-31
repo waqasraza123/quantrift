@@ -4,7 +4,25 @@ The web app uses a Tailwind-native cockpit design system for read-only market in
 
 ## Visual Foundation
 
-Global tokens live in `app/globals.css` and are exposed to Tailwind through `tailwind.config.ts`.
+Inter Variable is bundled in `app/fonts/InterVariable.woff2` with its SIL Open Font License.
+The root layout loads and preloads it through `next/font/local` using `font-display: swap`.
+`--font-sans` in `app/globals.css` uses the generated `--font-inter` family across the product,
+marketing, and authentication pages. Body text enables optical sizing and tabular numerals for
+aligned prices, percentages, and statistics. Prefer weights 400 for body copy, 500–600 for
+labels and controls, and 700 for headings. Monospace remains for technical input and identifiers.
+
+Global tokens and active Tailwind v4 color mappings live in `app/globals.css` through `@theme inline`.
+Use light surfaces, black/neutral text, and dark army green (`#303f22`, hover `#24331a`) only.
+The neutral and army scales are defined once as `--palette-*` tokens in that file. Legacy utility
+families map to these scales: slate is neutral; teal, emerald, sky, and blue are army green;
+amber, orange, red, and rose are neutral. The default Tailwind color namespace is reset so other
+color families cannot introduce additional hues. Prefer semantic tokens for new components.
+
+All pages use the light theme independently of the OS preference. The `dark` variant requires
+an explicit `data-theme="dark"` ancestor; the site does not set one. Status labels and icons
+retain their meaning: success/info use army green, warnings use charcoal, and errors use black.
+Do not rely on red/green alone to communicate direction or errors. Chart directions use army
+green and black, with existing legends, labels, and overlay line patterns retained.
 
 - `--background`, `--surface`, `--surface-muted`, `--surface-elevated`, `--border`, `--foreground`, and `--text-muted` define the app shell and cards.
 - `--accent`, `--success`, `--warning`, `--danger`, and `--info` define status and action tones.

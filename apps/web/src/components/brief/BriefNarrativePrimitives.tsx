@@ -27,7 +27,7 @@ export function BriefPanel({ title, eyebrow, children, className = "", style }: 
   return (
     <section
       style={style}
-      className={`rounded-3xl border border-white/70 bg-white/86 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/70 sm:p-6 ${className}`}
+      className={`rounded-3xl border border-white/70 bg-white/86 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/70 sm:p-6 ${className}`}
     >
       <div className="mb-5">
         {eyebrow && <p className="text-xs font-semibold uppercase text-slate-500">{eyebrow}</p>}

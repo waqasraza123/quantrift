@@ -1,5 +1,52 @@
 # Current Session
 
+## Typography, Palette, and Auth Publication
+
+- User requested publishing all pending work to `origin/main`: local Inter Variable/font license,
+  light/black/dark-army theme and assets, signed-out auth probe guards, and supporting docs.
+- Reviewed 19 modified tracked files and the two new font/license assets. Remote `main` matched
+  local `99a5235` before publication. `git diff --check` passed; no tests, builds, lint,
+  type checks, migrations, browser checks, or manual deployment run during publication.
+- Hosted web still needs `NEXT_PUBLIC_AUTH_MODE=session` at build time; Vercel environment
+  edits and Stripe sandbox flow validation remain separate from the source push.
+
+## Light, Black, and Dark Army Green Palette
+
+- Updated `app/globals.css` to a light-only neutral/army palette: main `#303f22`, hover
+  `#24331a`, black text, light surfaces. Removed OS dark overrides and made Tailwind dark
+  utilities opt-in via a data attribute the site does not set.
+- Tailwind v4 `@theme inline` resets the color namespace and maps all legacy families in use
+  to neutral/army scales centrally. Existing badges, charts, controls, and loading states follow
+  the palette without changing business logic. Errors/warnings retain labels/icons in black/charcoal.
+- Replaced blue-tinted hardcoded shadows, updated favicon and manifest/browser theme colors,
+  and revised design-system/product-experience docs and durable memory. Inter/auth work preserved.
+- Source color/token coverage review and `git diff --check` passed. No tests, builds, lint,
+  type checks, browser checks, commit, push, or deployment run.
+
+## Inter Variable Typography
+
+- Bundled official Inter Variable WOFF2 and SIL OFL license under `apps/web/app/fonts`.
+  Root layout uses `next/font/local` (100–900 weights, swap, preload) and exposes `--font-inter`;
+  global `--font-sans` consumes it. Optical sizing and tabular numerals inherit site-wide.
+- Marketing chart labels and journal preview now inherit Inter instead of decorative
+  monospace/Georgia overrides. Technical inputs/identifiers retain explicit monospace.
+- Updated design-system guidance and durable typography notes. Existing auth changes preserved.
+- Source/assets reviewed and `git diff --check` passed; no tests, builds, lint, type checks,
+  browser checks, commit, push, or deployment run, preserving the verification handoff.
+
+## Unauthorized Frontend Requests
+
+- Inspected live login JavaScript: API URL is `https://ai-trading-agent-api.vercel.app`, but
+  `NEXT_PUBLIC_AUTH_MODE` was not inlined and falls back to dev. Browser GET requests therefore
+  bypass the session proxy. Set web Production `NEXT_PUBLIC_AUTH_MODE=session` before rebuilding;
+  keep both API base URLs on the deployed API. Sign in again at `https://www.quantrift.live`.
+- No retry/render loop found in identity/workspace effects (both use empty dependencies).
+  Desktop/mobile shells each mount identity/workspace components, producing duplicate reads.
+- Login, registration, and MFA recovery now skip identity probes when no session cookie exists.
+  Existing cookie sessions still require backend validation. Deployment guide records build-time
+  auth configuration and hostname-scoped cookies. Remote environment was not modified.
+- Source/diff review only; no tests, builds, lint, type checks, commit, push, or deployment.
+
 ## Domain and Migration Configuration Publication
 
 - User requested publishing all pending changes to `origin/main`: custom-domain defaults/docs,

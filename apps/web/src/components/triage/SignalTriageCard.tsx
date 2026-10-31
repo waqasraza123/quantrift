@@ -44,7 +44,7 @@ export function SignalTriageCard({
     <article
       style={style}
       className={cn(
-        "group rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[0_1px_0_rgba(15,23,42,0.04)] transition hover:border-[var(--accent)] hover:shadow-soft",
+        "group rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[0_1px_0_rgba(0,0,0,0.04)] transition hover:border-[var(--accent)] hover:shadow-soft",
         motionCardClass,
         motionRevealPresetClass(),
         MOTION_INTERACTIVE_CLASS,

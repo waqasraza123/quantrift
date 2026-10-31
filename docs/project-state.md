@@ -16,6 +16,10 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
 
 ## Current Architecture
 
+- Web typography uses bundled Inter Variable via `next/font/local` in the root layout,
+  `--font-inter`/`--font-sans` tokens, and inherited tabular numerals. Font and SIL OFL license
+  live under `apps/web/app/fonts`; no external font requests are needed at build or runtime.
+
 - Database runtime traffic uses `DATABASE_URL` (Neon pooled); Alembic prefers `DIRECT_URL`
   (same branch/database, direct endpoint), falling back to `DATABASE_URL` when unset or blank.
   Integration migrations override both with the disposable `TEST_DATABASE_URL`.
@@ -40,11 +44,12 @@ compose evidence and paper-only plans but cannot execute trades or rewrite deter
   no tests, builds, lint, type checks, migrations, browser checks, or live Stripe calls were run.
   Handoff: `docs/billing.md`.
 
-- Public and account pages share white backgrounds, black/charcoal text, and army-green
-  (`#4b5320`) accents through `--brand-*` tokens in `apps/web/app/globals.css`, regardless of
-  system theme. Product pages retain adaptive light/dark colors with white light surfaces and
-  theme-appropriate olive accents. Shared status badges/dots use semantic tokens; accent-filled controls
-  use `--on-accent` for readable labels in both themes.
+- All web pages use light surfaces, black/charcoal text, and dark army-green (`#303f22`,
+  hover `#24331a`) accents regardless of OS theme. `apps/web/app/globals.css` owns neutral/army
+  scales, brand/status tokens, and Tailwind v4 `@theme inline` mappings for existing utilities;
+  other Tailwind color families are disabled. Dark variants require an explicit data attribute
+  that the site does not set. Charts use army/black; warnings/errors keep explicit text/icons
+  with neutral styling. Accent-filled controls use `--on-accent` for readable labels.
   Shared `AuthLayout`, fields, and scoped CSS cover login/signup, email
   verification, and optional `/mfa`. `/signup` aliases `/register`; local return paths are validated.
 - Optional authenticator verification lives under `auth/mfa`. Existing credentials, Argon2id,

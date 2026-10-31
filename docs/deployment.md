@@ -12,6 +12,9 @@ Vercel projects and use the same API settings for the billing worker:
 | Project | Variable | Value |
 | --- | --- | --- |
 | Web | `NEXT_PUBLIC_SITE_URL` | `https://www.quantrift.live` |
+| Web | `NEXT_PUBLIC_AUTH_MODE` | `session` |
+| Web | `NEXT_PUBLIC_API_BASE_URL` | `https://ai-trading-agent-api.vercel.app` |
+| Web | `WEB_API_PROXY_BASE_URL` | `https://ai-trading-agent-api.vercel.app` |
 | API and billing worker | `AUTH_PUBLIC_WEB_BASE_URL` | `https://www.quantrift.live` |
 | API | `CORS_ALLOWED_ORIGINS` | `https://www.quantrift.live,https://quantrift.live` |
 
@@ -20,6 +23,13 @@ worker. `NEXT_PUBLIC_SITE_URL` is used for canonical metadata, social previews, 
 sitemap URLs. `AUTH_PUBLIC_WEB_BASE_URL` controls verification/invitation links and Stripe
 checkout/portal return URLs. Keep `NEXT_PUBLIC_API_BASE_URL` and `WEB_API_PROXY_BASE_URL` pointed
 at the deployed API origin. Local environment examples retain localhost URLs.
+
+Set `NEXT_PUBLIC_AUTH_MODE=session` before building the web deployment. If it is absent at
+build time, browser code falls back to dev mode and sends GET requests directly to the API
+without the first-party session. Changing runtime settings alone does not update that bundle.
+In session mode, browser requests use `/api/backend/...` on the web origin, where the server
+forwards the HttpOnly cookie as a bearer token to the API. Sign in again on the canonical
+`www` hostname after changing domains; session cookies are scoped to the hostname that set them.
 
 For sandbox billing on the production domain, keep `STRIPE_LIVE_MODE=false` and use sandbox
 keys, prices, and portal configurations. Register the snapshot webhook destination directly at

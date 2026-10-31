@@ -19,11 +19,12 @@ are instance-specific so desktop and mobile markup can coexist.
 
 ## Presentation
 
-- Use the shared `--brand-*` palette: white backgrounds, black/charcoal text, and army-green
-  (`#4b5320`) actions and highlights, with white labels on green buttons. Product pages retain
-  adaptive light/dark themes with white light surfaces and theme-appropriate olive accents.
-  Shared status badges and dots use the semantic theme tokens. Accent-filled controls pair
-  their background with `--on-accent` so labels remain readable in both themes.
+- Use the shared `--brand-*` palette: light backgrounds, black/charcoal text, and dark army-green
+  (`#303f22`, hover `#24331a`) actions and highlights, with white labels on green buttons.
+  All pages stay light regardless of system preference. Shared status badges, dots, charts,
+  and legacy Tailwind color utilities use the same neutral/army scales in `app/globals.css`.
+  Warnings/errors retain explicit labels and icons with neutral styling. Accent-filled controls
+  pair their background with `--on-accent` so labels remain readable.
 - Prefer one primary page action, a few useful summary counts, and readable lists.
 - Keep setup rows responsive without a wide multi-column board or mandatory horizontal scrolling.
 - Put configuration, audit trails, and secondary diagnostics in native disclosure sections.
@@ -53,7 +54,7 @@ Setups, and Paper plans while preserving existing route and API identifiers.
 
 The user requested no tests, builds, lint, type checks, or browser verification during this work.
 The redesign has not been runtime or visually verified. Manual review should cover responsive
-navigation, both color schemes, keyboard focus and disclosures, workspace switching, preserved
+navigation, light appearance under both OS color preferences, keyboard focus and disclosures, workspace switching, preserved
 filters, scan creation/results, journal composition/selection, saved paper plans, and AI chart
 history/expiry. Existing browser expectations for old labels and the six-column board will need
 review against the new product layout.

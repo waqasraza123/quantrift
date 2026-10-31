@@ -32,7 +32,7 @@ type CockpitActionLinkProps = {
 };
 
 const panelClassName =
-  "border border-white/70 bg-white/85 shadow-[0_24px_80px_rgba(15,23,42,0.09)] backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/72 dark:shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/70 bg-white/85 shadow-[0_24px_80px_rgba(0,0,0,0.09)] backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/72 dark:shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 const toneClassName: Record<CommandCenterTone, string> = {
   neutral: "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200",
