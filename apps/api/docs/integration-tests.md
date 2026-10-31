@@ -12,14 +12,14 @@ database. Use a disposable database only.
   `production`, pytest refuses to run integration tests.
 - The smoke command also refuses `TEST_DATABASE_URL` when it equals `DATABASE_URL` under a
   production-like `APP_ENV` or `ENV`.
-- The integration fixture migrates the test database to Alembic head and truncates app tables
-  before and after the session.
+- The integration fixture overrides both `DATABASE_URL` and `DIRECT_URL` with `TEST_DATABASE_URL`,
+  migrates that database to Alembic head, and truncates app tables before and after the session.
 
 ## Migrations
 
 ```sh
 cd apps/api
-DATABASE_URL=postgresql://user:password@localhost:5432/trading_test .venv/bin/alembic upgrade head
+DIRECT_URL=postgresql://user:password@localhost:5432/trading_test .venv/bin/python -m alembic upgrade head
 ```
 
 The validation suite also checks that Alembic has one head, the disposable database is at head,

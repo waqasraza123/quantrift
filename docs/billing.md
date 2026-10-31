@@ -34,7 +34,8 @@ STRIPE_PORTAL_TEAM_CONFIGURATION_ID=
 STRIPE_LIVE_MODE=false
 ```
 
-Set `AUTH_PUBLIC_WEB_BASE_URL` to the web origin and retain the existing session, database,
+Set `AUTH_PUBLIC_WEB_BASE_URL` to the web origin (`https://www.quantrift.live` for the hosted
+site) and retain the existing session, database,
 verified-email, and optional MFA configuration. Production billing requires HTTPS return URLs.
 The Next.js browser proxy forwards the signed-in user's session; it does not add a privileged
 admin key to session requests. Billing changes require a verified first-party session and the
@@ -77,6 +78,10 @@ Register a snapshot webhook endpoint at either:
 - The web origin's `/api/stripe/webhook`, which forwards the original bytes and signature.
 - The API origin's `/billing/webhook`, including `API_PREFIX` if configured.
 
+For the hosted site, use `https://www.quantrift.live/api/stripe/webhook` directly. The apex
+`https://quantrift.live` redirects to `www`; configure the destination at the final hostname.
+Sandbox testing on this domain still requires `STRIPE_LIVE_MODE=false` and sandbox credentials.
+
 Use snapshot API version `2026-10-28.endive`, supported by the pinned Stripe SDK, for the destination. Subscribe to:
 
 ```text
@@ -106,10 +111,14 @@ verification continuation field, and the billing queue type. It backfills each e
 home workspace membership; the earliest administrator becomes owner, with the earliest user as
 fallback. Other roles are retained. Existing passwords, MFA secrets, and research stay in place.
 
+Set `DATABASE_URL` to the pooled connection string and `DIRECT_URL` to the direct connection
+string for the same Neon branch and database in `apps/api/.env`. Alembic prefers `DIRECT_URL`,
+falling back to `DATABASE_URL` when it is unset or blank. The application keeps using `DATABASE_URL`.
+
 ```sh
 cd apps/api
 .venv/bin/python -m pip install -e '.[dev]'
-.venv/bin/alembic upgrade head
+.venv/bin/python -m alembic upgrade head
 ```
 
 Enable `BILLING_ENABLED=true` only when the catalog, webhook, origins, database, and worker are
@@ -188,10 +197,11 @@ Use the portal to recover a payment method; a Checkout success URL alone never g
 
 ## Validation handoff
 
-The user requested implementation without running tests, builds, lint, type checks, migrations,
-preview servers, or browser checks. None were run. The Stripe SDK was installed locally. An
-isolated temporary PostgreSQL cluster was initialized while preparing the earlier approved test
-workflow, but no PostgreSQL server, migrations, or tests were started.
+The user requested implementation without running tests, builds, lint, type checks,
+preview servers, or browser checks. None were run. The Stripe SDK was installed locally. After
+implementation, the user explicitly authorized migrations: the configured Neon database was
+upgraded and `alembic current` confirmed `202611010900_workspace_billing (head)` on 2026-10-31.
+Sandbox checkout, webhook reconciliation, and portal flow validation remain owner-run.
 
 Prepared coverage is in `test_billing.py`, `test_billing_portal.py`,
 `test_billing_memberships_integration.py`, and the

@@ -246,6 +246,11 @@ WEB_API_PROXY_API_KEY_HEADER=x-api-key
 WEB_AUTH_SESSION_COOKIE=trading_intelligence_session
 ```
 
+For the hosted site, set `NEXT_PUBLIC_SITE_URL=https://www.quantrift.live` in the web project's
+Production environment before rebuilding/redeploying. The apex domain redirects to `www`.
+The API's public web origin, CORS, and Stripe webhook settings are listed in the
+[deployment guide](../../docs/deployment.md#production-domain).
+
 The API client sends `x-user-id` and `x-workspace-id` in dev mode when those public values are set.
 For JWT/mixed deployments, the client can read a bearer token from the configured browser storage
 key. Only public frontend configuration belongs in this file. Backend secrets, API keys, database

@@ -177,21 +177,24 @@ def test_database_url() -> str:
 
 @pytest.fixture(scope="session")
 def migrated_test_database(test_database_url: str) -> Iterator[str]:
-    previous_database_url = os.environ.get("DATABASE_URL")
-    os.environ["DATABASE_URL"] = test_database_url
-    get_settings.cache_clear()
-    api_root = Path(__file__).resolve().parents[2]
-    alembic_config = Config(str(api_root / "alembic.ini"))
-    alembic_config.set_main_option("script_location", str(api_root / "alembic"))
-    command.upgrade(alembic_config, "head")
-    get_settings.cache_clear()
+    database_variables = ("DATABASE_URL", "DIRECT_URL")
+    previous_database_urls = {name: os.environ.get(name) for name in database_variables}
     try:
+        for name in database_variables:
+            os.environ[name] = test_database_url
+        get_settings.cache_clear()
+        api_root = Path(__file__).resolve().parents[2]
+        alembic_config = Config(str(api_root / "alembic.ini"))
+        alembic_config.set_main_option("script_location", str(api_root / "alembic"))
+        command.upgrade(alembic_config, "head")
+        get_settings.cache_clear()
         yield test_database_url
     finally:
-        if previous_database_url is None:
-            os.environ.pop("DATABASE_URL", None)
-        else:
-            os.environ["DATABASE_URL"] = previous_database_url
+        for name, previous_url in previous_database_urls.items():
+            if previous_url is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = previous_url
         get_settings.cache_clear()
 
 

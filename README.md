@@ -4,7 +4,7 @@
 
 QuantRift is an open-source research workspace for following markets, reviewing trade setups, and getting a second perspective from AI. Keep your charts, supporting evidence, conditional paper setups, and research notes together.
 
-[Open QuantRift](https://quantrift.vercel.app) · [Get started locally](#get-started-locally) · [Enable AI research](docs/trade-suggestions.md) · [Deployment guide](docs/deployment.md)
+[Open QuantRift](https://www.quantrift.live) · [Get started locally](#get-started-locally) · [Enable AI research](docs/trade-suggestions.md) · [Deployment guide](docs/deployment.md)
 
 ## A clearer research routine
 

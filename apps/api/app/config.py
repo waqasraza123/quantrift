@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     api_prefix: str = ""
     log_level: LogLevel = LogLevel.INFO
     database_url: SecretStr | None = None
+    direct_url: SecretStr | None = None
     redis_url: SecretStr | None = None
     billing_enabled: bool = False
     stripe_secret_key: SecretStr | None = None

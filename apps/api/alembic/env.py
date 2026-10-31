@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from app.config import build_async_database_url, get_settings
+from app.config import build_async_database_url, get_settings, secret_is_empty
 from app.db.models import metadata
 
 config = context.config
@@ -48,10 +48,13 @@ def ensure_version_table(connection: Connection) -> None:
 
 def get_database_url() -> str:
     settings = get_settings()
-    if settings.database_url is None:
-        msg = "DATABASE_URL is required for Alembic migrations"
+    database_url = settings.direct_url
+    if secret_is_empty(database_url):
+        database_url = settings.database_url
+    if database_url is None or secret_is_empty(database_url):
+        msg = "DIRECT_URL or DATABASE_URL is required for Alembic migrations"
         raise RuntimeError(msg)
-    return build_async_database_url(settings.database_url)
+    return build_async_database_url(database_url)
 
 
 def run_migrations_offline() -> None:

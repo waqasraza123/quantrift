@@ -6,7 +6,7 @@ QuantRift is the MIT-licensed Agentic AI platform for quantitative market intell
 analysis, and evidence-based research. `/` is the public platform landing page; product routes use
 the existing Neon-backed FastAPI password-session architecture when `AUTH_MODE=session`. The
 GitHub repository slug is `quantrift`, and the canonical web URL is
-`https://quantrift.vercel.app`.
+`https://www.quantrift.live` (`https://quantrift.live` redirects to `www`).
 
 QuantRift has a deterministic market-intelligence backend and a read-only daily dashboard surface.
 It is not a chatbot, broker integration, auto-trading system, or financial-advice product. It
@@ -15,6 +15,12 @@ into the same candle model and feed the same deterministic analysis engine. Agen
 compose evidence and paper-only plans but cannot execute trades or rewrite deterministic signals.
 
 ## Current Architecture
+
+- Database runtime traffic uses `DATABASE_URL` (Neon pooled); Alembic prefers `DIRECT_URL`
+  (same branch/database, direct endpoint), falling back to `DATABASE_URL` when unset or blank.
+  Integration migrations override both with the disposable `TEST_DATABASE_URL`.
+  The configured Neon database was upgraded on 2026-10-31; `alembic current` confirmed
+  `202611010900_workspace_billing (head)`. Tests and billing flow validation remain owner-run.
 
 - Optional Stripe workspace subscriptions are implemented under `billing`, with public `/pricing`,
   `/billing`, `/team`, and `/invite` screens. Free retains core research; Pro is $29 USD/month with

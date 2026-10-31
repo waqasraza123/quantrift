@@ -7,4 +7,4 @@ source "${SCRIPT_DIR}/lib.sh"
 ensure_api_venv
 
 cd "${API_DIR}"
-exec .venv/bin/alembic upgrade head
+exec .venv/bin/python -m alembic upgrade head

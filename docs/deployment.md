@@ -3,6 +3,29 @@
 This project now has production-oriented Docker images for the FastAPI API and Next.js web app.
 Production secrets must be injected by the deployment platform, never baked into images.
 
+## Production domain
+
+The canonical web origin is `https://www.quantrift.live`. The apex domain
+`https://quantrift.live` redirects to it. Set these Production variables in the corresponding
+Vercel projects and use the same API settings for the billing worker:
+
+| Project | Variable | Value |
+| --- | --- | --- |
+| Web | `NEXT_PUBLIC_SITE_URL` | `https://www.quantrift.live` |
+| API and billing worker | `AUTH_PUBLIC_WEB_BASE_URL` | `https://www.quantrift.live` |
+| API | `CORS_ALLOWED_ORIGINS` | `https://www.quantrift.live,https://quantrift.live` |
+
+Redeploy the web and API projects after saving environment changes, and restart the billing
+worker. `NEXT_PUBLIC_SITE_URL` is used for canonical metadata, social previews, robots, and
+sitemap URLs. `AUTH_PUBLIC_WEB_BASE_URL` controls verification/invitation links and Stripe
+checkout/portal return URLs. Keep `NEXT_PUBLIC_API_BASE_URL` and `WEB_API_PROXY_BASE_URL` pointed
+at the deployed API origin. Local environment examples retain localhost URLs.
+
+For sandbox billing on the production domain, keep `STRIPE_LIVE_MODE=false` and use sandbox
+keys, prices, and portal configurations. Register the snapshot webhook destination directly at
+`https://www.quantrift.live/api/stripe/webhook` and store that destination's signing secret in
+`STRIPE_WEBHOOK_SECRET`. See [the billing runbook](billing.md) for events and worker setup.
+
 ## API Image
 
 Build from the repository root:
@@ -25,7 +48,9 @@ Required production environment:
 ```txt
 APP_ENV=production
 DATABASE_URL=postgresql://...
-CORS_ALLOWED_ORIGINS=https://quantrift.vercel.app
+DIRECT_URL=postgresql://...
+CORS_ALLOWED_ORIGINS=https://www.quantrift.live,https://quantrift.live
+AUTH_PUBLIC_WEB_BASE_URL=https://www.quantrift.live
 AUTH_ENABLED=true
 AUTH_MODE=session
 AUTH_PASSWORD_ENABLED=true
@@ -55,7 +80,7 @@ docker build \
   -f apps/web/Dockerfile \
   --build-arg NEXT_PUBLIC_API_BASE_URL=https://your-api-origin.example \
   --build-arg NEXT_PUBLIC_APP_NAME="QuantRift" \
-  --build-arg NEXT_PUBLIC_SITE_URL=https://quantrift.vercel.app \
+  --build-arg NEXT_PUBLIC_SITE_URL=https://www.quantrift.live \
   --build-arg NEXT_PUBLIC_REPOSITORY_URL=https://github.com/waqasraza123/quantrift \
   -t quantrift-web:latest .
 ```
@@ -73,7 +98,10 @@ The web image:
 Set `NEXT_PUBLIC_AUTH_MODE=session`, `WEB_API_PROXY_BASE_URL` to the API origin, and
 `WEB_AUTH_SESSION_COOKIE` to the chosen HTTP-only cookie name at runtime. Leave
 `WEB_API_PROXY_ADMIN_API_KEY` unset for production user sessions. The API must receive a pooled
-Neon `DATABASE_URL`, and Alembic migrations must finish before either application receives traffic.
+Neon `DATABASE_URL` for runtime traffic. Set `DIRECT_URL` to the direct connection string for the
+same Neon branch and database in the migration environment. Alembic prefers `DIRECT_URL`, falling
+back to `DATABASE_URL` if it is unset or blank. Migrations must finish before either application
+receives traffic.
 
 ## Local Production-Like Stack
 

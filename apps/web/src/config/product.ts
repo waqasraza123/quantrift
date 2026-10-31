@@ -1,7 +1,7 @@
 export const defaultProductName = "QuantRift";
 export const defaultProductDescription =
   "Research trade setups with clear charts, market evidence, and AI reasoning. Scan your watchlist, review conditional paper setups, and keep your decisions in one workspace.";
-export const defaultSiteUrl = "https://quantrift.vercel.app";
+export const defaultSiteUrl = "https://www.quantrift.live";
 export const defaultRepositoryUrl =
   "https://github.com/waqasraza123/quantrift";
 

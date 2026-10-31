@@ -1,5 +1,68 @@
 # Current Session
 
+## Domain and Migration Configuration Publication
+
+- User requested publishing all pending changes to `origin/main`: custom-domain defaults/docs,
+  direct migration URL support, disposable-test DB overrides, and migration/Stripe handoff notes.
+- Reviewed all 15 modified files; no untracked files. Remote `main` matched local `9f4294c`
+  before publication. `git diff --check` passed; no tests, builds, lint, or type checks run.
+- Vercel environment changes, API session-auth correction, worker configuration, and sandbox
+  checkout validation remain separate deployment tasks; no secrets are included in this commit.
+
+## Custom Production Domain
+
+- User confirmed `quantrift.live`; HTTP inspection found a 308 redirect to
+  `https://www.quantrift.live`, with the final pricing page returning 200.
+- Updated product URL and Docker build defaults, README links, deployment/billing guides,
+  and durable canonical URL. Metadata, social URLs, robots, and sitemap share product config.
+- Hosted settings still need application: web `NEXT_PUBLIC_SITE_URL`, API/worker
+  `AUTH_PUBLIC_WEB_BASE_URL` = `https://www.quantrift.live`; API CORS should allow both
+  custom origins. Use `https://www.quantrift.live/api/stripe/webhook` directly in Stripe and
+  its destination signing secret; retain sandbox mode. Redeploy web/API and restart worker.
+- Existing live metadata still points at the old Vercel domain; local changes are not deployed.
+- Live custom-domain `/api/backend/billing/plans` probe returned HTTP 500
+  `FUNCTION_INVOCATION_FAILED`. User-supplied Vercel logs identify Settings validation:
+  billing enabled with auth mode outside session/mixed. Set API Production `AUTH_MODE=session`,
+  `AUTH_ENABLED=true`, `AUTH_PASSWORD_ENABLED=true`, and HTTPS public web origin; redeploy API.
+  Web Production should use `NEXT_PUBLIC_AUTH_MODE=session`; redeploy web if changed.
+- Source review and `git diff --check` only; no tests, builds, lint, type checks, migrations,
+  Stripe resource changes, commit, push, or deployment. Local localhost settings preserved.
+
+## Stripe Integration Next Steps
+
+- Follow-up readiness review reconfirmed local session auth, billing enabled, test-key prefix,
+  sandbox mode, both price IDs, all three portal IDs, webhook secret, and both DB URLs present.
+  Values were not exposed; Stripe resource validity and running processes were not checked.
+- Remaining owner actions: run API/web/billing worker, forward sandbox events using the matching
+  listener signing secret, sign in as a verified workspace owner, and validate checkout,
+  reconciliation, portal upgrades/downgrades/cancellation, payment recovery, credits and seats.
+- Credential-free inspection: local billing is enabled, session auth selected, sandbox mode
+  selected, secret/signing keys and all five catalog/portal IDs present. Presence does not
+  verify Stripe resources. Web return origin is local HTTP.
+- After the completed migration, next start/restart API/web and billing worker, route sandbox
+  webhooks to the running instance, and manually validate checkout plus portal changes.
+  Local Stripe CLI forwarding needs its own signing secret; a dashboard destination's secret
+  applies only to that destination. Live deployment/catalog setup remains separate.
+- No activation, server startup, worker startup, Stripe calls, or tests performed for this handoff.
+
+## Direct and Pooled Database URLs
+
+- Added secret `DIRECT_URL`; Alembic prefers it, falling back to `DATABASE_URL` when unset/blank.
+  Runtime uses pooled `DATABASE_URL`. Test migration fixture overrides/restores both URLs with
+  the disposable test URL, including on migration failure.
+- Updated env example, API/deployment/billing/integration docs and migration script. Use
+  `.venv/bin/python -m alembic` to bypass the relocated venv's stale launcher. Actual `.env`
+  and connection strings were not modified.
+- User explicitly authorized applying migrations after their direct-URL retries timed out.
+  Sandbox attempt failed DNS resolution; approved execution outside the sandbox succeeded.
+- Applied trade suggestions, MFA, and billing revisions from `202610221000_auth_trade_agent_merge`.
+  Upgrade exited 0; read-only `alembic current` confirmed `202611010900_workspace_billing (head)`.
+  No offline SQL, browser editor, or alternate transport was needed. The user's separate
+  terminal timeout cause remains undiagnosed.
+- No tests, builds, lint, type checks, app startup, live Stripe calls, commit, or push run.
+  Billing sandbox flow validation remains owner-run; migration readiness is now satisfied
+  for the configured Neon database.
+
 ## Billing Implementation Publication
 
 - User requested pushing the pending code to `main`, including Stripe portal setup repair and

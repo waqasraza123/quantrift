@@ -423,15 +423,22 @@ Run the development server:
 .venv/bin/uvicorn app.main:app --reload
 ```
 
-Run migrations:
+Set both connection URLs in `apps/api/.env`, using the same Neon branch and database:
 
-```sh
-DATABASE_URL='postgresql://user:password@direct-host/database?sslmode=require' \
-  .venv/bin/alembic upgrade head
+```dotenv
+DATABASE_URL=postgresql://user:password@pooled-host/database?sslmode=require
+DIRECT_URL=postgresql://user:password@direct-host/database?sslmode=require
 ```
 
-Use Neon's direct, non-pooler endpoint for schema migrations. The application can use the pooled
-endpoint during normal runtime.
+The application uses `DATABASE_URL` for runtime traffic. Alembic prefers `DIRECT_URL` for schema
+migrations and falls back to `DATABASE_URL` when `DIRECT_URL` is unset or blank. In Neon's Connect
+dialog, copy the direct URL with connection pooling disabled and the pooled URL with pooling enabled.
+
+From `apps/api`, run migrations:
+
+```sh
+.venv/bin/python -m alembic upgrade head
+```
 
 Run product readiness:
 
@@ -484,7 +491,7 @@ Do not point `TEST_DATABASE_URL` at production data. If `TEST_DATABASE_URL` equa
 Run migrations against a disposable database:
 
 ```sh
-DATABASE_URL=postgresql://user:password@localhost:5432/trading_test .venv/bin/alembic upgrade head
+DIRECT_URL=postgresql://user:password@localhost:5432/trading_test .venv/bin/python -m alembic upgrade head
 ```
 
 Seed deterministic defaults against a disposable database:
